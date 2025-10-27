@@ -7,71 +7,59 @@ import { Review } from '../../models/review.model';
   standalone: true,
   imports: [ReactiveFormsModule],
   template: `
-    <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="bg-gray-50 p-6 rounded-lg mt-6">
-      <h3 class="text-xl font-semibold mb-4">Deixe sua avaliação</h3>
+    <h3 class="text-xl font-semibold mb-4">Leave a Review</h3>
+    <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()">
       <div class="mb-4">
-        <label for="userName" class="block text-gray-700 font-bold mb-2">Seu Nome</label>
-        <input
-          id="userName"
-          type="text"
-          formControlName="userName"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
+        <label for="userName" class="block text-gray-700 font-bold mb-2">Your Name</label>
+        <input type="text" id="userName" formControlName="userName"
+               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         @if (reviewForm.get('userName')?.invalid && reviewForm.get('userName')?.touched) {
-          <p class="text-red-500 text-xs italic mt-1">O nome é obrigatório.</p>
+          <p class="text-red-500 text-xs italic">Name is required.</p>
         }
       </div>
       <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2">Sua Nota</label>
-        <div class="flex space-x-1">
-          @for (star of [1, 2, 3, 4, 5]; track star) {
-            <button
-              type="button"
-              (click)="setRating(star)"
-              class="text-3xl focus:outline-none transition-transform transform hover:scale-125"
-              [class.text-yellow-400]="star <= (reviewForm.get('rating')?.value || 0)"
-              [class.text-gray-300]="star > (reviewForm.get('rating')?.value || 0)"
-            >
-              ★
-            </button>
+        <label class="block text-gray-700 font-bold mb-2">Rating</label>
+        <div class="flex items-center">
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <span class="cursor-pointer" (click)="setRating(i)">
+              <svg class="w-8 h-8" 
+                   [class.text-yellow-400]="i <= (reviewForm.get('rating')?.value ?? 0)" 
+                   [class.text-gray-300]="i > (reviewForm.get('rating')?.value ?? 0)"
+                   fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </span>
           }
         </div>
         @if (reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched) {
-          <p class="text-red-500 text-xs italic mt-1">A nota é obrigatória.</p>
+          <p class="text-red-500 text-xs italic">Rating is required.</p>
         }
       </div>
       <div class="mb-4">
-        <label for="comment" class="block text-gray-700 font-bold mb-2">Comentário</label>
-        <textarea
-          id="comment"
-          formControlName="comment"
-          rows="4"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        ></textarea>
+        <label for="comment" class="block text-gray-700 font-bold mb-2">Comment</label>
+        <textarea id="comment" formControlName="comment" rows="4"
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
         @if (reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched) {
-          <p class="text-red-500 text-xs italic mt-1">O comentário é obrigatório.</p>
+          <p class="text-red-500 text-xs italic">Comment is required.</p>
         }
       </div>
-      <button
-        type="submit"
-        [disabled]="reviewForm.invalid"
-        class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400"
-      >
-        Enviar Avaliação
+      <button type="submit" [disabled]="reviewForm.invalid"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
+        Submit Review
       </button>
     </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewFormComponent {
-  activityId = input.required<number>();
-  reviewSubmit = output<Omit<Review, 'id' | 'date'>>();
-
   private fb = inject(FormBuilder);
+  
+  activityId = input.required<number>();
+  reviewSubmitted = output<Omit<Review, 'id' | 'activityId' | 'date'>>();
 
   reviewForm = this.fb.group({
     userName: ['', Validators.required],
-    rating: [0, [Validators.required, Validators.min(1)]],
+    rating: [null as number | null, [Validators.required, Validators.min(1), Validators.max(5)]],
     comment: ['', Validators.required],
   });
 
@@ -86,16 +74,12 @@ export class ReviewFormComponent {
       return;
     }
     const formValue = this.reviewForm.value;
-    this.reviewSubmit.emit({
-      activityId: this.activityId(),
+    const review = {
       userName: formValue.userName!,
       rating: formValue.rating!,
       comment: formValue.comment!,
-    });
-    this.reviewForm.reset({ rating: 0, userName: '', comment: '' });
-     Object.keys(this.reviewForm.controls).forEach(key => {
-      this.reviewForm.get(key)?.setErrors(null) ;
-      this.reviewForm.get(key)?.markAsUntouched();
-    });
+    };
+    this.reviewSubmitted.emit(review);
+    this.reviewForm.reset();
   }
 }

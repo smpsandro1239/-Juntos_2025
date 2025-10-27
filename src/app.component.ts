@@ -1,44 +1,39 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, Signal } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <header class="bg-white shadow-md sticky top-0 z-10">
+    <header class="bg-white shadow-md">
       <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-        <a routerLink="/" class="text-2xl font-bold text-gray-800">+JUNTOS</a>
-        <div>
-          @if (authService.currentUser()) {
-            <a routerLink="/profile" class="text-gray-800 mx-2 hover:text-teal-500">Perfil</a>
-            <button (click)="logout()" class="text-gray-800 mx-2 hover:text-teal-500">Sair</button>
+        <a routerLink="/" class="text-2xl font-bold text-gray-800">CityExplorer</a>
+        <div class="flex items-center space-x-4">
+          <a routerLink="/" routerLinkActive="text-blue-600" [routerLinkActiveOptions]="{exact: true}" class="text-gray-600 hover:text-blue-600">Discover</a>
+          <a routerLink="/trip-planner" routerLinkActive="text-blue-600" class="text-gray-600 hover:text-blue-600">AI Planner</a>
+          @if (isLoggedIn()) {
+            <a routerLink="/profile" routerLinkActive="text-blue-600" class="text-gray-600 hover:text-blue-600">Profile</a>
+            <button (click)="logout()" class="text-gray-600 hover:text-blue-600">Logout</button>
           } @else {
-            <a routerLink="/login" class="text-gray-800 mx-2 hover:text-teal-500">Login</a>
+            <a routerLink="/login" routerLinkActive="text-blue-600" class="text-gray-600 hover:text-blue-600">Login</a>
           }
         </div>
       </nav>
     </header>
-
-    <main>
+    <main class="container mx-auto p-6 bg-gray-50 min-h-screen">
       <router-outlet></router-outlet>
     </main>
-
-    <footer class="bg-gray-100 mt-8">
-      <div class="container mx-auto px-6 py-4 text-center text-gray-600">
-        <p>&copy; 2024 +JUNTOS. Todos os direitos reservados.</p>
-      </div>
-    </footer>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  authService = inject(AuthService);
-  private router = inject(Router);
-
+  private authService = inject(AuthService);
+  
+  isLoggedIn: Signal<boolean> = this.authService.isLoggedIn;
+  
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/']);
   }
 }

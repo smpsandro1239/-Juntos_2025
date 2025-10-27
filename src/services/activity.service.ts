@@ -2,145 +2,136 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Activity } from '../models/activity.model';
 import { Review } from '../models/review.model';
 
-// Fix: Add mock data for reviews and activities.
-const MOCK_REVIEWS: Review[] = [
-  { id: 1, activityId: 1, userName: 'Ana', rating: 5, comment: 'Incrível! As crianças adoraram.', date: '2024-07-20T10:00:00Z' },
-  { id: 2, activityId: 1, userName: 'Carlos', rating: 4, comment: 'Muito bom, mas um pouco cheio.', date: '2024-07-19T14:30:00Z' },
-  { id: 3, activityId: 2, userName: 'Beatriz', rating: 5, comment: 'Perfeito para um dia de sol. Super recomendo!', date: '2024-07-18T11:00:00Z' },
-  { id: 4, activityId: 3, userName: 'Daniel', rating: 3, comment: 'Achei a comida cara, mas o ambiente é legal.', date: '2024-07-21T19:00:00Z' },
-];
-
 const MOCK_ACTIVITIES: Activity[] = [
-  {
-    id: 1,
-    name: 'Parque de Trampolins',
-    description: 'Um parque gigante com camas elásticas, piscinas de espuma e muita diversão para todas as idades.',
-    category: 'Indoor',
-    price: 50,
-    location: { lat: -23.5505, lng: -46.6333, address: 'Rua da Consolação, 247, São Paulo' },
-    imageUrl: 'https://picsum.photos/seed/trampoline/600/400',
-    rainyDayOk: true,
-    reviews: MOCK_REVIEWS.filter(r => r.activityId === 1),
-    rating: 4.5
-  },
-  {
-    id: 2,
-    name: 'Piquenique no Parque Ibirapuera',
-    description: 'Aproveite um dia de sol com um delicioso piquenique nas áreas verdes do parque mais famoso de São Paulo.',
-    category: 'Ar Livre',
-    price: 0,
-    location: { lat: -23.5885, lng: -46.6586, address: 'Av. Pedro Álvares Cabral, s/n - Vila Mariana, São Paulo' },
-    imageUrl: 'https://picsum.photos/seed/park/600/400',
-    rainyDayOk: false,
-    reviews: MOCK_REVIEWS.filter(r => r.activityId === 2),
-    rating: 5.0
-  },
-  {
-    id: 3,
-    name: 'Feira de Artesanato da Praça da República',
-    description: 'Explore a tradicional feira de artesanato e comidas típicas que acontece todos os domingos.',
-    category: 'Cultural',
-    price: 0,
-    location: { lat: -23.5428, lng: -46.6416, address: 'Praça da República, s/n - República, São Paulo' },
-    imageUrl: 'https://picsum.photos/seed/market/600/400',
-    rainyDayOk: false,
-    reviews: MOCK_REVIEWS.filter(r => r.activityId === 3),
-    rating: 3.0
-  },
-  {
-    id: 4,
-    name: 'Museu Catavento',
-    description: 'Um museu de ciências interativo que fascina crianças e adultos com suas exposições sobre o universo, a vida e a engenharia.',
-    category: 'Indoor',
-    price: 15,
-    location: { lat: -23.5413, lng: -46.6289, address: 'Av. Mercúrio, s/n - Parque Dom Pedro II, São Paulo' },
-    imageUrl: 'https://picsum.photos/seed/museum/600/400',
-    rainyDayOk: true,
-    reviews: [],
-    rating: 4.8
-  },
     {
-    id: 5,
-    name: 'Cinema ao Ar Livre no Parque Villa-Lobos',
-    description: 'Sessões de cinema gratuitas projetadas em uma tela gigante no gramado do parque. Leve sua canga e aproveite!',
-    category: 'Ar Livre',
-    price: 0,
-    location: { lat: -23.5419, lng: -46.7265, address: 'Av. Prof. Fonseca Rodrigues, 2001 - Alto de Pinheiros, São Paulo' },
-    imageUrl: 'https://picsum.photos/seed/cinema/600/400',
-    rainyDayOk: false,
-    reviews: [],
-    rating: 4.9
-  }
+      id: 1,
+      name: 'Explore Central Park',
+      description: 'A beautiful and large urban park with many attractions, including a zoo, a carousel, and plenty of walking paths.',
+      category: 'Outdoor',
+      price: 0,
+      location: { lat: 40.785091, lng: -73.968285, address: 'Central Park, New York, NY' },
+      imageUrl: 'https://picsum.photos/seed/cpark/600/400',
+      rainyDayOk: false,
+      reviews: [
+        { id: 1, activityId: 1, userName: 'Alice', rating: 5, comment: 'Absolutely stunning! So much to see.', date: new Date('2023-10-20').toISOString() },
+        { id: 2, activityId: 1, userName: 'Bob', rating: 4, comment: 'Great for a long walk, but can get crowded.', date: new Date('2023-10-22').toISOString() },
+      ],
+      rating: 4.5
+    },
+    {
+      id: 2,
+      name: 'Metropolitan Museum of Art',
+      description: 'One of the world\'s largest and finest art museums. It contains more than two million works of art.',
+      category: 'Museum',
+      price: 30,
+      location: { lat: 40.779437, lng: -73.963244, address: '1000 5th Ave, New York, NY 10028' },
+      imageUrl: 'https://picsum.photos/seed/met/600/400',
+      rainyDayOk: true,
+      reviews: [
+        { id: 3, activityId: 2, userName: 'Charlie', rating: 5, comment: 'Could spend days here. The Egyptian exhibit is incredible.', date: new Date('2023-11-05').toISOString() },
+      ],
+      rating: 5
+    },
+    {
+      id: 3,
+      name: 'Walk the Brooklyn Bridge',
+      description: 'A hybrid cable-stayed/suspension bridge in New York City, spanning the East River between Manhattan and Brooklyn.',
+      category: 'Outdoor',
+      price: 0,
+      location: { lat: 40.706051, lng: -73.996864, address: 'Brooklyn Bridge, New York, NY 10038' },
+      imageUrl: 'https://picsum.photos/seed/bbridge/600/400',
+      rainyDayOk: false,
+      reviews: [
+         { id: 4, activityId: 3, userName: 'Diana', rating: 4, comment: 'Iconic views, but very windy!', date: new Date('2023-11-10').toISOString() },
+         { id: 5, activityId: 3, userName: 'Eve', rating: 5, comment: 'Best to go early in the morning to avoid crowds.', date: new Date('2023-11-12').toISOString() }
+      ],
+      rating: 4.5
+    },
+    {
+      id: 4,
+      name: 'Intrepid Sea, Air & Space Museum',
+      description: 'An American military and maritime history museum with a collection of museum ships.',
+      category: 'Museum',
+      price: 33,
+      location: { lat: 40.764528, lng: -73.999645, address: 'Pier 86, W 46th St, New York, NY 10036' },
+      imageUrl: 'https://picsum.photos/seed/intrepid/600/400',
+      rainyDayOk: true,
+      reviews: [],
+      rating: 0
+    },
+    {
+      id: 5,
+      name: 'Katz\'s Delicatessen',
+      description: 'A kosher-style delicatessen known for its pastrami on rye, which is considered among New York\'s best.',
+      category: 'Food',
+      price: 25, // Average meal cost
+      location: { lat: 40.722237, lng: -73.987373, address: '205 E Houston St, New York, NY 10002' },
+      imageUrl: 'https://picsum.photos/seed/katz/600/400',
+      rainyDayOk: true,
+      reviews: [
+        { id: 6, activityId: 5, userName: 'Frank', rating: 5, comment: 'The pastrami sandwich is life-changing.', date: new Date('2023-09-15').toISOString() }
+      ],
+      rating: 5
+    }
 ];
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActivityService {
   private activities = signal<Activity[]>(MOCK_ACTIVITIES);
+  allActivities = this.activities.asReadonly();
 
   selectedCategory = signal<string | null>(null);
   showOnlyFree = signal<boolean>(false);
   showRainyDayOk = signal<boolean>(false);
 
   uniqueCategories = computed(() => {
-    const allActivities = this.activities();
-    const categories = allActivities.map(a => a.category);
-    return [...new Set(categories)];
+    const allCategories = this.allActivities().map(a => a.category);
+    return [...new Set(allCategories)];
   });
 
   filteredActivities = computed(() => {
-    const allActivities = this.activities();
-    const category = this.selectedCategory();
-    const freeOnly = this.showOnlyFree();
-    const rainy = this.showRainyDayOk();
-
-    return allActivities.filter(activity => {
-      const categoryMatch = !category || activity.category === category;
-      const priceMatch = !freeOnly || activity.price === 0;
-      const rainyMatch = !rainy || activity.rainyDayOk;
-      return categoryMatch && priceMatch && rainyMatch;
-    });
+    return this.allActivities()
+      .filter(activity => !this.selectedCategory() || activity.category === this.selectedCategory())
+      .filter(activity => !this.showOnlyFree() || activity.price === 0)
+      .filter(activity => !this.showRainyDayOk() || activity.rainyDayOk);
   });
   
-  getActivityById(id: number) {
-      return computed(() => this.activities().find(a => a.id === id));
-  }
-
-  addReview(review: Omit<Review, 'id' | 'date'>): void {
-      this.activities.update(activities => {
-          const activityIndex = activities.findIndex(a => a.id === review.activityId);
-          if (activityIndex === -1) return activities;
-
-          const newReview: Review = {
-              ...review,
-              id: Date.now(),
-              date: new Date().toISOString()
-          };
-
-          const updatedActivities = [...activities];
-          const activityToUpdate = { ...updatedActivities[activityIndex] };
-          activityToUpdate.reviews = [...activityToUpdate.reviews, newReview];
-          
-          // Recalculate average rating
-          const totalRating = activityToUpdate.reviews.reduce((sum, r) => sum + r.rating, 0);
-          activityToUpdate.rating = totalRating / activityToUpdate.reviews.length;
-
-          updatedActivities[activityIndex] = activityToUpdate;
-          return updatedActivities;
-      });
-  }
-
   setCategoryFilter(category: string | null): void {
     this.selectedCategory.set(category);
   }
-
-  toggleFreeFilter(): void {
+  
+  toggleShowOnlyFree(): void {
     this.showOnlyFree.update(value => !value);
   }
 
-  toggleRainyDayFilter(): void {
+  toggleShowRainyDayOk(): void {
     this.showRainyDayOk.update(value => !value);
+  }
+
+  addReview(activityId: number, review: Omit<Review, 'id' | 'activityId' | 'date'>): void {
+    this.activities.update(activities => {
+      const activityIndex = activities.findIndex(a => a.id === activityId);
+      if (activityIndex === -1) return activities;
+
+      const newReview: Review = {
+        ...review,
+        id: Date.now(),
+        activityId: activityId,
+        date: new Date().toISOString(),
+      };
+      
+      const updatedActivity = { ...activities[activityIndex] };
+      updatedActivity.reviews = [...updatedActivity.reviews, newReview];
+      
+      const totalRating = updatedActivity.reviews.reduce((sum, r) => sum + r.rating, 0);
+      updatedActivity.rating = totalRating / updatedActivity.reviews.length;
+
+      const newActivities = [...activities];
+      newActivities[activityIndex] = updatedActivity;
+      
+      return newActivities;
+    });
   }
 }
