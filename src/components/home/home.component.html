@@ -1,24 +1,38 @@
-<div class="container mx-auto p-4 sm:p-6 lg:p-8">
-  <app-filters></app-filters>
+<div class="space-y-8">
+  <section>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Próximos Eventos</h2>
+    <app-event-carousel></app-event-carousel>
+  </section>
 
-  <div class="my-6 flex justify-center items-center gap-2 rounded-full bg-slate-200 p-1 w-fit mx-auto sticky top-[88px] z-10 backdrop-blur-sm bg-slate-200/70">
-    <button (click)="viewMode.set('list')" 
-            class="px-6 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
-            [class]="viewMode() === 'list' ? 'bg-white text-teal-600 shadow' : 'text-slate-500 hover:bg-slate-300/50'">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
-      Lista
-    </button>
-    <button (click)="viewMode.set('map')"
-            class="px-6 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
-            [class]="viewMode() === 'map' ? 'bg-white text-teal-600 shadow' : 'text-slate-500 hover:bg-slate-300/50'">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clip-rule="evenodd" /></svg>
-      Mapa
-    </button>
-  </div>
-
-  @if (viewMode() === 'list') {
-    <app-discover-feed></app-discover-feed>
-  } @else {
-    <app-map-view></app-map-view>
-  }
+  <section>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Descobrir Atividades</h2>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex justify-center border border-gray-300 rounded-full p-1 bg-gray-100">
+        <button
+          (click)="setViewMode('list')"
+          class="px-4 py-1.5 text-sm font-semibold rounded-full transition-colors duration-200"
+          [class]="viewMode() === 'list' ? 'bg-white text-teal-600 shadow' : 'text-gray-600 hover:text-gray-800'"
+        >
+          Lista
+        </button>
+        <button
+          (click)="setViewMode('map')"
+          class="px-4 py-1.5 text-sm font-semibold rounded-full transition-colors duration-200"
+          [class]="viewMode() === 'map' ? 'bg-white text-teal-600 shadow' : 'text-gray-600 hover:text-gray-800'"
+        >
+          Mapa
+        </button>
+      </div>
+    </div>
+    
+    <app-filters></app-filters>
+    
+    <div class="mt-6">
+      @if (viewMode() === 'list') {
+        <app-discover-feed></app-discover-feed>
+      } @else {
+        <app-map-view></app-map-view>
+      }
+    </div>
+  </section>
 </div>
