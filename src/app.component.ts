@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <header class="bg-white shadow-md sticky top-0 z-40">
       <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-        <a routerLink="/" class="text-2xl font-bold text-teal-600">Miúdos a Bordo</a>
+        <a routerLink="/" class="text-2xl font-bold text-teal-600">+JUNTOS</a>
         <div class="flex items-center space-x-4">
           <a routerLink="/" routerLinkActive="text-teal-600" [routerLinkActiveOptions]="{exact: true}" class="text-gray-600 hover:text-teal-500">{{ 'navHome' | l10n }}</a>
           <a routerLink="/suppliers" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-500">{{ 'navSuppliers' | l10n }}</a>
@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
 
     <footer class="bg-gray-800 text-white p-6 mt-12">
       <div class="container mx-auto text-center">
-        <p>&copy; 2024 Miúdos a Bordo. Todos os direitos reservados.</p>
+        <p>&copy; 2024 +JUNTOS. {{ 'footerRights' | l10n }}</p>
       </div>
     </footer>
   `,

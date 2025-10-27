@@ -98,9 +98,10 @@ export class TripPlannerComponent {
     User request: "${this.prompt()}"`;
 
     try {
+      // FIX: The `contents` property for a single-turn text prompt should be a simple string.
       const response = await this.ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: [{role: 'user', parts: [{text: fullPrompt}]}]
+        contents: fullPrompt
       });
       this.itinerary.set(response.text);
     } catch (e: any) {

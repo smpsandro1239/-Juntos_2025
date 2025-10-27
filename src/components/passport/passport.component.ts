@@ -1,40 +1,40 @@
 import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ActivityService } from '../../services/activity.service';
 import { Activity } from '../../models/activity.model';
-import { RouterLink } from '@angular/router';
-import { NgOptimizedImage } from '@angular/common';
 import { L10nPipe } from '../../pipes/l10n.pipe';
+import { StarRatingComponent } from '../star-rating/star-rating.component';
 
 @Component({
   selector: 'app-passport',
   standalone: true,
-  imports: [RouterLink, NgOptimizedImage, L10nPipe],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, L10nPipe, StarRatingComponent],
   template: `
     <div class="bg-white p-8 rounded-lg shadow-lg">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ 'passportTitle' | l10n }}</h1>
-        <p class="text-gray-600 mb-8">{{ 'passportDescription' | l10n }}</p>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ 'passportTitle' | l10n }}</h1>
+      <p class="text-gray-600 mb-8">{{ 'passportDescription' | l10n }}</p>
 
-        @if(visitedActivities().length > 0) {
-            <div class="border-t pt-6">
-                <h2 class="text-2xl font-semibold mb-4">{{ 'visitedActivities' | l10n }} ({{ visitedActivities().length }})</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    @for (activity of visitedActivities(); track activity.id) {
-                        <a [routerLink]="['/activity', activity.id]" class="group block">
-                            <div class="relative">
-                                <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="300" height="200" class="w-full h-40 object-cover rounded-lg shadow-sm">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg"></div>
-                                <h3 class="absolute bottom-2 left-3 text-white font-bold text-lg">{{ activity.name }}</h3>
-                            </div>
-                        </a>
-                    }
-                </div>
+      <h2 class="text-2xl font-semibold mb-4">{{ 'visitedActivities' | l10n }} ({{ visitedActivities().length }})</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (activity of visitedActivities(); track activity.id) {
+          <a [routerLink]="['/activity', activity.id]" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border">
+            <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="400" height="300" class="w-full h-48 object-cover">
+            <div class="p-4">
+              <h3 class="font-bold text-lg text-gray-800 truncate">{{ activity.name }}</h3>
+              <div class="flex justify-between items-center mt-2">
+                <app-star-rating [rating]="activity.rating" />
+              </div>
             </div>
-        } @else {
-            <div class="text-center py-12 border-2 border-dashed rounded-lg">
+          </a>
+        } @empty {
+            <div class="sm:col-span-2 lg:col-span-3 text-center py-12 bg-gray-50 rounded-lg">
                 <p class="text-gray-500">{{ 'noVisitedActivities' | l10n }}</p>
             </div>
         }
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,15 +42,12 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
 export class PassportComponent {
     private authService = inject(AuthService);
     private activityService = inject(ActivityService);
-
-    user = this.authService.currentUser;
-    allActivities = this.activityService.allActivities;
-
+    
     visitedActivities = computed(() => {
-        const visitedIds = this.user()?.visitedActivityIds || [];
-        if(visitedIds.length === 0) return [];
+        const user = this.authService.currentUser();
+        if (!user) return [];
         
-        const visitedIdSet = new Set(visitedIds);
-        return this.allActivities().filter(activity => visitedIdSet.has(activity.id));
+        const allActivities = this.activityService.allActivities();
+        return allActivities.filter(activity => user.visitedActivityIds.includes(activity.id));
     });
 }

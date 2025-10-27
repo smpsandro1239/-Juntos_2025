@@ -21,7 +21,7 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
   template: `
     <section class="text-center mb-12">
       <h1 class="text-4xl font-bold text-gray-800 mb-2">{{ 'homeTitle' | l10n }}</h1>
-      <p class="text-gray-600">As melhores atividades e eventos para crianças em Lisboa e arredores.</p>
+      <p class="text-gray-600">{{ 'homeSubtitle' | l10n }}</p>
     </section>
 
     <section class="mb-12">

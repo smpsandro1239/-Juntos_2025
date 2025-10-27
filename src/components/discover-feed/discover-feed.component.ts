@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { CommonModule, NgOptimizedImage, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Activity } from '../../models/activity.model';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
 import { L10nPipe } from '../../pipes/l10n.pipe';
@@ -12,24 +12,21 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
   template: `
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (activity of activities(); track activity.id) {
-        <div [routerLink]="['/activity', activity.id]" class="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
-          <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="400" height="300" class="w-full h-48 object-cover" priority>
+        <a [routerLink]="['/activity', activity.id]" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="400" height="300" class="w-full h-48 object-cover">
           <div class="p-4">
-            <span class="inline-block bg-teal-100 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">{{ activity.category }}</span>
-            <h3 class="font-bold text-xl mt-2 mb-1">{{ activity.name }}</h3>
-            <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500">{{ activity.category }}</p>
+            <h3 class="font-bold text-lg text-gray-800 truncate">{{ activity.name }}</h3>
+            <div class="flex justify-between items-center mt-2">
               <app-star-rating [rating]="activity.rating" />
-              @if(activity.price > 0) {
-                 <p class="text-lg font-semibold text-gray-800">{{ activity.price | number:'1.2-2' }}€</p>
-              } @else {
-                 <p class="text-lg font-semibold text-green-600">{{ 'free' | l10n }}</p>
-              }
+              <span class="font-semibold text-teal-600">{{ activity.price > 0 ? (activity.price | currency:'EUR') : ('free' | l10n) }}</span>
             </div>
           </div>
+        </a>
+      } @empty {
+        <div class="sm:col-span-2 lg:col-span-3 text-center py-12">
+            <p class="text-gray-500">{{ 'noResults' | l10n }}</p>
         </div>
-      }
-      @if (activities().length === 0) {
-        <p class="text-gray-600 col-span-full text-center">{{ 'noResults' | l10n }}</p>
       }
     </div>
   `,

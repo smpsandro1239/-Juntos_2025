@@ -6,7 +6,8 @@ export const pt = {
     navProfile: 'Perfil',
     navLogout: 'Sair',
     navLogin: 'Entrar',
-    homeTitle: 'Miúdos a Bordo',
+    homeTitle: '+JUNTOS',
+    homeSubtitle: 'Descubra tudo o que pode fazer com a família, onde quer que esteja.',
     upcomingEvents: 'Próximos Eventos',
     filtersTitle: 'Filtros',
     searchPlaceholder: 'Pesquisar atividades...',
@@ -117,4 +118,6 @@ export const pt = {
     pharmacies: 'Farmácias',
     police: 'Polícia',
     contactSupplier: 'Contactar Fornecedor',
+    noLocationsMap: 'Nenhum local para mostrar no mapa.',
+    footerRights: 'Todos os direitos reservados.',
 };

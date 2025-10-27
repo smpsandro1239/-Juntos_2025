@@ -6,7 +6,8 @@ export const en = {
     navProfile: 'Profile',
     navLogout: 'Logout',
     navLogin: 'Login',
-    homeTitle: 'Kids on Board',
+    homeTitle: '+JUNTOS',
+    homeSubtitle: 'Discover everything you can do with your family, wherever you are.',
     upcomingEvents: 'Upcoming Events',
     filtersTitle: 'Filters',
     searchPlaceholder: 'Search activities...',
@@ -117,4 +118,6 @@ export const en = {
     pharmacies: 'Pharmacies',
     police: 'Police',
     contactSupplier: 'Contact Supplier',
+    noLocationsMap: 'No locations to show on the map.',
+    footerRights: 'All rights reserved.',
 };
