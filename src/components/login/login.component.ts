@@ -53,6 +53,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   errorMessage = signal<string | null>(null);
 
@@ -67,7 +68,9 @@ export class LoginComponent {
     }
     const { email, password } = this.loginForm.value;
     const success = this.authService.login(email!, password!);
-    if (!success) {
+    if (success) {
+      this.router.navigate(['/profile']);
+    } else {
       this.errorMessage.set('Email ou palavra-passe inválidos.');
     }
   }
