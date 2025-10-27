@@ -1,65 +1,94 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { User } from '../models/user.model';
+import { Album, AlbumPhoto } from '../models/album.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly MOCK_USER: User = { id: 1, name: 'Utilizador Teste', email: 'user@example.com', isPremium: false, visitedActivityIds: [2, 5] };
-  
-  private currentUserSignal = signal<User | null>(this.getStoredUser());
-  
-  constructor() {
-    effect(() => {
-        const user = this.currentUserSignal();
-        if (typeof window !== 'undefined' && window.localStorage) {
-            if (user) {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-            } else {
-                localStorage.removeItem('currentUser');
-            }
-        }
-    });
-  }
+  private users: User[] = [
+    { id: 1, name: 'Família Aventura', email: 'user@example.com', isPremium: false, visitedActivityIds: [1, 3] },
+  ];
 
-  private getStoredUser(): User | null {
-    if (typeof window !== 'undefined' && window.localStorage) {
-        const storedUser = localStorage.getItem('currentUser');
-        return storedUser ? JSON.parse(storedUser) : null;
-    }
-    return null;
-  }
+  private albums = signal<Album[]>([
+    { id: 1, name: 'Verão em Lisboa', photos: [
+        { imageUrl: 'https://picsum.photos/seed/oceanario/400/300', activityName: 'Oceanário de Lisboa' }
+    ]},
+    { id: 2, name: 'Fim de Semana Radical', photos: []}
+  ]);
 
-  currentUser = this.currentUserSignal.asReadonly();
-  isLoggedIn = computed(() => !!this.currentUser());
+  private loggedInUser = signal<User | null>(null);
+
+  currentUser = this.loggedInUser.asReadonly();
+  isLoggedIn = computed(() => !!this.loggedInUser());
+  userAlbums = this.albums.asReadonly();
 
   login(email: string, password: string): boolean {
-    if (email === 'user@example.com' && password === 'password') {
-      this.currentUserSignal.set(this.MOCK_USER);
+    const user = this.users.find(u => u.email === email && password === 'password');
+    if (user) {
+      // Create a copy to avoid mutating the original user object
+      this.loggedInUser.set({...user});
       return true;
     }
     return false;
   }
 
   logout(): void {
-    this.currentUserSignal.set(null);
+    this.loggedInUser.set(null);
   }
-  
+
   upgradeToPremium(): void {
-    this.currentUserSignal.update(user => {
+    this.loggedInUser.update(user => {
       if (user) {
         return { ...user, isPremium: true };
       }
-      return null;
+      return user;
+    });
+     // Also update the "database"
+    const userInDb = this.users.find(u => u.id === this.loggedInUser()?.id);
+    if(userInDb) {
+      userInDb.isPremium = true;
+    }
+  }
+
+  markAsVisited(activityId: number): void {
+     this.loggedInUser.update(user => {
+      if (user && !user.visitedActivityIds.includes(activityId)) {
+        const updatedIds = [...user.visitedActivityIds, activityId];
+        
+        // Also update the "database"
+        const userInDb = this.users.find(u => u.id === user.id);
+        if(userInDb) {
+            userInDb.visitedActivityIds = updatedIds;
+        }
+
+        return { ...user, visitedActivityIds: updatedIds };
+      }
+      return user;
     });
   }
 
-  markActivityAsVisited(activityId: number): void {
-    this.currentUserSignal.update(user => {
-      if (user && !user.visitedActivityIds.includes(activityId)) {
-        return { ...user, visitedActivityIds: [...user.visitedActivityIds, activityId] };
+  getAlbumById(id: number): Album | undefined {
+    return this.albums().find(a => a.id === id);
+  }
+
+  addAlbum(name: string): void {
+    const newAlbum: Album = {
+      id: Date.now(),
+      name,
+      photos: []
+    };
+    this.albums.update(albums => [...albums, newAlbum]);
+  }
+
+  addPhotoToAlbum(albumId: number, photo: AlbumPhoto): void {
+    this.albums.update(albums => {
+      const albumIndex = albums.findIndex(a => a.id === albumId);
+      if (albumIndex > -1) {
+        const updatedAlbum = { ...albums[albumIndex], photos: [...albums[albumIndex].photos, photo] };
+        return albums.map(a => a.id === albumId ? updatedAlbum : a);
       }
-      return user;
+      return albums;
     });
   }
 }

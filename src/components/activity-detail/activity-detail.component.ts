@@ -1,7 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit, WritableSignal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
-
 import { ActivityService } from '../../services/activity.service';
 import { AuthService } from '../../services/auth.service';
 import { Activity } from '../../models/activity.model';
@@ -9,127 +7,123 @@ import { Review } from '../../models/review.model';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
 import { ReviewFormComponent } from '../review-form/review-form.component';
 import { PhotoUploadFormComponent } from '../photo-upload-form/photo-upload-form.component';
-import { User } from '../../models/user.model';
+import { AddToAlbumModalComponent } from '../add-to-album-modal/add-to-album-modal.component';
 
 @Component({
   selector: 'app-activity-detail',
   standalone: true,
-  imports: [AsyncPipe, RouterLink, StarRatingComponent, ReviewFormComponent, PhotoUploadFormComponent],
+  imports: [RouterLink, StarRatingComponent, ReviewFormComponent, PhotoUploadFormComponent, AddToAlbumModalComponent],
   template: `
-    @if (activity()) {
+    @if (activity(); as act) {
       <div class="max-w-4xl mx-auto">
+        <a routerLink="/" class="inline-flex items-center text-teal-600 hover:underline mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+            Voltar a Descobrir
+        </a>
+
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
-          <img [src]="activity()?.imageUrl" [alt]="activity()?.name" class="w-full h-64 object-cover">
+          <img [src]="act.imageUrl" [alt]="act.name" class="w-full h-64 object-cover">
           <div class="p-6">
-            <h1 class="text-3xl font-bold mb-2">{{ activity()?.name }}</h1>
+            <span class="text-sm font-semibold text-teal-600">{{ act.category }}</span>
+            <h1 class="text-3xl font-bold mt-1 mb-2">{{ act.name }}</h1>
             <div class="flex justify-between items-start mb-4">
-              <span class="bg-teal-100 text-teal-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">{{ activity()?.category }}</span>
-              <div class="text-right">
-                <app-star-rating [rating]="activity()!.rating" [showRatingValue]="true" />
-                <span class="text-sm text-gray-500">({{ activity()!.reviews?.length || 0 }} avaliações)</span>
-              </div>
+                <app-star-rating [rating]="act.rating" [showRatingValue]="true" />
+                <span class="text-lg font-bold text-gray-800">{{ act.price > 0 ? act.price + '€' : 'Grátis' }}</span>
             </div>
             
-            <p class="text-gray-700 mb-4">{{ activity()?.description }}</p>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600 mb-6">
-              <div class="flex items-center">
-                <svg class="w-6 h-6 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span>{{ activity()?.location.address }}</span>
-              </div>
-              <div class="flex items-center">
-                <svg class="w-6 h-6 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg>
-                <span class="font-bold text-lg">{{ activity()!.price > 0 ? activity()!.price + '€' : 'Grátis' }}</span>
-              </div>
-              @if(activity()?.suitableForRainyDays) {
-                <div class="flex items-center">
-                  <svg class="w-6 h-6 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                  <span>Adequado para dias de chuva</span>
-                </div>
-              }
+            <p class="text-gray-700 mb-6">{{ act.description }}</p>
+
+            <div class="flex flex-wrap gap-4 items-center border-t pt-4">
+                @if (isLoggedIn()) {
+                    <button (click)="markAsVisited()" [disabled]="hasVisited()"
+                        class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded disabled:bg-green-700 disabled:cursor-not-allowed">
+                        {{ hasVisited() ? '✅ Visitado' : 'Marcar como Visitado' }}
+                    </button>
+                     <button (click)="showReviewForm.set(!showReviewForm())"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">
+                        {{ showReviewForm() ? 'Cancelar Avaliação' : 'Deixar Avaliação' }}
+                    </button>
+                    <button (click)="showPhotoUploadForm.set(!showPhotoUploadForm())"
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">
+                        {{ showPhotoUploadForm() ? 'Cancelar Foto' : 'Adicionar Foto' }}
+                    </button>
+                } @else {
+                    <p class="text-gray-600">
+                        <a routerLink="/login" class="text-teal-600 font-bold hover:underline">Entre</a> para marcar como visitado, avaliar ou adicionar fotos.
+                    </p>
+                }
             </div>
-
-             @if (isLoggedIn()) {
-              <div class="mt-4 border-t pt-4">
-                <button (click)="markAsVisited()" [disabled]="isVisited()"
-                        class="w-full text-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300"
-                        [class]="isVisited() ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-700 text-white'">
-                  @if (isVisited()) {
-                    <span>Visitado!</span>
-                  } @else {
-                    <span>Marcar como Visitado</span>
-                  }
-                </button>
-              </div>
-            }
-
           </div>
         </div>
 
-        <!-- Community Gallery Section -->
+        <!-- Forms -->
         <div class="mt-8">
-            <h2 class="text-2xl font-bold mb-4">Galeria da Comunidade</h2>
-            @if(activity()?.userImages && activity()!.userImages!.length > 0) {
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  @for(image of activity()!.userImages; track image.id) {
-                      <div class="relative group">
-                          <img [src]="image.imageUrl" [alt]="'Foto de ' + image.userName" class="w-full h-40 object-cover rounded-lg shadow-md">
-                          <div class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-tr-lg rounded-bl-lg">
-                              {{ image.userName }}
-                          </div>
-                      </div>
-                  }
-              </div>
-            } @else {
-              <p class="text-gray-500">Nenhuma foto da comunidade ainda. Partilhe a sua!</p>
-            }
-
-            @if (isLoggedIn()) {
-              <div class="mt-6">
-                @if(showUploadForm()) {
-                   <app-photo-upload-form (imageSubmit)="onImageSubmit($event)" (cancel)="showUploadForm.set(false)" />
-                } @else {
-                   <button (click)="showUploadForm.set(true)" class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded">
-                        Adicionar Foto
-                   </button>
-                }
-              </div>
-            }
+          @if (showReviewForm()) {
+            <app-review-form [activityId]="act.id" (reviewSubmit)="addReview($event)" />
+          }
+          @if (showPhotoUploadForm()) {
+            <app-photo-upload-form (imageSubmit)="addUserImage($event)" (cancel)="showPhotoUploadForm.set(false)" />
+          }
         </div>
 
-        <!-- Reviews Section -->
-        <div class="mt-8">
-            <h2 class="text-2xl font-bold mb-4">Avaliações</h2>
-            @if (isLoggedIn()) {
-              <app-review-form [activityId]="activity()!.id" (reviewSubmit)="onReviewSubmit($event)"/>
-            } @else {
-              <div class="bg-gray-100 p-4 rounded-lg text-center">
-                <p> <a routerLink="/login" class="text-teal-600 hover:underline font-semibold">Inicie sessão</a> para deixar a sua avaliação. </p>
-              </div>
-            }
-            
-            <div class="mt-6 space-y-4">
-              @if (reviews().length > 0) {
-                @for (review of reviews(); track review.id) {
-                  <div class="bg-white p-4 rounded-lg shadow">
-                      <div class="flex justify-between items-center mb-2">
-                          <span class="font-bold">{{ review.userName }}</span>
-                          <app-star-rating [rating]="review.rating" />
-                      </div>
-                      <p class="text-gray-600">{{ review.comment }}</p>
-                      <p class="text-xs text-gray-400 text-right mt-2">{{ formatDate(review.date) }}</p>
+        <!-- User Photos -->
+        @if (act.userImages && act.userImages.length > 0) {
+          <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Galeria dos Visitantes</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              @for (image of act.userImages; track image.id) {
+                <div class="relative group">
+                  <img [src]="image.imageUrl" [alt]="'Foto de ' + image.userName" class="rounded-lg object-cover w-full h-40">
+                  <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex flex-col justify-between p-2 text-white">
+                     <p class="text-sm opacity-0 group-hover:opacity-100 transition-opacity">por {{ image.userName }}</p>
+                     @if (isLoggedIn()) {
+                        <button (click)="openAddToAlbumModal(image.imageUrl)"
+                            class="text-xs bg-white text-black rounded-full px-2 py-1 self-end opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-200">
+                            + Álbum
+                        </button>
+                     }
                   </div>
-                }
-              } @else {
-                  <p class="text-gray-500">Ainda não existem avaliações. Seja o primeiro a avaliar!</p>
+                </div>
               }
             </div>
+          </div>
+        }
+
+        <!-- Reviews -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Avaliações ({{ act.reviews?.length || 0 }})</h2>
+            @if (act.reviews && act.reviews.length > 0) {
+                <div class="space-y-6">
+                    @for (review of act.reviews; track review.id) {
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-bold">{{ review.userName }}</p>
+                                    <p class="text-sm text-gray-500">{{ formatDate(review.date) }}</p>
+                                </div>
+                                <app-star-rating [rating]="review.rating" />
+                            </div>
+                            <p class="mt-2 text-gray-700">{{ review.comment }}</p>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <p class="text-gray-600">Ainda não existem avaliações. Seja o primeiro a avaliar!</p>
+            }
         </div>
       </div>
     } @else {
       <div class="text-center py-12">
         <p class="text-gray-500 text-lg">Atividade não encontrada.</p>
       </div>
+    }
+
+    @if (showAlbumModal() && selectedImageUrlForAlbum()) {
+      <app-add-to-album-modal 
+        [imageUrl]="selectedImageUrlForAlbum()!"
+        [activityName]="activity()!.name"
+        (close)="showAlbumModal.set(false)"
+        (addPhoto)="onAddPhotoToAlbum($event)" />
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -139,18 +133,20 @@ export class ActivityDetailComponent implements OnInit {
   private activityService = inject(ActivityService);
   private authService = inject(AuthService);
 
-  activity: WritableSignal<Activity | null> = signal(null);
-  reviews: WritableSignal<Review[]> = signal([]);
+  activity = signal<Activity | null>(null);
+  showReviewForm = signal(false);
+  showPhotoUploadForm = signal(false);
+  showAlbumModal = signal(false);
+  selectedImageUrlForAlbum = signal<string | null>(null);
+
   isLoggedIn = this.authService.isLoggedIn;
   currentUser = this.authService.currentUser;
   
-  showUploadForm = signal(false);
-
-  isVisited = computed(() => {
+  hasVisited = computed(() => {
     const user = this.currentUser();
-    const currentActivity = this.activity();
-    if (!user || !currentActivity) return false;
-    return user.visitedActivityIds.includes(currentActivity.id);
+    const act = this.activity();
+    if (!user || !act) return false;
+    return user.visitedActivityIds.includes(act.id);
   });
 
   ngOnInit(): void {
@@ -158,40 +154,47 @@ export class ActivityDetailComponent implements OnInit {
     if (idParam) {
       const id = +idParam;
       const foundActivity = this.activityService.getActivityById(id);
-      if (foundActivity) {
-        this.activity.set(foundActivity);
-        this.reviews.set(this.activityService.getReviewsForActivity(id));
-      }
+      this.activity.set(foundActivity ?? null);
     }
   }
 
-  onReviewSubmit(review: Omit<Review, 'id'>): void {
+  addReview(review: Omit<Review, 'id'>) {
     this.activityService.addReview(review);
-    // Refresh data
-    const activityId = this.activity()!.id;
-    this.activity.set(this.activityService.getActivityById(activityId) ?? null);
-    this.reviews.set(this.activityService.getReviewsForActivity(activityId));
+    // The filteredActivities computed signal will update automatically, refreshing the data
+    this.showReviewForm.set(false);
   }
   
-  onImageSubmit(imageData: { imageUrl: string }): void {
-    const user = this.currentUser();
-    if (user && this.activity()) {
-        this.activityService.addUserImage(this.activity()!.id, imageData.imageUrl, user.name);
-        this.activity.set(this.activityService.getActivityById(this.activity()!.id) ?? null);
-        this.showUploadForm.set(false);
+  addUserImage({imageUrl}: {imageUrl: string}) {
+    const activityId = this.activity()?.id;
+    const userName = this.currentUser()?.name;
+    if (activityId && userName) {
+        this.activityService.addUserImage(activityId, imageUrl, userName);
+        this.showPhotoUploadForm.set(false);
     }
   }
 
-  markAsVisited(): void {
-    const currentActivity = this.activity();
-    if (currentActivity && !this.isVisited()) {
-      this.authService.markActivityAsVisited(currentActivity.id);
-    }
+  markAsVisited() {
+      const activityId = this.activity()?.id;
+      if (activityId) {
+          this.authService.markAsVisited(activityId);
+      }
+  }
+  
+  openAddToAlbumModal(imageUrl: string) {
+    this.selectedImageUrlForAlbum.set(imageUrl);
+    this.showAlbumModal.set(true);
   }
 
+  onAddPhotoToAlbum(event: { albumId: number; photoUrl: string; activityName: string }) {
+     this.authService.addPhotoToAlbum(event.albumId, { imageUrl: event.photoUrl, activityName: event.activityName });
+     this.showAlbumModal.set(false);
+  }
+  
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('pt-PT', {
-        year: 'numeric', month: 'long', day: 'numeric'
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
   }
 }
