@@ -1,41 +1,44 @@
-import { Component, ChangeDetectionStrategy, inject, Signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { CommonModule, NgOptimizedImage, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ActivityService } from '../../services/activity.service';
 import { Activity } from '../../models/activity.model';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
+import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-discover-feed',
   standalone: true,
-  imports: [RouterLink, StarRatingComponent],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, StarRatingComponent, L10nPipe, CurrencyPipe],
   template: `
-    @if (activities().length > 0) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (activity of activities(); track activity.id) {
-          <div [routerLink]="['/activity', activity.id]" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer">
-            <img [src]="activity.imageUrl" [alt]="activity.name" class="w-full h-48 object-cover">
-            <div class="p-4">
-              <h3 class="text-xl font-semibold mb-2">{{ activity.name }}</h3>
-              <p class="text-gray-600 mb-2">{{ activity.category }}</p>
-              <div class="flex justify-between items-center">
-                <app-star-rating [rating]="activity.rating" [showRatingValue]="true" />
-                <span class="text-lg font-bold text-gray-800">
-                  {{ activity.price > 0 ? activity.price + '€' : 'Grátis' }}
-                </span>
-              </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (activity of activities(); track activity.id) {
+        <div [routerLink]="['/activity', activity.id]" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col">
+          <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="400" height="300" class="w-full h-48 object-cover">
+          <div class="p-4 flex flex-col flex-grow">
+            <span class="inline-block bg-teal-200 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">{{ activity.category }}</span>
+            <h3 class="mt-2 font-bold text-xl text-gray-800">{{ activity.name }}</h3>
+            <div class="flex items-center mt-2">
+              <app-star-rating [rating]="activity.rating" />
+              <span class="text-gray-600 ml-2 text-sm">({{ activity.reviews.length }} avaliações)</span>
+            </div>
+            <div class="mt-auto pt-2 text-right">
+              <p class="font-bold text-lg text-gray-700">
+                  @if (activity.price > 0) {
+                      {{ 'from' | l10n }} {{ activity.price | currency:'EUR' }}
+                  } @else {
+                      {{ 'priceFree' | l10n }}
+                  }
+              </p>
             </div>
           </div>
-        }
-      </div>
-    } @else {
-      <div class="text-center py-12">
-        <p class="text-gray-500 text-lg">Nenhuma atividade encontrada com os critérios selecionados.</p>
-      </div>
-    }
+        </div>
+      } @empty {
+        <p class="text-gray-500 col-span-full">Nenhuma atividade encontrada com os filtros selecionados.</p>
+      }
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscoverFeedComponent {
-  private activityService = inject(ActivityService);
-  activities: Signal<Activity[]> = this.activityService.filteredActivities;
+  activities = input.required<Activity[]>();
 }

@@ -1,71 +1,79 @@
-import { Component, ChangeDetectionStrategy, input, output, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, inject, input, output, EventEmitter, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
-import { Album } from '../../models/album.model';
 
 @Component({
   selector: 'app-add-to-album-modal',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [FormsModule, CommonModule],
   template: `
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center" (click)="close.emit()">
-      <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full" (click)="$event.stopPropagation()">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-2xl font-bold">Adicionar ao Álbum</h3>
-          <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
-        </div>
-
+     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="close()">
+      <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full" (click)="$event.stopPropagation()">
+        <h2 class="text-2xl font-bold mb-4">Adicionar a um Álbum</h2>
+        
         <div class="mb-4">
-          <img [src]="imageUrl()" alt="Foto a adicionar" class="rounded-lg max-h-48 mx-auto">
+            <label for="album" class="block text-sm font-medium text-gray-700">Selecionar Álbum</label>
+            <select id="album" name="album" [(ngModel)]="selectedAlbumId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                @for(album of albums(); track album.id) {
+                    <option [value]="album.id">{{ album.name }}</option>
+                }
+            </select>
         </div>
+        <button (click)="addPhotoToSelectedAlbum()" [disabled]="!selectedAlbumId" class="w-full bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 disabled:bg-gray-400">Adicionar Foto</button>
 
-        <form [formGroup]="albumForm" (ngSubmit)="addPhotoToAlbum()">
-            <div class="mb-4">
-                <label for="album" class="block text-gray-700 font-bold mb-2">Escolha um álbum</label>
-                <select id="album" formControlName="albumId" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    @for (album of albums(); track album.id) {
-                        <option [value]="album.id">{{ album.name }}</option>
-                    }
-                </select>
+        <div class="my-4 text-center text-gray-500">ou</div>
+
+        <form (ngSubmit)="createNewAlbumAndAddPhoto()" class="space-y-2">
+            <div>
+                <label for="newAlbumName" class="block text-sm font-medium text-gray-700">Criar Novo Álbum</label>
+                <input type="text" id="newAlbumName" name="newAlbumName" [(ngModel)]="newAlbumName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="Nome do novo álbum">
             </div>
-            
-            <div class="flex items-center justify-between">
-                <button type="submit" [disabled]="albumForm.invalid" class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
-                    Adicionar
-                </button>
-                <button type="button" (click)="close.emit()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
-                    Cancelar
-                </button>
-            </div>
+            <button type="submit" [disabled]="!newAlbumName" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400">Criar e Adicionar</button>
         </form>
+
+        <button (click)="close()" class="mt-6 w-full bg-gray-200 text-gray-800 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
       </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddToAlbumModalComponent {
-  imageUrl = input.required<string>();
-  activityName = input.required<string>();
-  close = output<void>();
-  addPhoto = output<{albumId: number, photoUrl: string, activityName: string}>();
+    activityName = input.required<string>();
+    activityImageUrl = input.required<string>();
+    closeModal = output<void>();
 
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+    private authService = inject(AuthService);
+    albums = this.authService.userAlbums;
 
-  albums = this.authService.userAlbums;
+    selectedAlbumId: number | null = null;
+    newAlbumName: string = '';
 
-  albumForm = this.fb.group({
-    albumId: [this.albums()?.[0]?.id ?? '', Validators.required],
-  });
+    addPhotoToSelectedAlbum(): void {
+        if (!this.selectedAlbumId) return;
+        this.authService.addPhotoToAlbum(this.selectedAlbumId, {
+            imageUrl: this.activityImageUrl(),
+            activityName: this.activityName()
+        });
+        this.close();
+    }
 
-  addPhotoToAlbum(): void {
-    if (this.albumForm.invalid) return;
-    
-    const albumId = this.albumForm.value.albumId!;
-    this.addPhoto.emit({
-        albumId: +albumId,
-        photoUrl: this.imageUrl(),
-        activityName: this.activityName(),
-    });
-  }
+    createNewAlbumAndAddPhoto(): void {
+        if (!this.newAlbumName) return;
+        this.authService.addAlbum(this.newAlbumName);
+        // This is a simplification. In a real app, we'd get the new album's ID back.
+        // Here we assume the last album is the new one.
+        const newAlbum = this.albums().slice(-1)[0];
+        if (newAlbum) {
+            this.authService.addPhotoToAlbum(newAlbum.id, {
+                imageUrl: this.activityImageUrl(),
+                activityName: this.activityName()
+            });
+        }
+        this.close();
+    }
+
+    close(): void {
+        this.closeModal.emit();
+    }
 }

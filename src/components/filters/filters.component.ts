@@ -1,119 +1,59 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, OnDestroy } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, inject, output, signal, model } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivityService, ActivityFilters } from '../../services/activity.service';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { L10nPipe } from '../../pipes/l10n.pipe';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-filters',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [FormsModule, L10nPipe, CommonModule, CurrencyPipe],
   template: `
-    <div class="bg-white p-4 rounded-lg shadow-md">
-      <form [formGroup]="filterForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-        <!-- Search -->
-        <div class="lg:col-span-2">
-          <label for="search" class="block text-sm font-medium text-gray-700">Pesquisar</label>
-          <input type="text" id="search" formControlName="searchTerm" placeholder="Nome da atividade..."
-                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h3 class="font-bold text-lg mb-4">{{ 'filtersTitle' | l10n }}</h3>
+      <form (submit)="applyFilters(); $event.preventDefault()">
+        <div class="mb-4">
+          <label for="search" class="sr-only">{{ 'searchPlaceholder' | l10n }}</label>
+          <input type="text" id="search" name="search" [(ngModel)]="filtersSignal().searchTerm" placeholder="{{ 'searchPlaceholder' | l10n }}" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
         </div>
-
-        <!-- Category -->
-        <div>
-          <label for="category" class="block text-sm font-medium text-gray-700">Categoria</label>
-          <select id="category" formControlName="category"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
-            <option [ngValue]="null">Todas</option>
-            @for(category of uniqueCategories(); track category) {
+        <div class="mb-4">
+          <label for="category" class="block text-sm font-medium text-gray-700 mb-1">{{ 'filtersCategory' | l10n }}</label>
+          <select id="category" name="category" [(ngModel)]="filtersSignal().category" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+            <option [ngValue]="null">{{ 'filtersAllCategories' | l10n }}</option>
+            @for (category of categories(); track category) {
               <option [value]="category">{{ category }}</option>
             }
           </select>
         </div>
-
-        <!-- Rating -->
-        <div>
-          <label for="rating" class="block text-sm font-medium text-gray-700">Avaliação Mínima</label>
-          <select id="rating" formControlName="minRating"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
-            <option value="0">Qualquer</option>
-            <option value="3">3+ Estrelas</option>
-            <option value="4">4+ Estrelas</option>
-            <option value="5">5 Estrelas</option>
-          </select>
+        <div class="mb-4">
+          <label for="price" class="block text-sm font-medium text-gray-700 mb-1">{{ 'filtersPrice' | l10n }}: {{ filtersSignal().maxPrice | currency:'EUR' }}</label>
+          <input type="range" id="price" name="price" min="0" max="100" [(ngModel)]="filtersSignal().maxPrice" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
         </div>
-
-        <!-- Price Range -->
-        <div class="lg:col-span-2">
-          <label for="maxPrice" class="block text-sm font-medium text-gray-700">Preço (até {{ filterForm.get('maxPrice')?.value }}€)</label>
-           <input type="range" id="maxPrice" formControlName="maxPrice" min="0" max="100" step="5"
-                 class="mt-1 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-500">
+        <div class="mb-4">
+          <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">{{ 'filtersRating' | l10n }}: {{ filtersSignal().minRating }} ★</label>
+          <input type="range" id="rating" name="rating" min="0" max="5" step="0.5" [(ngModel)]="filtersSignal().minRating" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
         </div>
-
-         <!-- Free only -->
-         <div class="flex items-center">
-            <input id="freeOnly" type="checkbox" formControlName="freeOnly" class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
-            <label for="freeOnly" class="ml-2 block text-sm text-gray-900">Apenas Grátis</label>
-        </div>
-
-        <!-- Reset Button -->
-        <div>
-            <button type="button" (click)="resetFilters()" class="w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-              Limpar
-            </button>
-        </div>
+        <button type="submit" class="w-full bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 transition-colors">{{ 'filtersApply' | l10n }}</button>
       </form>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FiltersComponent implements OnInit, OnDestroy {
-  private fb = inject(FormBuilder);
+export class FiltersComponent {
   private activityService = inject(ActivityService);
-  private destroy$ = new Subject<void>();
-
-  uniqueCategories = this.activityService.uniqueCategories;
-
-  filterForm = this.fb.group({
-    searchTerm: [''],
-    category: [null as string | null],
-    minRating: [0],
-    maxPrice: [100],
-    freeOnly: [false],
+  filtersChanged = output<ActivityFilters>();
+  
+  categories = this.activityService.uniqueCategories;
+  
+  filtersSignal = signal<ActivityFilters>({
+    searchTerm: '',
+    category: null,
+    minPrice: 0,
+    maxPrice: 100,
+    minRating: 0
   });
 
-  ngOnInit(): void {
-    this.filterForm.valueChanges
-      .pipe(debounceTime(300), takeUntil(this.destroy$))
-      .subscribe(values => {
-        if (values.freeOnly) {
-            this.filterForm.get('maxPrice')?.disable({ emitEvent: false });
-        } else {
-            this.filterForm.get('maxPrice')?.enable({ emitEvent: false });
-        }
-        
-        const filters: ActivityFilters = {
-          searchTerm: values.searchTerm ?? '',
-          category: values.category ?? null,
-          minRating: Number(values.minRating ?? 0),
-          maxPrice: values.freeOnly ? 0 : Number(values.maxPrice ?? 100),
-          minPrice: 0
-        };
-        this.activityService.applyFilters(filters);
-      });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  resetFilters(): void {
-    this.filterForm.reset({
-      searchTerm: '',
-      category: null,
-      minRating: 0,
-      maxPrice: 100,
-      freeOnly: false
-    });
+  applyFilters(): void {
+    this.filtersChanged.emit(this.filtersSignal());
   }
 }

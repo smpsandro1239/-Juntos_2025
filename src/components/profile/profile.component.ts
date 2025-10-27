@@ -1,44 +1,50 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
 import { RouterLink } from '@angular/router';
-import { PassportComponent } from '../passport/passport.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink, PassportComponent],
+  imports: [RouterLink],
   template: `
-    <div class="max-w-4xl mx-auto">
-      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 class="text-3xl font-bold text-teal-600">Olá, {{ authService.currentUser()?.name }}!</h2>
-        <p class="text-gray-600 mt-2">Este é o seu centro de controlo para todas as aventuras em família.</p>
-        <div class="mt-4 flex flex-wrap gap-4">
-            <a routerLink="/albums" class="bg-teal-100 text-teal-800 font-semibold py-2 px-4 rounded-lg hover:bg-teal-200">
-                Meus Álbuns
-            </a>
-             <a routerLink="/orders" class="bg-blue-100 text-blue-800 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200">
-                Minhas Encomendas
-            </a>
-            <a routerLink="/passport" class="bg-purple-100 text-purple-800 font-semibold py-2 px-4 rounded-lg hover:bg-purple-200">
-                Passaporte Família
-            </a>
-            @if (authService.currentUser()?.isPremium) {
-                <span class="bg-yellow-100 text-yellow-800 font-semibold py-2 px-4 rounded-lg">
-                    Membro Premium ⭐
-                </span>
-            } @else {
-                 <a routerLink="/premium" class="bg-yellow-100 text-yellow-800 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-200">
-                    Tornar-se Premium
-                </a>
-            }
-        </div>
-      </div>
+    @if(user(); as u) {
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h1 class="text-3xl font-bold mb-4">Olá, {{ u.name }}!</h1>
+            <p class="text-gray-600 mb-6">{{ u.email }}</p>
 
-      <app-passport></app-passport>
-    </div>
+            @if(!u.isPremium) {
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Torne-se Premium!</p>
+                    <p>Desbloqueie funcionalidades exclusivas como o Planeador de Viagens.</p>
+                    <a routerLink="/premium" class="text-yellow-800 font-bold hover:underline">Fazer Upgrade Agora</a>
+                </div>
+            } @else {
+                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Conta Premium Ativa!</p>
+                    <p>Obrigado por fazer parte da nossa comunidade premium.</p>
+                </div>
+            }
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <a routerLink="/trip-planner" class="block p-6 bg-teal-500 text-white rounded-lg shadow hover:bg-teal-600">
+                    <h3 class="font-bold text-xl">Planeador de Viagens</h3>
+                    <p>Organize as suas próximas aventuras.</p>
+                </a>
+                <a routerLink="/albums" class="block p-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
+                    <h3 class="font-bold text-xl">Meus Álbuns</h3>
+                    <p>Recorde os seus melhores momentos.</p>
+                </a>
+                 <a routerLink="/orders" class="block p-6 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600">
+                    <h3 class="font-bold text-xl">Minhas Encomendas</h3>
+                    <p>Veja o seu histórico de encomendas.</p>
+                </a>
+            </div>
+        </div>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
-  authService = inject(AuthService);
+  private authService = inject(AuthService);
+  user = this.authService.currentUser;
 }

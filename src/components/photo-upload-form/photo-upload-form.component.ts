@@ -1,56 +1,63 @@
-import { Component, ChangeDetectionStrategy, output, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, input, output, EventEmitter } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AlbumPhoto } from '../../models/album.model';
+import { Activity } from '../../models/activity.model';
 
 @Component({
   selector: 'app-photo-upload-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [FormsModule],
   template: `
-    <form [formGroup]="uploadForm" (ngSubmit)="submitImage()" class="bg-gray-50 p-6 rounded-lg shadow">
-      <h3 class="text-xl font-semibold mb-4">Partilhe a sua foto</h3>
-      <p class="text-sm text-gray-600 mb-4">
-        Cole o URL de uma imagem para a adicionar à galeria. Use, por exemplo, um link do <a href="https://picsum.photos/" target="_blank" class="text-teal-600 hover:underline">Picsum Photos</a>.
-      </p>
-      <div class="mb-4">
-        <label for="imageUrl" class="block text-gray-700 font-bold mb-2">URL da Imagem</label>
-        <input type="url" id="imageUrl" formControlName="imageUrl"
-               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-               placeholder="https://picsum.photos/seed/minhafoto/400/300">
-        @if (uploadForm.get('imageUrl')?.touched && uploadForm.get('imageUrl')?.invalid) {
-          <p class="text-red-500 text-xs italic mt-1">Por favor, insira um URL válido.</p>
+     <form (ngSubmit)="addPhoto()" class="space-y-4">
+        <div>
+            <label for="photo" class="block text-sm font-medium text-gray-700">Ficheiro da Foto</label>
+            <input type="file" id="photo" name="photo" (change)="onFileSelected($event)" accept="image/*" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"/>
+        </div>
+        
+        @if (previewUrl) {
+            <img [src]="previewUrl" alt="Preview" class="max-h-40 rounded-md mx-auto">
         }
-      </div>
-      <div class="flex items-center gap-4">
-        <button type="submit" [disabled]="uploadForm.invalid"
-                class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
-          Enviar Foto
-        </button>
-        <button type="button" (click)="cancel.emit()"
-                class="bg-transparent hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded">
-          Cancelar
-        </button>
-      </div>
+
+        <div>
+            <label for="activityName" class="block text-sm font-medium text-gray-700">Atividade Associada</label>
+            <input type="text" id="activityName" name="activityName" [(ngModel)]="activityName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Nome da atividade">
+        </div>
+
+        <button type="submit" [disabled]="!selectedFile || !activityName" class="w-full bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 disabled:bg-gray-400">Adicionar Foto</button>
     </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhotoUploadFormComponent {
-  imageSubmit = output<{ imageUrl: string }>();
-  cancel = output<void>();
-  
-  private fb = inject(FormBuilder);
+    photoAdded = output<AlbumPhoto>();
 
-  uploadForm = this.fb.group({
-    imageUrl: ['', [Validators.required, Validators.pattern('https?://.+')]],
-  });
+    selectedFile: File | null = null;
+    previewUrl: string | null = null;
+    activityName: string = '';
 
-  submitImage(): void {
-    if (this.uploadForm.invalid) {
-      this.uploadForm.markAllAsTouched();
-      return;
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            this.selectedFile = input.files[0];
+            const reader = new FileReader();
+            reader.onload = () => this.previewUrl = reader.result as string;
+            reader.readAsDataURL(this.selectedFile);
+        }
     }
-    
-    this.imageSubmit.emit({ imageUrl: this.uploadForm.value.imageUrl! });
-    this.uploadForm.reset();
-  }
+
+    addPhoto(): void {
+        if (!this.previewUrl || !this.activityName) {
+            return;
+        }
+
+        this.photoAdded.emit({
+            imageUrl: this.previewUrl,
+            activityName: this.activityName
+        });
+
+        // Reset form
+        this.selectedFile = null;
+        this.previewUrl = null;
+        this.activityName = '';
+    }
 }

@@ -1,131 +1,98 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit, computed } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Album } from '../../models/album.model';
-import { User } from '../../models/user.model';
 import { Order } from '../../models/order.model';
 
 @Component({
   selector: 'app-order-print',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [FormsModule, CommonModule, CurrencyPipe],
   template: `
     @if(album(); as alb) {
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-2 text-teal-600">Encomendar Impressão</h2>
-        <p class="text-center text-gray-600 mb-8">Transforme as suas memórias digitais num tesouro físico!</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Order Summary -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Resumo da Encomenda</h3>
-                <img [src]="alb.photos[0]?.imageUrl || 'https://picsum.photos/seed/placeholder/400/300'" [alt]="alb.name" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h4 class="text-lg font-bold">{{ alb.name }}</h4>
-                <p class="text-gray-600">{{ alb.photos.length }} fotos</p>
-                <div class="mt-4 pt-4 border-t space-y-2">
-                    <div class="flex justify-between"><span>Capa:</span> <strong>{{ orderForm.get('coverType')?.value }}</strong></div>
-                    <div class="flex justify-between"><span>Custo base:</span> <span>{{ basePrice() }}€</span></div>
-                    <div class="flex justify-between text-xl font-bold"><span>Total:</span> <span>{{ totalPrice() }}€</span></div>
-                </div>
-            </div>
-
-            <!-- Form -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                 <form [formGroup]="orderForm" (ngSubmit)="placeOrder()">
-                    <div class="space-y-4">
-                        <div>
+        <div class="max-w-4xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+            <h1 class="text-3xl font-bold mb-6">Encomendar Impressão: {{ alb.name }}</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h2 class="text-xl font-bold mb-4">Detalhes da Encomenda</h2>
+                    <form #orderForm="ngForm" (ngSubmit)="placeOrder()">
+                        <div class="mb-4">
                             <label class="block text-gray-700 font-bold mb-2">Tipo de Capa</label>
-                            <select formControlName="coverType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select name="coverType" [(ngModel)]="coverType" required class="w-full px-3 py-2 border rounded-md">
                                 <option value="Capa Mole">Capa Mole</option>
                                 <option value="Capa Dura">Capa Dura</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-bold mb-2">Nome Completo</label>
-                            <input type="text" formControlName="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        </div>
-                         <div>
-                            <label class="block text-gray-700 font-bold mb-2">Morada</label>
-                            <input type="text" formControlName="address" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-700 font-bold mb-2">Cód. Postal</label>
-                                <input type="text" formControlName="postalCode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-bold mb-2">Cidade</label>
-                                <input type="text" formControlName="city" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <h3 class="text-lg font-bold mt-6 mb-2">Morada de Entrega</h3>
+                        <div class="space-y-4">
+                            <input type="text" name="name" [(ngModel)]="shippingAddress.name" required placeholder="Nome Completo" class="w-full px-3 py-2 border rounded-md">
+                            <input type="text" name="address" [(ngModel)]="shippingAddress.address" required placeholder="Morada" class="w-full px-3 py-2 border rounded-md">
+                            <div class="flex space-x-4">
+                                <input type="text" name="postalCode" [(ngModel)]="shippingAddress.postalCode" required placeholder="Código Postal" class="w-1/2 px-3 py-2 border rounded-md">
+                                <input type="text" name="city" [(ngModel)]="shippingAddress.city" required placeholder="Cidade" class="w-1/2 px-3 py-2 border rounded-md">
                             </div>
                         </div>
-                        <div class="pt-4">
-                            <button type="submit" [disabled]="orderForm.invalid" class="w-full bg-teal-500 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline disabled:bg-gray-400">
-                                Confirmar Encomenda
-                            </button>
-                        </div>
+                    </form>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-4">Resumo</h2>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="flex justify-between"><span>Álbum:</span> <strong>{{ alb.name }}</strong></p>
+                        <p class="flex justify-between"><span>Nº de Fotos:</span> <strong>{{ alb.photos.length }}</strong></p>
+                        <p class="flex justify-between"><span>Capa:</span> <strong>{{ coverType }}</strong></p>
+                        <hr class="my-2">
+                        <p class="flex justify-between text-lg font-bold"><span>Total:</span> <span>{{ totalPrice() | currency:'EUR' }}</span></p>
                     </div>
-                 </form>
+                     <button (click)="placeOrder()" [disabled]="orderForm.invalid" class="w-full mt-6 bg-teal-500 text-white py-3 rounded-md text-lg font-bold hover:bg-teal-600 disabled:bg-gray-400">Finalizar Encomenda</button>
+                </div>
             </div>
         </div>
-      </div>
-    } @else {
-      <div class="text-center py-12">
-        <p class="text-gray-500 text-lg">Álbum não encontrado ou sem fotos para imprimir.</p>
-         <a routerLink="/albums" class="text-teal-600 hover:underline font-semibold mt-2 inline-block">Voltar aos seus Álbuns</a>
-      </div>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderPrintComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private authService = inject(AuthService);
-  private fb = inject(FormBuilder);
+export class OrderPrintComponent {
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private authService = inject(AuthService);
 
-  album = signal<Album | null>(null);
-  currentUser = this.authService.currentUser;
-
-  orderForm = this.fb.group({
-    coverType: ['Capa Mole', Validators.required],
-    name: [this.currentUser()?.name || '', Validators.required],
-    address: ['', Validators.required],
-    postalCode: ['', Validators.required],
-    city: ['', Validators.required],
-  });
-
-  basePrice = computed(() => this.orderForm.get('coverType')?.value === 'Capa Dura' ? 29.99 : 19.99);
-  totalPrice = computed(() => this.basePrice());
-
-  ngOnInit(): void {
-    const albumIdParam = this.route.snapshot.paramMap.get('albumId');
-    if (albumIdParam) {
-      const albumId = +albumIdParam;
-      const foundAlbum = this.authService.getAlbumById(albumId);
-      if (foundAlbum && foundAlbum.photos.length > 0) {
-        this.album.set(foundAlbum);
-      }
-    }
-  }
-
-  placeOrder(): void {
-    if (this.orderForm.invalid || !this.album()) return;
-
-    const formValue = this.orderForm.value;
-    const orderData: Omit<Order, 'id' | 'date'> = {
-        album: this.album()!,
-        coverType: formValue.coverType as 'Capa Mole' | 'Capa Dura',
-        price: this.totalPrice(),
-        shippingAddress: {
-            name: formValue.name!,
-            address: formValue.address!,
-            postalCode: formValue.postalCode!,
-            city: formValue.city!,
-        }
+    album = signal<Album | undefined>(undefined);
+    
+    coverType: 'Capa Mole' | 'Capa Dura' = 'Capa Mole';
+    shippingAddress = {
+        name: '',
+        address: '',
+        postalCode: '',
+        city: ''
     };
 
-    this.authService.placeOrder(orderData);
-    this.router.navigate(['/order-success']);
-  }
+    totalPrice = computed(() => {
+        const basePrice = 15; // Base price for the album
+        const photoPrice = this.album()?.photos.length || 0 * 0.5;
+        const coverPrice = this.coverType === 'Capa Dura' ? 10 : 0;
+        return basePrice + photoPrice + coverPrice;
+    });
+
+    constructor() {
+        const albumId = Number(this.route.snapshot.paramMap.get('albumId'));
+        this.album.set(this.authService.getAlbumById(albumId));
+    }
+
+    placeOrder(): void {
+        const currentAlbum = this.album();
+        if(!currentAlbum) return;
+
+        const orderData: Omit<Order, 'id' | 'date'> = {
+            album: currentAlbum,
+            coverType: this.coverType,
+            price: this.totalPrice(),
+            shippingAddress: this.shippingAddress
+        };
+
+        const newOrder = this.authService.placeOrder(orderData);
+        this.router.navigate(['/order-success'], { queryParams: { orderId: newOrder.id }});
+    }
 }

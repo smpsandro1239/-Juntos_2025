@@ -1,43 +1,30 @@
-import { Component, ChangeDetectionStrategy, inject, Signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { CommonModule, NgOptimizedImage, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ActivityService } from '../../services/activity.service';
 import { Event } from '../../models/event.model';
 
 @Component({
   selector: 'app-event-carousel',
   standalone: true,
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, DatePipe],
   template: `
     <div class="relative">
-      <div class="flex space-x-4 overflow-x-auto pb-4 -mb-4 snap-x snap-mandatory">
-        @for (event of events(); track event.id) {
-          <div class="snap-start flex-shrink-0 w-80">
-            <a [routerLink]="['/event', event.id]" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full">
-              <img [src]="event.imageUrl" [alt]="event.name" class="w-full h-40 object-cover">
-              <div class="p-4">
-                <h3 class="text-lg font-semibold mb-1 truncate">{{ event.name }}</h3>
-                <p class="text-sm text-gray-600 mb-2">{{ formatDate(event.startDate) }}</p>
-                <p class="text-sm text-gray-500 truncate">{{ event.location }}</p>
-              </div>
-            </a>
-          </div>
-        }
-        @if (events().length === 0) {
-          <p class="text-gray-500">Não há eventos agendados.</p>
-        }
-      </div>
+        <div class="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory">
+            @for (event of events(); track event.id) {
+                <div [routerLink]="['/event', event.id]" class="snap-center flex-shrink-0 w-80 bg-white rounded-lg shadow-md overflow-hidden cursor-pointer">
+                    <img [ngSrc]="event.imageUrl" [alt]="event.name" width="320" height="180" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg">{{ event.name }}</h3>
+                        <p class="text-sm text-gray-600">{{ event.location }}</p>
+                        <p class="text-sm text-gray-500 mt-2">{{ event.startDate | date:'dd MMM' }} - {{ event.endDate | date:'dd MMM, yyyy' }}</p>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventCarouselComponent {
-  private activityService = inject(ActivityService);
-  events: Signal<Event[]> = this.activityService.upcomingEvents;
-
-  formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('pt-PT', {
-      day: 'numeric',
-      month: 'long',
-    });
-  }
+    events = input.required<Event[]>();
 }

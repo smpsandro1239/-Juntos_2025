@@ -1,14 +1,40 @@
 export const pt = {
-    'discover_adventures': 'Descubra Aventuras em Família',
-    'activities_events_suppliers': 'Atividades, eventos e fornecedores para momentos inesquecíveis.',
-    'upcoming_events': 'Eventos Próximos',
-    'plan_your_day': 'Planeie o seu dia',
-    'view_as': 'Visualizar como:',
-    'list': 'Lista',
-    'map': 'Mapa',
-    'suppliers': 'Fornecedores',
-    'sos': 'SOS',
-    'login': 'Entrar',
-    'logout': 'Sair',
-    'profile': 'Perfil',
+  // Geral
+  loading: 'A carregar...',
+  priceFree: 'Grátis',
+  from: 'Desde',
+
+  // Cabeçalho
+  navHome: 'Início',
+  navSuppliers: 'Fornecedores',
+  navPassport: 'Passaporte',
+  navProfile: 'Perfil',
+  navLogin: 'Entrar',
+  navLogout: 'Sair',
+  navSOS: 'SOS',
+
+  // Página Inicial
+  homeTitle: 'Encontre a próxima aventura em família!',
+  searchPlaceholder: 'Pesquisar atividades...',
+  upcomingEvents: 'Próximos Eventos',
+  
+  // Filtros
+  filtersTitle: 'Filtros',
+  filtersCategory: 'Categoria',
+  filtersAllCategories: 'Todas',
+  filtersPrice: 'Preço Máximo',
+  filtersRating: 'Avaliação Mínima',
+  filtersApply: 'Aplicar Filtros',
+
+  // Detalhe da Atividade
+  activityReviews: 'Avaliações',
+  activityLocation: 'Localização',
+  activityAccessibility: 'Acessibilidade',
+  accessibilityWheelchair: 'Cadeira de Rodas',
+  accessibilityStroller: 'Carrinho de Bebé',
+  accessibilityTotal: 'Total',
+  accessibilityPartial: 'Parcial',
+  accessibilityNone: 'Nenhuma',
+  addYourReview: 'Adicione a sua avaliação',
+  noReviewsYet: 'Ainda não existem avaliações. Seja o primeiro a deixar uma!',
 };
