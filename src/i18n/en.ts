@@ -1,14 +1,46 @@
 export const en = {
+    // Nav
     navHome: 'Home',
     navSuppliers: 'Suppliers',
-    navTripPlanner: 'AI Planner',
+    navTripPlanner: 'Trip Planner',
     navSOS: 'SOS',
     navProfile: 'Profile',
     navLogout: 'Logout',
     navLogin: 'Login',
-    homeTitle: '+JUNTOS',
-    homeSubtitle: 'Discover everything you can do with your family, wherever you are.',
+
+    // Footer
+    footerRights: 'All rights reserved.',
+
+    // Common
+    free: 'Free',
+    noResults: 'No results found.',
+    description: 'Description',
+    gallery: 'Gallery',
+    details: 'Details',
+    location: 'Location',
+    reviews: 'Reviews',
+    noReviews: 'There are no reviews yet. Be the first to leave one!',
+    login: 'Login',
+    name: 'Name',
+    email: 'Email',
+    password: 'Password',
+    backToActivities: 'Back to all activities',
+    price: 'Price',
+    rating: 'Rating',
+    comment: 'Comment',
+    all: 'All',
+    or: 'or',
+    create: 'Create',
+    cancel: 'Cancel',
+    add: 'Add',
+    photos: 'photos',
+
+    // Home
+    homeTitle: 'Discover Family Adventure',
+    homeSubtitle: 'Activities, events, and services for unforgettable moments.',
     upcomingEvents: 'Upcoming Events',
+
+    // Filters
     filtersTitle: 'Filters',
     searchPlaceholder: 'Search activities...',
     filtersCategory: 'Category',
@@ -16,42 +48,32 @@ export const en = {
     filtersPrice: 'Maximum Price',
     filtersRating: 'Minimum Rating',
     filtersApply: 'Apply Filters',
-    free: 'Free',
-    noResults: 'No activities found. Try changing the filters.',
-    backToActivities: 'Back to all activities',
-    description: 'Description',
-    gallery: 'Gallery',
-    details: 'Details',
+
+    // Activity Detail
     wheelchair: 'Wheelchair',
     stroller: 'Stroller',
+    activityVisited: 'Visited!',
     markAsVisited: 'Mark as Visited',
-    activityVisited: 'Activity Visited',
     addToAlbum: 'Add to Album',
-    location: 'Location',
-    reviews: 'Reviews',
-    noReviews: 'There are no reviews for this activity yet.',
     logInToReview: 'To leave a review, please',
-    login: 'login',
+
+    // Review Form
     leaveReviewTitle: 'Leave Your Review',
-    rating: 'Your Rating',
-    comment: 'Comment',
     submitReview: 'Submit Review',
-    selectAlbum: 'Select an album',
-    or: 'or',
-    createNewAlbum: 'Create a new album',
-    create: 'Create',
-    cancel: 'Cancel',
-    add: 'Add',
-    loginTitle: 'Welcome back!',
-    email: 'Email',
-    password: 'Password',
-    loginHint: 'Hint: use user@example.com and password "password"',
+
+    // Map
+    noLocationsMap: 'No locations to show on the map.',
+
+    // Login
+    loginTitle: 'Sign in to your account',
+    loginHint: 'Use user@example.com and password "password" to test.',
+    
+    // Profile
     welcome: 'Welcome',
     profileInfo: 'Profile Information',
-    name: 'Name',
-    membership: 'Subscription',
-    standard: 'Standard',
+    membership: 'Membership',
     premium: 'Premium',
+    standard: 'Standard',
     quickLinks: 'Quick Links',
     myPassport: 'My Passport',
     myAlbums: 'My Albums',
@@ -60,29 +82,56 @@ export const en = {
     premiumDescriptionShort: 'Unlock exclusive features like the AI trip planner.',
     learnMore: 'Learn More',
     logout: 'Logout',
-    tripPlannerTitle: 'AI Trip Planner',
-    tripPlannerDescription: 'Let our AI create the perfect itinerary for your family. Describe what you\'re looking for.',
-    tripPlannerPlaceholder: 'E.g., "A weekend in Lisbon for a family with two children aged 5 and 8. We like the outdoors and interactive museums."',
-    generateItinerary: 'Generate Itinerary',
-    generatingItinerary: 'Generating your itinerary... This may take a moment.',
-    itinerary: 'Your Custom Itinerary',
-    premiumTitle: 'Become a Premium Member',
+    
+    // Premium
+    upgradeSuccess: 'Upgrade Successful!',
+    backToProfile: 'Back to Profile',
+    premiumTitle: '⭐ Become a Premium Member',
     premiumBenefits: 'Premium Benefits',
-    premiumBenefit1: 'Unlimited access to the AI Trip Planner',
-    premiumBenefit2: 'Exclusive discounts on partner activities',
-    premiumBenefit3: 'Unlimited photo album creation',
-    premiumBenefit4: 'Priority support',
+    premiumBenefit1: 'Artificial Intelligence Trip Planner',
+    premiumBenefit2: 'Unlimited creation of memory albums',
+    premiumBenefit3: 'Exclusive discounts on album printing',
+    premiumBenefit4: 'Early access to new events and activities',
     upgradeNow: 'Upgrade Now',
-    upgradeSuccess: 'Congratulations! You are now a Premium member.',
+    
+    // Photo Upload
+    uploadPhoto: 'Upload Photo',
+    
+    // Passport
+    passportTitle: 'Adventure Passport',
+    passportDescription: 'Here you can see all the activities you have already visited and stamped in your passport.',
+    visitedActivities: 'Visited Activities',
+    noVisitedActivities: 'You haven\'t visited any activities yet. Start exploring!',
+
+    // Event Detail
+    eventDetails: 'Event Details',
+    when: 'When',
+    
+    // Suppliers
+    allSuppliers: 'All Suppliers',
+    contactSupplier: 'Contact Supplier',
+    
+    // Contact Modal
+    contact: 'Contact',
+    phone: 'Phone',
+    website: 'Website',
+
+    // Add to Album Modal
+    selectAlbum: 'Select an album',
+    createNewAlbum: 'Create new album',
+
+    // Albums
     yourAlbums: 'Your Albums',
     createNew: 'Create New',
-    albumName: 'Album Name',
-    viewAlbum: 'View Album',
-    album: 'Album',
-    photos: 'Photos',
-    noPhotos: 'This album has no photos yet.',
-    uploadPhoto: 'Upload Photo',
-    printAlbum: 'Order Print',
+    albumName: 'Album name',
+    viewAlbum: 'View album',
+    noAlbums: 'You haven\'t created any albums yet.',
+
+    // Album Detail
+    printAlbum: 'Print Album',
+    noPhotos: 'This album has no photos yet. Add some memories!',
+
+    // Order
     orderPrintTitle: 'Order Album Print',
     coverType: 'Cover Type',
     softCover: 'Soft Cover',
@@ -93,31 +142,35 @@ export const en = {
     city: 'City',
     total: 'Total',
     placeOrder: 'Place Order',
-    orderSuccessTitle: 'Order Placed Successfully!',
-    orderSuccessMessage: 'Your memory album is on its way. You will receive a confirmation email shortly.',
-    backToProfile: 'Back to Profile',
-    noOrders: 'You have not placed any orders yet.',
+    orderSuccessTitle: 'Order Received!',
+    orderSuccessMessage: 'Your order has been received and will be processed shortly. Thank you!',
     order: 'Order',
+    album: 'Album',
     date: 'Date',
-    passportTitle: 'Adventure Passport',
-    passportDescription: 'Here you can see all the amazing activities you have already visited.',
-    visitedActivities: 'Visited Activities',
-    noVisitedActivities: 'You haven\'t marked any activities as visited yet. Start exploring!',
-    allSuppliers: 'Party and Event Suppliers',
-    supplierCategories: 'Categories',
-    all: 'All',
-    contact: 'Contact',
-    website: 'Website',
-    phone: 'Phone',
-    eventDetails: 'Event Details',
-    when: 'When',
-    price: 'Price',
-    sosTitle: 'Emergency Page',
-    sosDescription: 'Useful contacts and locations in Lisbon for any eventuality.',
+    noOrders: 'You have not placed any orders yet.',
+
+    // SOS
+    sosTitle: 'Emergency (SOS)',
+    sosDescription: 'Useful contacts and locations in case of an emergency.',
     hospitals: 'Hospitals',
     pharmacies: 'Pharmacies',
     police: 'Police',
-    contactSupplier: 'Contact Supplier',
-    noLocationsMap: 'No locations to show on the map.',
-    footerRights: 'All rights reserved.',
+    
+    // Trip Planner
+    tripPlannerTitle: 'AI Trip Planner',
+    tripPlannerSubtitle: 'Let our artificial intelligence create the perfect itinerary for your family.',
+    tripDuration: 'Trip Duration',
+    days: 'Days',
+    numberOfPeople: 'Number of People',
+    adults: 'Adults',
+    children: 'Children',
+    interests: 'Interests',
+    interestsPlaceholder: 'E.g. museums, outdoors, beach, food',
+    travelPace: 'Travel Pace',
+    relaxed: 'Relaxed',
+    moderate: 'Moderate',
+    fastPaced: 'Fast-Paced',
+    generatePlan: 'Generate Plan',
+    generating: 'Generating your travel plan...',
+    yourPlan: 'Your Personalized Travel Plan'
 };
