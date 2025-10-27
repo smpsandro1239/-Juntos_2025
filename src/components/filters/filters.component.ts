@@ -1,92 +1,119 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
-import { ActivityService } from '../../services/activity.service';
+import { Component, ChangeDetectionStrategy, inject, OnInit, OnDestroy } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ActivityService, ActivityFilters } from '../../services/activity.service';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-filters',
   standalone: true,
+  imports: [ReactiveFormsModule],
   template: `
-    <div class="bg-white p-4 rounded-lg shadow-md mb-6 sticky top-20 z-10">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white p-4 rounded-lg shadow-md">
+      <form [formGroup]="filterForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
         <!-- Search -->
-        <div>
+        <div class="lg:col-span-2">
           <label for="search" class="block text-sm font-medium text-gray-700">Pesquisar</label>
-          <input 
-            type="text" 
-            id="search" 
-            placeholder="Nome da atividade..."
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-            (input)="onSearchChange($event)">
+          <input type="text" id="search" formControlName="searchTerm" placeholder="Nome da atividade..."
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
         </div>
+
         <!-- Category -->
         <div>
           <label for="category" class="block text-sm font-medium text-gray-700">Categoria</label>
-          <select 
-            id="category" 
-            class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-teal-500 focus:outline-none focus:ring-teal-500 sm:text-sm"
-            (change)="onCategoryChange($event)">
-            <option value="">Todas</option>
-            @for (category of uniqueCategories(); track category) {
+          <select id="category" formControlName="category"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+            <option [ngValue]="null">Todas</option>
+            @for(category of uniqueCategories(); track category) {
               <option [value]="category">{{ category }}</option>
             }
           </select>
         </div>
-        <!-- Price -->
-        <div>
-          <label for="price" class="block text-sm font-medium text-gray-700">Preço Máximo: <span class="font-bold text-teal-600">{{ currentPrice() }}€</span></label>
-          <input 
-            type="range" 
-            id="price" 
-            min="0" 
-            max="50" 
-            step="5"
-            [value]="currentPrice()"
-            class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            (input)="onPriceChange($event)">
-        </div>
+
         <!-- Rating -->
         <div>
-          <label for="rating" class="block text-sm font-medium text-gray-700">Avaliação Mínima: <span class="font-bold text-teal-600">{{ currentRating() }} ★</span></label>
-           <input 
-            type="range" 
-            id="rating" 
-            min="0" 
-            max="5" 
-            step="0.5"
-            [value]="currentRating()"
-            class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            (input)="onRatingChange($event)">
+          <label for="rating" class="block text-sm font-medium text-gray-700">Avaliação Mínima</label>
+          <select id="rating" formControlName="minRating"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+            <option value="0">Qualquer</option>
+            <option value="3">3+ Estrelas</option>
+            <option value="4">4+ Estrelas</option>
+            <option value="5">5 Estrelas</option>
+          </select>
         </div>
-      </div>
+
+        <!-- Price Range -->
+        <div class="lg:col-span-2">
+          <label for="maxPrice" class="block text-sm font-medium text-gray-700">Preço (até {{ filterForm.get('maxPrice')?.value }}€)</label>
+           <input type="range" id="maxPrice" formControlName="maxPrice" min="0" max="100" step="5"
+                 class="mt-1 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-500">
+        </div>
+
+         <!-- Free only -->
+         <div class="flex items-center">
+            <input id="freeOnly" type="checkbox" formControlName="freeOnly" class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+            <label for="freeOnly" class="ml-2 block text-sm text-gray-900">Apenas Grátis</label>
+        </div>
+
+        <!-- Reset Button -->
+        <div>
+            <button type="button" (click)="resetFilters()" class="w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+              Limpar
+            </button>
+        </div>
+      </form>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FiltersComponent {
+export class FiltersComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
   private activityService = inject(ActivityService);
-  
+  private destroy$ = new Subject<void>();
+
   uniqueCategories = this.activityService.uniqueCategories;
-  currentPrice = computed(() => this.activityService.priceFilter() ?? 50);
-  currentRating = computed(() => this.activityService.ratingFilter() ?? 0);
 
-  onSearchChange(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.activityService.searchQuery.set(value);
-  }
-  
-  onCategoryChange(event: Event) {
-    const value = (event.target as HTMLSelectElement).value;
-    this.activityService.categoryFilter.set(value || null);
+  filterForm = this.fb.group({
+    searchTerm: [''],
+    category: [null as string | null],
+    minRating: [0],
+    maxPrice: [100],
+    freeOnly: [false],
+  });
+
+  ngOnInit(): void {
+    this.filterForm.valueChanges
+      .pipe(debounceTime(300), takeUntil(this.destroy$))
+      .subscribe(values => {
+        if (values.freeOnly) {
+            this.filterForm.get('maxPrice')?.disable({ emitEvent: false });
+        } else {
+            this.filterForm.get('maxPrice')?.enable({ emitEvent: false });
+        }
+        
+        const filters: ActivityFilters = {
+          searchTerm: values.searchTerm ?? '',
+          category: values.category ?? null,
+          minRating: Number(values.minRating ?? 0),
+          maxPrice: values.freeOnly ? 0 : Number(values.maxPrice ?? 100),
+          minPrice: 0
+        };
+        this.activityService.applyFilters(filters);
+      });
   }
 
-  onPriceChange(event: Event) {
-    const value = +(event.target as HTMLInputElement).value;
-    // Set to null if it's the max value to disable filter
-    this.activityService.priceFilter.set(value === 50 ? null : value);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  onRatingChange(event: Event) {
-    const value = +(event.target as HTMLInputElement).value;
-    // Set to null if it's the min value to disable filter
-    this.activityService.ratingFilter.set(value === 0 ? null : value);
+  resetFilters(): void {
+    this.filterForm.reset({
+      searchTerm: '',
+      category: null,
+      minRating: 0,
+      maxPrice: 100,
+      freeOnly: false
+    });
   }
 }

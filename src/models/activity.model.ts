@@ -8,7 +8,6 @@ export interface Activity {
   category: string;
   description: string;
   imageUrl: string;
-  galleryImages: string[];
   price: number;
   rating: number;
   reviews: Review[];
@@ -20,4 +19,5 @@ export interface Activity {
     wheelchair: AccessibilityLevel;
     stroller: AccessibilityLevel;
   };
+  galleryImages: string[];
 }
