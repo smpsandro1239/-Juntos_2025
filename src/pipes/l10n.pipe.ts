@@ -1,0 +1,1 @@
+full contents of src/pipes/l10n.pipe.ts

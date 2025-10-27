@@ -1,0 +1,1 @@
+full contents of src/services/l10n.service.ts

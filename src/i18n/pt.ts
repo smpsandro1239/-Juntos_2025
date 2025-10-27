@@ -1,0 +1,1 @@
+full contents of src/i18n/pt.ts
