@@ -1,5 +1,5 @@
 export const pt = {
-    // Nav
+    // Navigation
     navHome: 'Início',
     navSuppliers: 'Fornecedores',
     navTripPlanner: 'Planeador de Viagem',
@@ -18,57 +18,60 @@ export const pt = {
     gallery: 'Galeria',
     details: 'Detalhes',
     location: 'Localização',
-    reviews: 'Avaliações',
-    noReviews: 'Ainda não existem avaliações. Seja o primeiro a deixar uma!',
-    login: 'Entrar',
+    price: 'Preço',
+    rating: 'Avaliação',
     name: 'Nome',
     email: 'Email',
     password: 'Password',
-    backToActivities: 'Voltar a todas as atividades',
-    price: 'Preço',
-    rating: 'Avaliação',
-    comment: 'Comentário',
-    all: 'Todos',
+    login: 'Entrar',
+    logout: 'Sair',
     or: 'ou',
     create: 'Criar',
     cancel: 'Cancelar',
     add: 'Adicionar',
+    all: 'Todos',
     photos: 'fotos',
-    
-    // Home
-    homeTitle: 'Descubra a Aventura em Família',
-    homeSubtitle: 'Atividades, eventos e serviços para momentos inesquecíveis.',
-    upcomingEvents: 'Próximos Eventos',
+    days: 'dias',
+    adults: 'Adultos',
+    children: 'Crianças',
+
+    // Home Page
+    upcomingEvents: 'Eventos Futuros',
+    discoverActivities: 'Descubra Atividades',
 
     // Filters
-    filtersTitle: 'Filtros',
-    searchPlaceholder: 'Pesquisar atividades...',
+    filtersTitle: 'Filtrar Atividades',
+    searchPlaceholder: 'Pesquisar por nome...',
     filtersCategory: 'Categoria',
     filtersAllCategories: 'Todas as categorias',
     filtersPrice: 'Preço Máximo',
     filtersRating: 'Avaliação Mínima',
     filtersApply: 'Aplicar Filtros',
-    
+
     // Activity Detail
+    backToActivities: 'Voltar às atividades',
     wheelchair: 'Cadeira de rodas',
     stroller: 'Carrinho de bebé',
-    activityVisited: 'Visitado!',
-    markAsVisited: 'Marcar como Visitado',
+    activityVisited: 'Atividade Visitada',
+    markAsVisited: 'Marcar como Visitada',
     addToAlbum: 'Adicionar ao Álbum',
+    reviews: 'Avaliações',
+    noReviews: 'Ainda não existem avaliações. Seja o primeiro!',
     logInToReview: 'Para deixar uma avaliação, por favor',
-    
+
     // Review Form
     leaveReviewTitle: 'Deixe a sua Avaliação',
-    submitReview: 'Submeter Avaliação',
+    comment: 'Comentário',
+    submitReview: 'Enviar Avaliação',
 
     // Map
-    noLocationsMap: 'Nenhuma localização para mostrar no mapa.',
+    noLocationsMap: 'Nenhuma localização para mostrar.',
 
-    // Login
+    // Login Page
     loginTitle: 'Aceda à sua conta',
-    loginHint: 'Use user@example.com e a password "password" para testar.',
+    loginHint: 'Use user@example.com / password',
     
-    // Profile
+    // Profile Page
     welcome: 'Bem-vindo(a)',
     profileInfo: 'Informação do Perfil',
     membership: 'Subscrição',
@@ -79,46 +82,51 @@ export const pt = {
     myAlbums: 'Os Meus Álbuns',
     orderHistory: 'Histórico de Encomendas',
     upgradeToPremium: 'Faça Upgrade para Premium',
-    premiumDescriptionShort: 'Desbloqueie funcionalidades exclusivas como o planeador de viagens com IA.',
+    premiumDescriptionShort: 'Desbloqueie funcionalidades exclusivas como o planeador de viagens e álbuns ilimitados.',
     learnMore: 'Saber Mais',
-    logout: 'Sair',
-    
-    // Premium
+
+    // Passport Page
+    passportTitle: 'Passaporte de Aventuras',
+    passportDescription: 'Aqui estão todas as atividades que já visitou. Continue a explorar!',
+    visitedActivities: 'Atividades Visitadas',
+    noVisitedActivities: 'Ainda não marcou nenhuma atividade como visitada. Comece a explorar!',
+
+    // Trip Planner
+    tripPlannerTitle: 'Planeador de Viagem IA',
+    tripPlannerSubtitle: 'Deixe a nossa inteligência artificial criar o roteiro perfeito para a sua família.',
+    tripDuration: 'Duração da Viagem',
+    numberOfPeople: 'Número de Pessoas',
+    interests: 'Interesses',
+    interestsPlaceholder: 'Ex: museus, ar livre, comida local',
+    travelPace: 'Ritmo da Viagem',
+    relaxed: 'Relaxado',
+    moderate: 'Moderado',
+    fastPaced: 'Intenso',
+    generating: 'A gerar plano...',
+    generatePlan: 'Gerar Plano',
+    yourPlan: 'O Seu Plano de Viagem Personalizado',
+
+    // Premium Page
     upgradeSuccess: 'Upgrade efetuado com sucesso!',
     backToProfile: 'Voltar ao Perfil',
-    premiumTitle: '⭐ Torne-se Membro Premium',
+    premiumTitle: 'Torne-se Membro Premium',
     premiumBenefits: 'Benefícios Premium',
-    premiumBenefit1: 'Planeador de Viagens com Inteligência Artificial',
-    premiumBenefit2: 'Criação de álbuns de recordações ilimitados',
-    premiumBenefit3: 'Descontos exclusivos na impressão de álbuns',
-    premiumBenefit4: 'Acesso antecipado a novos eventos e atividades',
+    premiumBenefit1: 'Acesso ilimitado ao nosso Planeador de Viagem IA.',
+    premiumBenefit2: 'Crie álbuns de fotos ilimitados para guardar as suas memórias.',
+    premiumBenefit3: 'Encomende impressões físicas dos seus álbuns de fotos.',
+    premiumBenefit4: 'Descontos exclusivos em atividades parceiras.',
     upgradeNow: 'Fazer Upgrade Agora',
 
-    // Photo Upload
-    uploadPhoto: 'Carregar Foto',
-    
-    // Passport
-    passportTitle: 'Passaporte de Aventuras',
-    passportDescription: 'Aqui pode ver todas as atividades que já visitou e carimbou no seu passaporte.',
-    visitedActivities: 'Atividades Visitadas',
-    noVisitedActivities: 'Ainda não visitou nenhuma atividade. Comece a explorar!',
-
-    // Event Detail
-    eventDetails: 'Detalhes do Evento',
-    when: 'Quando',
-    
     // Suppliers
-    allSuppliers: 'Todos os Fornecedores',
+    allSuppliers: 'Fornecedores para a sua Festa',
     contactSupplier: 'Contactar Fornecedor',
-    
-    // Contact Modal
-    contact: 'Contactar',
+    contact: 'Contacto',
     phone: 'Telefone',
     website: 'Website',
     
-    // Add to Album Modal
-    selectAlbum: 'Selecione um álbum',
-    createNewAlbum: 'Criar novo álbum',
+    // Events
+    eventDetails: 'Detalhes do Evento',
+    when: 'Quando',
     
     // Albums
     yourAlbums: 'Os Seus Álbuns',
@@ -126,12 +134,13 @@ export const pt = {
     albumName: 'Nome do álbum',
     viewAlbum: 'Ver álbum',
     noAlbums: 'Ainda não criou nenhum álbum.',
-
-    // Album Detail
-    printAlbum: 'Imprimir Álbum',
-    noPhotos: 'Este álbum ainda não tem fotos. Adicione algumas memórias!',
+    selectAlbum: 'Selecione um álbum',
+    createNewAlbum: 'Ou crie um novo álbum',
+    printAlbum: 'Encomendar Impressão',
+    noPhotos: 'Este álbum ainda não tem fotos.',
+    uploadPhoto: 'Carregar Foto',
     
-    // Order
+    // Orders
     orderPrintTitle: 'Encomendar Impressão de Álbum',
     coverType: 'Tipo de Capa',
     softCover: 'Capa Mole',
@@ -143,34 +152,21 @@ export const pt = {
     total: 'Total',
     placeOrder: 'Finalizar Encomenda',
     orderSuccessTitle: 'Encomenda Recebida!',
-    orderSuccessMessage: 'A sua encomenda foi recebida e será processada em breve. Obrigado!',
+    orderSuccessMessage: 'A sua encomenda foi submetida com sucesso. Irá receber um email de confirmação em breve.',
     order: 'Encomenda',
-    album: 'Álbum',
     date: 'Data',
     noOrders: 'Ainda não efetuou nenhuma encomenda.',
     
-    // SOS
-    sosTitle: 'Emergência (SOS)',
-    sosDescription: 'Contactos e localizações úteis em caso de emergência.',
+    // SOS Page
+    sosTitle: 'SOS - Emergência',
+    sosSubtitle: 'Contactos e locais importantes para a sua segurança.',
+    emergencyNumber: 'Número Nacional de Emergência',
+    callNow: 'Ligar Agora',
     hospitals: 'Hospitais',
+    policeStations: 'Polícia',
     pharmacies: 'Farmácias',
-    police: 'Polícia',
     
-    // Trip Planner
-    tripPlannerTitle: 'Planeador de Viagem IA',
-    tripPlannerSubtitle: 'Deixe que a nossa inteligência artificial crie o roteiro perfeito para a sua família.',
-    tripDuration: 'Duração da Viagem',
-    days: 'Dias',
-    numberOfPeople: 'Número de Pessoas',
-    adults: 'Adultos',
-    children: 'Crianças',
-    interests: 'Interesses',
-    interestsPlaceholder: 'Ex: museus, ar livre, praia, comida',
-    travelPace: 'Ritmo da Viagem',
-    relaxed: 'Relaxado',
-    moderate: 'Moderado',
-    fastPaced: 'Intenso',
-    generatePlan: 'Gerar Plano',
-    generating: 'A gerar o seu plano de viagem...',
-    yourPlan: 'O Seu Plano de Viagem Personalizado'
+    // Weather Widget
+    weatherIn: 'Tempo em',
+    loadingWeather: 'A carregar meteorologia...',
 };

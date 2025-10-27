@@ -1,48 +1,50 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
 import { ActivityService, ActivityFilters } from '../../services/activity.service';
-import { DiscoverFeedComponent } from '../discover-feed/discover-feed.component';
 import { FiltersComponent } from '../filters/filters.component';
+import { DiscoverFeedComponent } from '../discover-feed/discover-feed.component';
 import { EventCarouselComponent } from '../event-carousel/event-carousel.component';
-import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
 import { L10nPipe } from '../../pipes/l10n.pipe';
+import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    AsyncPipe,
-    DiscoverFeedComponent,
     FiltersComponent,
+    DiscoverFeedComponent,
     EventCarouselComponent,
     WeatherWidgetComponent,
     L10nPipe
   ],
   template: `
-    <section class="text-center mb-12">
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">{{ 'homeTitle' | l10n }}</h1>
-      <p class="text-gray-600">{{ 'homeSubtitle' | l10n }}</p>
-    </section>
-
-    <section class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
-        <app-event-carousel [events]="activityService.upcomingEvents()" />
-    </section>
-    
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-      <aside class="md:col-span-1">
-        <app-filters (filtersChanged)="onFiltersChanged($event)" />
-        <app-weather-widget location="Lisbon" class="mt-8" />
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <aside class="lg:col-span-1">
+        <div class="sticky top-24 space-y-6">
+            <app-filters (filtersChanged)="onFiltersChanged($event)" />
+            <app-weather-widget location="Lisbon" />
+        </div>
       </aside>
-      <main class="md:col-span-3">
-        <app-discover-feed [activities]="activityService.filteredActivities()" />
-      </main>
+
+      <div class="lg:col-span-3">
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
+            <app-event-carousel [events]="upcomingEvents()" />
+        </section>
+
+        <section>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ 'discoverActivities' | l10n }}</h2>
+            <app-discover-feed [activities]="filteredActivities()" />
+        </section>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  activityService = inject(ActivityService);
+  private activityService = inject(ActivityService);
+  
+  filteredActivities = this.activityService.filteredActivities;
+  upcomingEvents = this.activityService.upcomingEvents;
 
   onFiltersChanged(filters: ActivityFilters): void {
     this.activityService.applyFilters(filters);

@@ -1,7 +1,7 @@
 export interface EmergencyLocation {
   id: number;
   name: string;
-  type: 'hospital' | 'pharmacy' | 'police';
+  type: 'Hospital' | 'Police' | 'Pharmacy';
   address: string;
   phone: string;
   location: {

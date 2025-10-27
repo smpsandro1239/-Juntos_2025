@@ -1,83 +1,76 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MapViewComponent } from '../map-view/map-view.component';
 import { EmergencyService } from '../../services/emergency.service';
 import { EmergencyLocation } from '../../models/emergency-location.model';
-import { MapViewComponent } from '../map-view/map-view.component';
 import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-sos-page',
   standalone: true,
-  imports: [MapViewComponent, L10nPipe],
+  imports: [CommonModule, MapViewComponent, L10nPipe],
   template: `
-    <div class="bg-white p-8 rounded-lg shadow-lg">
-      <h1 class="text-3xl font-bold text-red-600 mb-2">{{ 'sosTitle' | l10n }}</h1>
-      <p class="text-gray-600 mb-8">{{ 'sosDescription' | l10n }}</p>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Locations List -->
-        <div class="lg:col-span-2 space-y-8">
-          <section>
-            <h2 class="text-2xl font-semibold mb-4 flex items-center"><span class="text-3xl mr-3">🏥</span> {{ 'hospitals' | l10n }}</h2>
-            <div class="space-y-3">
-              @for(location of hospitals(); track location.id) {
-                <div class="bg-gray-50 p-4 rounded-md border">
-                  <h3 class="font-bold">{{ location.name }}</h3>
-                  <p class="text-sm text-gray-600">{{ location.address }}</p>
-                  <a [href]="'tel:' + location.phone" class="text-teal-600 hover:underline">{{ location.phone }}</a>
-                </div>
-              }
-            </div>
-          </section>
-
-          <section>
-            <h2 class="text-2xl font-semibold mb-4 flex items-center"><span class="text-3xl mr-3">💊</span> {{ 'pharmacies' | l10n }}</h2>
-             <div class="space-y-3">
-              @for(location of pharmacies(); track location.id) {
-                <div class="bg-gray-50 p-4 rounded-md border">
-                  <h3 class="font-bold">{{ location.name }}</h3>
-                  <p class="text-sm text-gray-600">{{ location.address }}</p>
-                  <a [href]="'tel:' + location.phone" class="text-teal-600 hover:underline">{{ location.phone }}</a>
-                </div>
-              }
-            </div>
-          </section>
-
-          <section>
-            <h2 class="text-2xl font-semibold mb-4 flex items-center"><span class="text-3xl mr-3">🚓</span> {{ 'police' | l10n }}</h2>
-             <div class="space-y-3">
-              @for(location of police(); track location.id) {
-                <div class="bg-gray-50 p-4 rounded-md border">
-                  <h3 class="font-bold">{{ location.name }}</h3>
-                  <p class="text-sm text-gray-600">{{ location.address }}</p>
-                  <a [href]="'tel:' + location.phone" class="text-teal-600 hover:underline">{{ location.phone }}</a>
-                </div>
-              }
-            </div>
-          </section>
-        </div>
-        <!-- Map -->
-        <aside class="sticky top-24 h-96">
-            <app-map-view [locations]="mapLocations()" />
-        </aside>
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-red-600">{{ 'sosTitle' | l10n }}</h1>
+        <p class="text-gray-600 mt-2">{{ 'sosSubtitle' | l10n }}</p>
       </div>
 
+      <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-r-lg mb-8 text-center">
+        <h2 class="text-2xl font-bold">{{ 'emergencyNumber' | l10n }}: 112</h2>
+        <a href="tel:112" class="mt-4 inline-block bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors">
+          {{ 'callNow' | l10n }}
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <div class="flex space-x-2 mb-4 border-b pb-2">
+            @for(type of filterTypes; track type.id) {
+              <button 
+                (click)="selectedType.set(type.id)"
+                class="px-4 py-2 rounded-full text-sm font-semibold transition-colors"
+                [class.bg-teal-500]="selectedType() === type.id"
+                [class.text-white]="selectedType() === type.id"
+                [class.hover:bg-teal-100]="selectedType() !== type.id"
+              >
+                {{ type.label | l10n }}
+              </button>
+            }
+          </div>
+          <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+            @for(location of filteredLocations(); track location.id) {
+              <div class="p-4 border rounded-lg bg-gray-50">
+                <h3 class="font-bold text-gray-800">{{ location.name }}</h3>
+                <p class="text-sm text-gray-600">{{ location.address }}</p>
+                <a [href]="'tel:' + location.phone" class="text-sm text-teal-600 hover:underline">{{ location.phone }}</a>
+              </div>
+            }
+          </div>
+        </div>
+        <div>
+          <app-map-view [locations]="filteredLocations()" />
+        </div>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SosPageComponent {
-    private emergencyService = inject(EmergencyService);
-    locations = this.emergencyService.allLocations;
-    
-    hospitals = computed(() => this.locations().filter(l => l.type === 'hospital'));
-    pharmacies = computed(() => this.locations().filter(l => l.type === 'pharmacy'));
-    police = computed(() => this.locations().filter(l => l.type === 'police'));
+  private emergencyService = inject(EmergencyService);
 
-    mapLocations = computed(() => {
-        return this.locations().map(l => ({
-            lat: l.location.lat,
-            lng: l.location.lng,
-            name: l.name
-        }));
-    });
+  filterTypes: {id: EmergencyLocation['type'], label: string}[] = [
+    { id: 'Hospital', label: 'hospitals' },
+    { id: 'Police', label: 'policeStations' },
+    { id: 'Pharmacy', label: 'pharmacies' }
+  ];
+  
+  selectedType = signal<EmergencyLocation['type']>('Hospital');
+  
+  allLocations = this.emergencyService.allLocations;
+
+  filteredLocations = computed(() => {
+    const type = this.selectedType();
+    return this.allLocations().filter(loc => loc.type === type);
+  });
 }
