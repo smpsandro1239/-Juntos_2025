@@ -10,10 +10,18 @@ import { Album } from '../../models/album.model';
   template: `
     @if (album(); as alb) {
       <div class="max-w-6xl mx-auto">
-        <a routerLink="/albums" class="inline-flex items-center text-teal-600 hover:underline mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            Voltar aos Álbuns
-        </a>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <a routerLink="/albums" class="inline-flex items-center text-teal-600 hover:underline mb-4 sm:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                Voltar aos Álbuns
+            </a>
+            @if (alb.photos.length > 0) {
+                 <a [routerLink]="['/order-print', alb.id]" class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">
+                    Imprimir Álbum
+                </a>
+            }
+        </div>
+
 
         <div class="bg-white p-6 rounded-lg shadow-md mb-8">
             <h2 class="text-3xl font-bold text-teal-600">{{ alb.name }}</h2>

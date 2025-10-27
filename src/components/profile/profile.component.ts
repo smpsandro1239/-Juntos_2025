@@ -16,6 +16,12 @@ import { PassportComponent } from '../passport/passport.component';
             <a routerLink="/albums" class="bg-teal-100 text-teal-800 font-semibold py-2 px-4 rounded-lg hover:bg-teal-200">
                 Meus Álbuns
             </a>
+             <a routerLink="/orders" class="bg-blue-100 text-blue-800 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200">
+                Minhas Encomendas
+            </a>
+            <a routerLink="/passport" class="bg-purple-100 text-purple-800 font-semibold py-2 px-4 rounded-lg hover:bg-purple-200">
+                Passaporte Família
+            </a>
             @if (authService.currentUser()?.isPremium) {
                 <span class="bg-yellow-100 text-yellow-800 font-semibold py-2 px-4 rounded-lg">
                     Membro Premium ⭐
