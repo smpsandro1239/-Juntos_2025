@@ -20,6 +20,11 @@ export const appRoutes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'passport',
+    loadComponent: () => import('./components/passport/passport.component').then(c => c.PassportComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'trip-planner',
     loadComponent: () => import('./components/trip-planner/trip-planner.component').then(c => c.TripPlannerComponent),
     canActivate: [authGuard],

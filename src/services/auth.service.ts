@@ -5,7 +5,7 @@ import { User } from '../models/user.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly MOCK_USER: User = { id: 1, name: 'Utilizador Teste', email: 'user@example.com', isPremium: false };
+  private readonly MOCK_USER: User = { id: 1, name: 'Utilizador Teste', email: 'user@example.com', isPremium: false, visitedActivityIds: [2, 5] };
   
   private currentUserSignal = signal<User | null>(this.getStoredUser());
   
@@ -51,6 +51,15 @@ export class AuthService {
         return { ...user, isPremium: true };
       }
       return null;
+    });
+  }
+
+  markActivityAsVisited(activityId: number): void {
+    this.currentUserSignal.update(user => {
+      if (user && !user.visitedActivityIds.includes(activityId)) {
+        return { ...user, visitedActivityIds: [...user.visitedActivityIds, activityId] };
+      }
+      return user;
     });
   }
 }

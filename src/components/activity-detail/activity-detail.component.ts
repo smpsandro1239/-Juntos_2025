@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit, WritableSignal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, WritableSignal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 
@@ -48,6 +48,21 @@ import { User } from '../../models/user.model';
                 </div>
               }
             </div>
+
+             @if (isLoggedIn()) {
+              <div class="mt-4 border-t pt-4">
+                <button (click)="markAsVisited()" [disabled]="isVisited()"
+                        class="w-full text-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300"
+                        [class]="isVisited() ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-700 text-white'">
+                  @if (isVisited()) {
+                    <span>Visitado!</span>
+                  } @else {
+                    <span>Marcar como Visitado</span>
+                  }
+                </button>
+              </div>
+            }
+
           </div>
         </div>
 
@@ -131,6 +146,13 @@ export class ActivityDetailComponent implements OnInit {
   
   showUploadForm = signal(false);
 
+  isVisited = computed(() => {
+    const user = this.currentUser();
+    const currentActivity = this.activity();
+    if (!user || !currentActivity) return false;
+    return user.visitedActivityIds.includes(currentActivity.id);
+  });
+
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -157,6 +179,13 @@ export class ActivityDetailComponent implements OnInit {
         this.activityService.addUserImage(this.activity()!.id, imageData.imageUrl, user.name);
         this.activity.set(this.activityService.getActivityById(this.activity()!.id) ?? null);
         this.showUploadForm.set(false);
+    }
+  }
+
+  markAsVisited(): void {
+    const currentActivity = this.activity();
+    if (currentActivity && !this.isVisited()) {
+      this.authService.markActivityAsVisited(currentActivity.id);
     }
   }
 
