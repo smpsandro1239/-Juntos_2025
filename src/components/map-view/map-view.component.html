@@ -15,8 +15,8 @@
          class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-48 bg-white rounded-lg shadow-xl p-2 text-center text-xs transition-all duration-200 origin-bottom z-20"
          [class]="activeActivityId() === activity.id ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'">
           <img [src]="activity.imageUrl" class="w-full h-16 object-cover rounded-md mb-2">
-          <p class="font-bold text-slate-800 truncate">{{activity.title}}</p>
-          <p class="text-slate-500">{{activity.price}}</p>
+          <p class="font-bold text-slate-800 truncate">{{activity.name}}</p>
+          <p class="text-slate-500">{{ activity.price > 0 ? activity.price + '€' : 'Grátis' }}</p>
       </a>
 
       <!-- Marcador (Pin) -->

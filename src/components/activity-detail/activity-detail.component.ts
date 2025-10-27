@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs/interop';
 import { map } from 'rxjs/operators';
 import { ActivityService } from '../../services/activity.service';
 import { Activity } from '../../models/activity.model';
@@ -15,20 +15,23 @@ import { ReviewFormComponent } from '../review-form/review-form.component';
   template: `
     @if (activity(); as act) {
       <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-        <a routerLink="/" class="text-blue-500 hover:text-blue-700 mb-4 inline-block">&larr; Back to Discover</a>
+        <a routerLink="/" class="text-teal-600 hover:text-teal-800 mb-4 inline-block">&larr; Voltar a Descobrir</a>
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
           <img [src]="act.imageUrl" [alt]="act.name" class="w-full h-64 object-cover">
           <div class="p-6">
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
               <h1 class="text-3xl font-bold text-gray-800">{{ act.name }}</h1>
-              <span class="text-xl font-semibold text-green-600 mt-2 sm:mt-0">{{ act.price > 0 ? '$' + act.price : 'Free' }}</span>
+              <span class="text-xl font-semibold text-green-600 mt-2 sm:mt-0">{{ act.price > 0 ? act.price + '€' : 'Grátis' }}</span>
             </div>
             <div class="flex items-center mb-4">
-              <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">{{ act.category }}</span>
+              <span class="bg-teal-100 text-teal-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">{{ act.category }}</span>
               @if (act.rainyDayOk) {
-                <span class="bg-gray-200 text-gray-800 text-sm font-medium px-2.5 py-0.5 rounded flex items-center">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                  Rainy Day OK
+                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M15.5 8a5.5 5.5 0 00-10.841 1.222.5.5 0 01-.88.445A6.5 6.5 0 0115.5 8zM10 12.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 01-.5-.5v-1a.5.5 0 011 0v1a.5.5 0 01-.5.5zM12.016 11.2a.5.5 0 01.353.146l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 01.353-.853zM7.984 11.2a.5.5 0 01.353-.853l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 01.353-.146z" clip-rule="evenodd" />
+                  </svg>
+                  Bom para Chuva
                 </span>
               }
             </div>
@@ -36,7 +39,7 @@ import { ReviewFormComponent } from '../review-form/review-form.component';
             <p class="text-gray-700 leading-relaxed mb-6">{{ act.description }}</p>
 
             <div class="border-t pt-6">
-              <h2 class="text-2xl font-semibold mb-4">Reviews ({{ act.reviews.length }})</h2>
+              <h2 class="text-2xl font-semibold mb-4">Avaliações ({{ act.reviews.length }})</h2>
               @if (act.rating > 0) {
                 <div class="flex items-center mb-4">
                   <app-star-rating [rating]="act.rating" [showRatingValue]="true" />
@@ -55,7 +58,7 @@ import { ReviewFormComponent } from '../review-form/review-form.component';
                   </div>
                 }
                 @if (act.reviews.length === 0) {
-                  <p class="text-gray-500">No reviews yet. Be the first to add one!</p>
+                  <p class="text-gray-500">Ainda sem avaliações. Seja o primeiro a deixar uma!</p>
                 }
               </div>
             </div>
@@ -68,7 +71,7 @@ import { ReviewFormComponent } from '../review-form/review-form.component';
         </div>
       </div>
     } @else {
-      <p class="text-center text-gray-500 mt-8">Activity not found.</p>
+      <p class="text-center text-gray-500 mt-8">Atividade não encontrada.</p>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

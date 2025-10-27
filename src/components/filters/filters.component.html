@@ -11,16 +11,16 @@
             }
         </div>
         <div class="w-full sm:w-auto flex-shrink-0 flex items-center gap-2 justify-end">
-            <button (click)="activityService.toggleFreeFilter()"
+            <button (click)="activityService.toggleShowOnlyFree()"
                     class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
                     [class]="showOnlyFree() ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.168-.217c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5c.396 0 .762-.092 1.082-.254v1.698c-.43.15-.89.23-1.382.23-2.209 0-4-1.79-4-4s1.791-4 4-4c.453 0 .88.066 1.274.184V5.44c-.211-.07-.416-.126-.618-.162a4 4 0 00-3.656 3.656 1.5 1.5 0 01-1.13.04c-1.295-.55-2.293-1.8-2.293-3.234 0-1.84 1.492-3.333 3.333-3.333 1.156 0 2.183.587 2.796 1.484A4.002 4.002 0 0012 2C9.791 2 8 3.79 8 6v1.418z" /><path d="M11 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" /></svg>
                 <span>Grátis</span>
             </button>
-            <button (click)="activityService.toggleRainyDayFilter()"
+            <button (click)="activityService.toggleShowRainyDayOk()"
                     class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
                     [class]="showRainyDayOk() ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.5 8a5.5 5.5 0 00-10.841 1.222.5.5 0 01-.88.445A6.5 6.5 0 0115.5 8zM10 12.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 12.5a.5.5 0 01-.5-.5v-1a.5.5 0 011 0v1a.5.5 0 01-.5.5zM12.016 11.2a.5.5 0 01.353.146l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 01.353-.853zM7.984 11.2a.5.5 0 01.353-.853l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 01.353-.146z" clip-rule="evenodd" /></svg>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.5 8a5.5 5.5 0 00-10.841 1.222.5.5 0 01-.88.445A6.5 6.5 0 0115.5 8zM10 12.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 12.5a.5.5 0 01-.5-.5v-1a.5.5 0 011 0v1a.5.5 0 01-.5-.5zM12.016 11.2a.5.5 0 01.353.146l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 01.353-.853zM7.984 11.2a.5.5 0 01.353-.853l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 01.353-.146z" clip-rule="evenodd" /></svg>
                 <span>Chuva OK</span>
             </button>
         </div>

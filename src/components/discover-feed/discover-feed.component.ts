@@ -20,7 +20,7 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
               <div class="flex justify-between items-center">
                 <app-star-rating [rating]="activity.rating" [showRatingValue]="true" />
                 <span class="text-lg font-bold text-gray-800">
-                  {{ activity.price > 0 ? '$' + activity.price : 'Free' }}
+                  {{ activity.price > 0 ? activity.price + '€' : 'Grátis' }}
                 </span>
               </div>
             </div>
@@ -29,7 +29,7 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
       </div>
     } @else {
       <div class="text-center py-12">
-        <p class="text-gray-500 text-lg">No activities found matching your criteria.</p>
+        <p class="text-gray-500 text-lg">Nenhuma atividade encontrada com os critérios selecionados.</p>
       </div>
     }
   `,

@@ -7,18 +7,18 @@ import { Review } from '../../models/review.model';
   standalone: true,
   imports: [ReactiveFormsModule],
   template: `
-    <h3 class="text-xl font-semibold mb-4">Leave a Review</h3>
+    <h3 class="text-xl font-semibold mb-4">Deixe a sua Avaliação</h3>
     <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()">
       <div class="mb-4">
-        <label for="userName" class="block text-gray-700 font-bold mb-2">Your Name</label>
+        <label for="userName" class="block text-gray-700 font-bold mb-2">O seu Nome</label>
         <input type="text" id="userName" formControlName="userName"
                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         @if (reviewForm.get('userName')?.invalid && reviewForm.get('userName')?.touched) {
-          <p class="text-red-500 text-xs italic">Name is required.</p>
+          <p class="text-red-500 text-xs italic">O nome é obrigatório.</p>
         }
       </div>
       <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2">Rating</label>
+        <label class="block text-gray-700 font-bold mb-2">Classificação</label>
         <div class="flex items-center">
           @for (i of [1, 2, 3, 4, 5]; track i) {
             <span class="cursor-pointer" (click)="setRating(i)">
@@ -32,20 +32,20 @@ import { Review } from '../../models/review.model';
           }
         </div>
         @if (reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched) {
-          <p class="text-red-500 text-xs italic">Rating is required.</p>
+          <p class="text-red-500 text-xs italic">A classificação é obrigatória.</p>
         }
       </div>
       <div class="mb-4">
-        <label for="comment" class="block text-gray-700 font-bold mb-2">Comment</label>
+        <label for="comment" class="block text-gray-700 font-bold mb-2">Comentário</label>
         <textarea id="comment" formControlName="comment" rows="4"
                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
         @if (reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched) {
-          <p class="text-red-500 text-xs italic">Comment is required.</p>
+          <p class="text-red-500 text-xs italic">O comentário é obrigatório.</p>
         }
       </div>
       <button type="submit" [disabled]="reviewForm.invalid"
-              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
-        Submit Review
+              class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
+        Submeter Avaliação
       </button>
     </form>
   `,

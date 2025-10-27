@@ -21,7 +21,7 @@ export class AuthService {
   login(email: string, password: string): boolean {
     // Mock login logic
     if (email === 'user@example.com' && password === 'password') {
-      const user: User = { id: '1', name: 'Test User', email: 'user@example.com' };
+      const user: User = { id: '1', name: 'Utilizador Teste', email: 'user@example.com' };
       this.currentUser.set(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
       this.router.navigate(['/profile']);
@@ -33,6 +33,5 @@ export class AuthService {
   logout(): void {
     this.currentUser.set(null);
     localStorage.removeItem('currentUser');
-    this.router.navigate(['/']);
   }
 }

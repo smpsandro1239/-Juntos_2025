@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="max-w-md mx-auto mt-8">
       <div class="bg-white p-8 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
+        <h2 class="text-2xl font-bold text-center mb-6">Entrar</h2>
         @if (errorMessage()) {
           <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">{{ errorMessage() }}</span>
@@ -23,27 +23,27 @@ import { AuthService } from '../../services/auth.service';
                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                    [class.border-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-              <p class="text-red-500 text-xs italic">Please enter a valid email.</p>
+              <p class="text-red-500 text-xs italic">Por favor, insira um email válido.</p>
             }
           </div>
           <div class="mb-6">
-            <label for="password" class="block text-gray-700 font-bold mb-2">Password</label>
+            <label for="password" class="block text-gray-700 font-bold mb-2">Palavra-passe</label>
             <input type="password" id="password" formControlName="password"
                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                    [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
             @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                <p class="text-red-500 text-xs italic">Password is required.</p>
+                <p class="text-red-500 text-xs italic">A palavra-passe é obrigatória.</p>
             }
           </div>
           <div class="flex items-center justify-between">
             <button type="submit" [disabled]="loginForm.invalid"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
-              Sign In
+                    class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400">
+              Entrar
             </button>
           </div>
         </form>
          <div class="mt-4 text-sm text-gray-600">
-          <p>Use <strong>user@example.com</strong> and <strong>password</strong> to log in.</p>
+          <p>Use <strong>user@example.com</strong> e <strong>password</strong> para entrar.</p>
         </div>
       </div>
     </div>
@@ -68,7 +68,7 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
     const success = this.authService.login(email!, password!);
     if (!success) {
-      this.errorMessage.set('Invalid email or password.');
+      this.errorMessage.set('Email ou palavra-passe inválidos.');
     }
   }
 }

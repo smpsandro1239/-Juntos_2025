@@ -5,71 +5,71 @@ import { Review } from '../models/review.model';
 const MOCK_ACTIVITIES: Activity[] = [
     {
       id: 1,
-      name: 'Explore Central Park',
-      description: 'A beautiful and large urban park with many attractions, including a zoo, a carousel, and plenty of walking paths.',
-      category: 'Outdoor',
-      price: 0,
-      location: { lat: 40.785091, lng: -73.968285, address: 'Central Park, New York, NY' },
-      imageUrl: 'https://picsum.photos/seed/cpark/600/400',
-      rainyDayOk: false,
+      name: 'Oceanário de Lisboa',
+      description: 'Um dos maiores e mais espetaculares aquários da Europa, com uma vasta coleção de espécies marinhas. Ideal para um dia em família.',
+      category: 'Educação',
+      price: 22,
+      location: { lat: 38.7634, lng: -9.0936, address: 'Esplanada Dom Carlos I s/nº, 1990-005 Lisboa' },
+      imageUrl: 'https://picsum.photos/seed/oceanario/600/400',
+      rainyDayOk: true,
       reviews: [
-        { id: 1, activityId: 1, userName: 'Alice', rating: 5, comment: 'Absolutely stunning! So much to see.', date: new Date('2023-10-20').toISOString() },
-        { id: 2, activityId: 1, userName: 'Bob', rating: 4, comment: 'Great for a long walk, but can get crowded.', date: new Date('2023-10-22').toISOString() },
+        { id: 1, activityId: 1, userName: 'Ana Silva', rating: 5, comment: 'Absolutamente incrível! As crianças adoraram o aquário central.', date: new Date('2023-10-20').toISOString() },
+        { id: 2, activityId: 1, userName: 'Bruno Costa', rating: 4, comment: 'Muito bom, mas pode ficar cheio ao fim de semana. Recomendo ir cedo.', date: new Date('2023-10-22').toISOString() },
       ],
       rating: 4.5
     },
     {
       id: 2,
-      name: 'Metropolitan Museum of Art',
-      description: 'One of the world\'s largest and finest art museums. It contains more than two million works of art.',
-      category: 'Museum',
-      price: 30,
-      location: { lat: 40.779437, lng: -73.963244, address: '1000 5th Ave, New York, NY 10028' },
-      imageUrl: 'https://picsum.photos/seed/met/600/400',
-      rainyDayOk: true,
+      name: 'Jardim Zoológico de Lisboa',
+      description: 'Um dia bem passado entre animais de todo o mundo. Inclui um teleférico com vistas fantásticas sobre o parque.',
+      category: 'Ar Livre',
+      price: 23,
+      location: { lat: 38.7424, lng: -9.1744, address: 'Praça Marechal Humberto Delgado, 1549-004 Lisboa' },
+      imageUrl: 'https://picsum.photos/seed/zoo/600/400',
+      rainyDayOk: false,
       reviews: [
-        { id: 3, activityId: 2, userName: 'Charlie', rating: 5, comment: 'Could spend days here. The Egyptian exhibit is incredible.', date: new Date('2023-11-05').toISOString() },
+        { id: 3, activityId: 2, userName: 'Carla Dias', rating: 5, comment: 'O espetáculo dos golfinhos é imperdível. Um clássico que nunca falha!', date: new Date('2023-11-05').toISOString() },
       ],
       rating: 5
     },
     {
       id: 3,
-      name: 'Walk the Brooklyn Bridge',
-      description: 'A hybrid cable-stayed/suspension bridge in New York City, spanning the East River between Manhattan and Brooklyn.',
-      category: 'Outdoor',
+      name: 'Passeio nos Jardins de Serralves',
+      description: 'Explore os magníficos jardins da Fundação de Serralves, um oásis de tranquilidade e arte no coração do Porto.',
+      category: 'Ar Livre',
       price: 0,
-      location: { lat: 40.706051, lng: -73.996864, address: 'Brooklyn Bridge, New York, NY 10038' },
-      imageUrl: 'https://picsum.photos/seed/bbridge/600/400',
+      location: { lat: 41.1594, lng: -8.6599, address: 'R. Dom João de Castro 210, 4150-417 Porto' },
+      imageUrl: 'https://picsum.photos/seed/serralves/600/400',
       rainyDayOk: false,
       reviews: [
-         { id: 4, activityId: 3, userName: 'Diana', rating: 4, comment: 'Iconic views, but very windy!', date: new Date('2023-11-10').toISOString() },
-         { id: 5, activityId: 3, userName: 'Eve', rating: 5, comment: 'Best to go early in the morning to avoid crowds.', date: new Date('2023-11-12').toISOString() }
+         { id: 4, activityId: 3, userName: 'Diana Moreira', rating: 4, comment: 'Lindo e relaxante, mas use calçado confortável!', date: new Date('2023-11-10').toISOString() },
+         { id: 5, activityId: 3, userName: 'Eva Fernandes', rating: 5, comment: 'Perfeito para um piquenique em família. A Treetop Walk é fantástica.', date: new Date('2023-11-12').toISOString() }
       ],
       rating: 4.5
     },
     {
       id: 4,
-      name: 'Intrepid Sea, Air & Space Museum',
-      description: 'An American military and maritime history museum with a collection of museum ships.',
-      category: 'Museum',
-      price: 33,
-      location: { lat: 40.764528, lng: -73.999645, address: 'Pier 86, W 46th St, New York, NY 10036' },
-      imageUrl: 'https://picsum.photos/seed/intrepid/600/400',
+      name: 'Pavilhão do Conhecimento',
+      description: 'Um museu de ciência e tecnologia interativo onde é proibido não tocar. Perfeito para crianças curiosas.',
+      category: 'Museu',
+      price: 11,
+      location: { lat: 38.7623, lng: -9.095, address: 'Largo José Mariano Gago 1, 1990-073 Lisboa' },
+      imageUrl: 'https://picsum.photos/seed/pavconhecimento/600/400',
       rainyDayOk: true,
       reviews: [],
       rating: 0
     },
     {
       id: 5,
-      name: 'Katz\'s Delicatessen',
-      description: 'A kosher-style delicatessen known for its pastrami on rye, which is considered among New York\'s best.',
-      category: 'Food',
-      price: 25, // Average meal cost
-      location: { lat: 40.722237, lng: -73.987373, address: '205 E Houston St, New York, NY 10002' },
-      imageUrl: 'https://picsum.photos/seed/katz/600/400',
+      name: 'Livraria Lello',
+      description: 'Uma das mais belas livrarias do mundo, famosa pela sua escadaria icónica e ambiente mágico. Uma visita obrigatória no Porto.',
+      category: 'Cultura',
+      price: 8, // Voucher dedutível em livros
+      location: { lat: 41.1469, lng: -8.6147, address: 'R. das Carmelitas 144, 4050-161 Porto' },
+      imageUrl: 'https://picsum.photos/seed/lello/600/400',
       rainyDayOk: true,
       reviews: [
-        { id: 6, activityId: 5, userName: 'Frank', rating: 5, comment: 'The pastrami sandwich is life-changing.', date: new Date('2023-09-15').toISOString() }
+        { id: 6, activityId: 5, userName: 'Francisco Reis', rating: 5, comment: 'Parece que estamos dentro de um filme do Harry Potter. Mágico!', date: new Date('2023-09-15').toISOString() }
       ],
       rating: 5
     }
