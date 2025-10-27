@@ -1,50 +1,72 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, L10nPipe],
   template: `
-    @if(user(); as u) {
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h1 class="text-3xl font-bold mb-4">Olá, {{ u.name }}!</h1>
-            <p class="text-gray-600 mb-6">{{ u.email }}</p>
-
+    @if (user()) {
+      @let u = user()!;
+      <div class="bg-white p-8 rounded-lg shadow-lg">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">{{ 'welcome' | l10n }}, {{ u.name }}!</h1>
+            @if(u.isPremium) {
+                <span class="bg-yellow-200 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">⭐ Premium</span>
+            }
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Profile Info -->
+            <div class="bg-gray-50 p-6 rounded-lg border">
+                <h2 class="text-xl font-semibold mb-4">{{ 'profileInfo' | l10n }}</h2>
+                <p><strong>{{ 'name' | l10n }}:</strong> {{ u.name }}</p>
+                <p><strong>{{ 'email' | l10n }}:</strong> {{ u.email }}</p>
+                <p><strong>{{ 'membership' | l10n }}:</strong> {{ u.isPremium ? ('premium' | l10n) : ('standard' | l10n) }}</p>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="bg-gray-50 p-6 rounded-lg border">
+                <h2 class="text-xl font-semibold mb-4">{{ 'quickLinks' | l10n }}</h2>
+                <ul class="space-y-2">
+                    <li><a routerLink="/passport" class="text-teal-600 hover:underline">{{ 'myPassport' | l10n }}</a></li>
+                    <li><a routerLink="/albums" class="text-teal-600 hover:underline">{{ 'myAlbums' | l10n }}</a></li>
+                    <li><a routerLink="/orders" class="text-teal-600 hover:underline">{{ 'orderHistory' | l10n }}</a></li>
+                </ul>
+            </div>
+            
+             <!-- Premium Upgrade -->
             @if(!u.isPremium) {
-                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
-                    <p class="font-bold">Torne-se Premium!</p>
-                    <p>Desbloqueie funcionalidades exclusivas como o Planeador de Viagens.</p>
-                    <a routerLink="/premium" class="text-yellow-800 font-bold hover:underline">Fazer Upgrade Agora</a>
-                </div>
-            } @else {
-                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                    <p class="font-bold">Conta Premium Ativa!</p>
-                    <p>Obrigado por fazer parte da nossa comunidade premium.</p>
+                <div class="bg-teal-50 p-6 rounded-lg border border-teal-200">
+                    <h2 class="text-xl font-semibold mb-2">{{ 'upgradeToPremium' | l10n }}</h2>
+                    <p class="text-gray-600 mb-4">{{ 'premiumDescriptionShort' | l10n }}</p>
+                    <a routerLink="/premium" class="inline-block bg-teal-500 text-white font-bold py-2 px-4 rounded hover:bg-teal-600 transition-colors">{{ 'learnMore' | l10n }}</a>
                 </div>
             }
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <a routerLink="/trip-planner" class="block p-6 bg-teal-500 text-white rounded-lg shadow hover:bg-teal-600">
-                    <h3 class="font-bold text-xl">Planeador de Viagens</h3>
-                    <p>Organize as suas próximas aventuras.</p>
-                </a>
-                <a routerLink="/albums" class="block p-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
-                    <h3 class="font-bold text-xl">Meus Álbuns</h3>
-                    <p>Recorde os seus melhores momentos.</p>
-                </a>
-                 <a routerLink="/orders" class="block p-6 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600">
-                    <h3 class="font-bold text-xl">Minhas Encomendas</h3>
-                    <p>Veja o seu histórico de encomendas.</p>
-                </a>
-            </div>
         </div>
+
+         <div class="mt-8 text-center">
+            <button (click)="logout()" class="text-gray-500 hover:text-red-600 hover:underline">{{ 'logout' | l10n }}</button>
+        </div>
+
+      </div>
+    } @else {
+      <p>A carregar perfil...</p>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
+  private router = inject(Router);
   user = this.authService.currentUser;
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
 }

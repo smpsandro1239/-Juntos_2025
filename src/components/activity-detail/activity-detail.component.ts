@@ -1,101 +1,138 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule, DatePipe, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivityService } from '../../services/activity.service';
-import { AuthService } from '../../services/auth.service';
 import { Activity, AccessibilityLevel } from '../../models/activity.model';
+import { Review } from '../../models/review.model';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
-import { ReviewFormComponent } from '../review-form/review-form.component';
 import { MapViewComponent } from '../map-view/map-view.component';
+import { ReviewFormComponent } from '../review-form/review-form.component';
+import { AuthService } from '../../services/auth.service';
 import { AddToAlbumModalComponent } from '../add-to-album-modal/add-to-album-modal.component';
 import { L10nPipe } from '../../pipes/l10n.pipe';
-import { L10nService } from '../../services/l10n.service';
 
 @Component({
   selector: 'app-activity-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, NgOptimizedImage, DatePipe, StarRatingComponent, ReviewFormComponent, MapViewComponent, AddToAlbumModalComponent, L10nPipe],
+  imports: [
+    CommonModule,
+    RouterLink,
+    NgOptimizedImage,
+    StarRatingComponent,
+    MapViewComponent,
+    ReviewFormComponent,
+    AddToAlbumModalComponent,
+    L10nPipe
+  ],
   template: `
-    @if (activity(); as act) {
-      <div class="bg-white p-6 rounded-lg shadow-lg">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <img [ngSrc]="act.imageUrl" [alt]="act.name" width="600" height="400" class="w-full h-auto rounded-lg mb-4 shadow-md">
-            <div class="grid grid-cols-3 gap-2">
-                @for(img of act.galleryImages; track img) {
-                    <img [ngSrc]="img" [alt]="act.name" width="200" height="150" class="w-full h-auto rounded-md shadow">
-                }
-            </div>
+    @if (activity()) {
+      @let act = activity()!;
+      <div class="bg-white p-8 rounded-lg shadow-lg">
+        <button routerLink="/" class="text-teal-500 hover:text-teal-700 mb-4">&larr; {{ 'backToActivities' | l10n }}</button>
+
+        <header class="mb-8">
+          <h1 class="text-4xl font-extrabold text-gray-800">{{ act.name }}</h1>
+          <div class="flex items-center mt-2">
+            <app-star-rating [rating]="act.rating" [showRatingValue]="true" />
+            <span class="mx-2 text-gray-400">|</span>
+            <span class="text-gray-600">{{ act.category }}</span>
           </div>
-          <div>
-            <span class="inline-block bg-teal-200 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">{{ act.category }}</span>
-            <h1 class="text-4xl font-bold text-gray-800 my-2">{{ act.name }}</h1>
-            <div class="flex items-center mb-4">
-              <app-star-rating [rating]="act.rating" [showRatingValue]="true" />
-            </div>
-            <p class="text-gray-600 mb-4">{{ act.description }}</p>
+        </header>
 
-            <div class="mb-4 p-4 bg-gray-50 rounded-md">
-              <h3 class="font-bold text-lg mb-2">{{ 'activityAccessibility' | l10n }}</h3>
-              <div class="flex items-center space-x-4">
-                <span class="text-gray-700">{{ 'accessibilityWheelchair' | l10n }}: <span class="font-semibold">{{ accessibilityLabel(act.accessibility.wheelchair) }}</span></span>
-                <span class="text-gray-700">{{ 'accessibilityStroller' | l10n }}: <span class="font-semibold">{{ accessibilityLabel(act.accessibility.stroller) }}</span></span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="md:col-span-2">
+            <img [ngSrc]="act.imageUrl" [alt]="act.name" width="800" height="600" class="w-full rounded-lg shadow-md mb-6" priority>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-700 mb-3">{{ 'description' | l10n }}</h2>
+                <p class="text-gray-600 leading-relaxed">{{ act.description }}</p>
+            </section>
+            
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-700 mb-3">{{ 'gallery' | l10n }}</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    @for(image of act.galleryImages; track image) {
+                        <img [ngSrc]="image" alt="Gallery image for {{ act.name }}" width="300" height="200" class="rounded-md object-cover w-full h-32 cursor-pointer hover:opacity-80 transition-opacity">
+                    }
+                </div>
+            </section>
+
+          </div>
+          <aside>
+            <div class="bg-gray-50 p-6 rounded-lg border">
+              <h3 class="text-xl font-bold mb-4">{{ 'details' | l10n }}</h3>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <span class="text-2xl mr-3">💰</span>
+                  <span>{{ act.price > 0 ? (act.price | currency:'EUR') : ('free' | l10n) }}</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-2xl mr-3">♿</span>
+                  <span>{{ 'wheelchair' | l10n }}: {{ accessibilityText(act.accessibility.wheelchair) }}</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-2xl mr-3">👶</span>
+                  <span>{{ 'stroller' | l10n }}: {{ accessibilityText(act.accessibility.stroller) }}</span>
+                </div>
               </div>
+              @if(authService.isLoggedIn()) {
+                <button (click)="markVisited(act.id)" [disabled]="isVisited()" class="w-full mt-6 bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+                  {{ isVisited() ? ('activityVisited' | l10n) : ('markAsVisited' | l10n) }}
+                </button>
+                <button (click)="showAddToAlbumModal.set(true)" class="w-full mt-2 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors">
+                  {{ 'addToAlbum' | l10n }}
+                </button>
+              }
+            </div>
+            
+            <div class="mt-6">
+                <h3 class="text-xl font-bold mb-2">{{ 'location' | l10n }}</h3>
+                <app-map-view [locations]="[{lat: act.location.lat, lng: act.location.lng, name: act.name}]" />
             </div>
 
-             @if (authService.isLoggedIn()) {
-              <div class="flex items-center space-x-4 mt-4">
-                <button (click)="markAsVisited()" [disabled]="isVisited()" class="px-4 py-2 rounded-md transition-colors text-white" [class.bg-green-500]="isVisited()" [class.bg-teal-500]="!isVisited()" [class.hover:bg-teal-600]="!isVisited()">
-                  {{ isVisited() ? 'Visitado!' : 'Marcar como Visitado' }}
-                </button>
-                 <button (click)="showAddToAlbumModal.set(true)" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">Adicionar a Álbum</button>
+          </aside>
+        </div>
+
+        <hr class="my-8">
+
+        <section>
+          <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ 'reviews' | l10n }} ({{ act.reviews.length }})</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            @for(review of act.reviews; track review.id) {
+              <div class="bg-gray-50 p-4 rounded-lg border">
+                <div class="flex items-center mb-2">
+                  <app-star-rating [rating]="review.rating" />
+                  <span class="font-semibold ml-auto">{{ review.userName }}</span>
+                </div>
+                <p class="text-gray-600 italic">"{{ review.comment }}"</p>
+                <p class="text-right text-sm text-gray-400 mt-2">{{ review.date | date:'mediumDate' }}</p>
               </div>
             }
+            @if(act.reviews.length === 0) {
+              <p class="text-gray-500">{{ 'noReviews' | l10n }}</p>
+            }
           </div>
-        </div>
 
-        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-           <div>
-              <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'activityLocation' | l10n }}</h2>
-              <app-map-view [locations]="[{lat: act.location.lat, lng: act.location.lng, name: act.name}]" />
-           </div>
-           <div>
-              <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'activityReviews' | l10n }}</h2>
-              @for(review of act.reviews; track review.id) {
-                <div class="border-b py-4">
-                  <div class="flex justify-between items-center">
-                    <span class="font-bold">{{ review.userName }}</span>
-                    <span class="text-sm text-gray-500">{{ review.date | date:'dd/MM/yyyy' }}</span>
-                  </div>
-                  <app-star-rating [rating]="review.rating" class="my-1" />
-                  <p class="text-gray-700">{{ review.comment }}</p>
-                </div>
-              } @empty {
-                <p class="text-gray-500 py-4">{{ 'noReviewsYet' | l10n }}</p>
-              }
+          @if (authService.isLoggedIn()) {
+            <app-review-form [activityId]="act.id" (reviewSubmitted)="onReviewSubmitted($event)" />
+          } @else {
+            <div class="text-center bg-gray-100 p-4 rounded-md">
+                <p>{{ 'logInToReview' | l10n }} <a routerLink="/login" class="text-teal-600 font-semibold hover:underline">{{ 'login' | l10n }}</a></p>
+            </div>
+          }
+        </section>
+        
+        @if(showAddToAlbumModal()) {
+          <app-add-to-album-modal
+            [activityName]="act.name"
+            [activityImageUrl]="act.imageUrl"
+            (close)="showAddToAlbumModal.set(false)"
+          />
+        }
 
-              @if (authService.isLoggedIn()) {
-                <div class="mt-6">
-                  <h3 class="text-xl font-bold mb-2">{{ 'addYourReview' | l10n }}</h3>
-                  <app-review-form [activityId]="act.id" />
-                </div>
-              } @else {
-                  <p class="mt-6 p-4 bg-gray-100 rounded-md text-center">
-                    <a routerLink="/login" class="text-teal-500 hover:underline">Faça login</a> para deixar uma avaliação.
-                  </p>
-              }
-           </div>
-        </div>
       </div>
     } @else {
-      <p>{{ 'loading' | l10n }}</p>
-    }
-
-    @if (showAddToAlbumModal() && activity()) {
-      <app-add-to-album-modal 
-        [activityName]="activity()!.name"
-        [activityImageUrl]="activity()!.imageUrl"
-        (closeModal)="showAddToAlbumModal.set(false)" />
+      <p>A carregar atividade...</p>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -117,24 +154,29 @@ export class ActivityDetailComponent {
 
   constructor() {
     const activityId = Number(this.route.snapshot.paramMap.get('id'));
-    this.activity.set(this.activityService.getActivityById(activityId));
-  }
-
-  markAsVisited(): void {
-    const act = this.activity();
-    if(act) {
-        this.authService.markAsVisited(act.id);
+    if (activityId) {
+      this.activity.set(this.activityService.getActivityById(activityId));
     }
   }
 
-  accessibilityLabel(level: AccessibilityLevel): string {
-    const labels = {
-      total: 'Total',
-      parcial: 'Parcial',
-      nenhum: 'Nenhuma'
-    };
-    return this.l10n.translate(`accessibility${labels[level]}` as any);
+  onReviewSubmitted(review: Review): void {
+    this.activityService.addReview(review);
+    // Refresh activity data to show new review
+    const act = this.activity();
+    if (act) {
+        this.activity.set(this.activityService.getActivityById(act.id));
+    }
   }
 
-  private l10n = inject(L10nService);
+  markVisited(activityId: number): void {
+    this.authService.markAsVisited(activityId);
+  }
+
+  accessibilityText(level: AccessibilityLevel): string {
+    switch (level) {
+      case 'total': return 'Total';
+      case 'parcial': return 'Parcial';
+      case 'nenhum': return 'Nenhuma';
+    }
+  }
 }

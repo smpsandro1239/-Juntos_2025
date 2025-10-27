@@ -1,63 +1,43 @@
-import { Component, ChangeDetectionStrategy, input, output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlbumPhoto } from '../../models/album.model';
-import { Activity } from '../../models/activity.model';
+import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-photo-upload-form',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, L10nPipe],
   template: `
-     <form (ngSubmit)="addPhoto()" class="space-y-4">
-        <div>
-            <label for="photo" class="block text-sm font-medium text-gray-700">Ficheiro da Foto</label>
-            <input type="file" id="photo" name="photo" (change)="onFileSelected($event)" accept="image/*" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"/>
+    <div class="p-4 bg-gray-50 rounded-lg border">
+      <h3 class="text-lg font-semibold mb-2">{{ 'uploadPhoto' | l10n }}</h3>
+      <form #form="ngForm" (ngSubmit)="uploadPhoto(form.value.activityName); form.reset()" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div class="md:col-span-2">
+            <label for="activityName" class="block text-sm font-medium text-gray-700">Atividade (opcional)</label>
+            <input type="text" name="activityName" ngModel id="activityName" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
         </div>
-        
-        @if (previewUrl) {
-            <img [src]="previewUrl" alt="Preview" class="max-h-40 rounded-md mx-auto">
-        }
-
         <div>
-            <label for="activityName" class="block text-sm font-medium text-gray-700">Atividade Associada</label>
-            <input type="text" id="activityName" name="activityName" [(ngModel)]="activityName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Nome da atividade">
+            <!-- In a real app, this would be an <input type="file"> -->
+            <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">
+                Carregar
+            </button>
         </div>
-
-        <button type="submit" [disabled]="!selectedFile || !activityName" class="w-full bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 disabled:bg-gray-400">Adicionar Foto</button>
-    </form>
+      </form>
+       <p class="text-xs text-gray-500 mt-2">Nota: A funcionalidade de upload é simulada. Será adicionada uma foto de exemplo.</p>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhotoUploadFormComponent {
-    photoAdded = output<AlbumPhoto>();
+    albumId = input.required<number>();
+    photoUploaded = output<AlbumPhoto>();
 
-    selectedFile: File | null = null;
-    previewUrl: string | null = null;
-    activityName: string = '';
-
-    onFileSelected(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        if (input.files && input.files[0]) {
-            this.selectedFile = input.files[0];
-            const reader = new FileReader();
-            reader.onload = () => this.previewUrl = reader.result as string;
-            reader.readAsDataURL(this.selectedFile);
-        }
-    }
-
-    addPhoto(): void {
-        if (!this.previewUrl || !this.activityName) {
-            return;
-        }
-
-        this.photoAdded.emit({
-            imageUrl: this.previewUrl,
-            activityName: this.activityName
-        });
-
-        // Reset form
-        this.selectedFile = null;
-        this.previewUrl = null;
-        this.activityName = '';
+    uploadPhoto(activityName: string) {
+        // Mock photo upload
+        const randomId = Math.floor(Math.random() * 1000);
+        const newPhoto: AlbumPhoto = {
+            imageUrl: `https://picsum.photos/seed/${this.albumId()}-${randomId}/400/400`,
+            activityName: activityName || 'Memória Especial'
+        };
+        this.photoUploaded.emit(newPhoto);
     }
 }

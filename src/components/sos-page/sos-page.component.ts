@@ -1,76 +1,83 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { EmergencyService } from '../../services/emergency.service';
-import { MapViewComponent } from '../map-view/map-view.component';
 import { EmergencyLocation } from '../../models/emergency-location.model';
+import { MapViewComponent } from '../map-view/map-view.component';
+import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-sos-page',
   standalone: true,
-  imports: [CommonModule, MapViewComponent],
+  imports: [MapViewComponent, L10nPipe],
   template: `
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-red-600 mb-2">Página de Emergência (SOS)</h1>
-        <p class="text-gray-600">Contactos e locais úteis em caso de emergência. Em caso de perigo imediato, ligue 112.</p>
-        <a href="tel:112" class="mt-4 inline-block bg-red-600 text-white text-2xl font-bold py-4 px-8 rounded-full hover:bg-red-700">
-            Ligar 112
-        </a>
-      </div>
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold text-red-600 mb-2">{{ 'sosTitle' | l10n }}</h1>
+      <p class="text-gray-600 mb-8">{{ 'sosDescription' | l10n }}</p>
 
-      <div class="mb-6 flex justify-center space-x-2 border-b">
-         @for (type of locationTypes; track type) {
-          <button 
-            (click)="selectedType.set(type.id)"
-            class="py-2 px-4 -mb-px"
-            [class.border-b-2]="selectedType() === type.id"
-            [class.border-red-500]="selectedType() === type.id"
-            [class.text-red-600]="selectedType() === type.id"
-            [class.text-gray-500]="selectedType() !== type.id">
-            {{ type.label }}
-          </button>
-        }
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          @for(location of filteredLocations(); track location.id) {
-            <div class="border-b p-4 hover:bg-gray-50">
-                <h3 class="font-bold text-lg">{{ location.name }}</h3>
-                <p class="text-gray-700">{{ location.address }}</p>
-                <a [href]="'tel:'+location.phone" class="text-teal-500 hover:underline">{{ location.phone }}</a>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Locations List -->
+        <div class="lg:col-span-2 space-y-8">
+          <section>
+            <h2 class="text-2xl font-semibold mb-4 flex items-center"><span class="text-3xl mr-3">🏥</span> {{ 'hospitals' | l10n }}</h2>
+            <div class="space-y-3">
+              @for(location of hospitals(); track location.id) {
+                <div class="bg-gray-50 p-4 rounded-md border">
+                  <h3 class="font-bold">{{ location.name }}</h3>
+                  <p class="text-sm text-gray-600">{{ location.address }}</p>
+                  <a [href]="'tel:' + location.phone" class="text-teal-600 hover:underline">{{ location.phone }}</a>
+                </div>
+              }
             </div>
-          }
+          </section>
+
+          <section>
+            <h2 class="text-2xl font-semibold mb-4 flex items-center"><span class="text-3xl mr-3">💊</span> {{ 'pharmacies' | l10n }}</h2>
+             <div class="space-y-3">
+              @for(location of pharmacies(); track location.id) {
+                <div class="bg-gray-50 p-4 rounded-md border">
+                  <h3 class="font-bold">{{ location.name }}</h3>
+                  <p class="text-sm text-gray-600">{{ location.address }}</p>
+                  <a [href]="'tel:' + location.phone" class="text-teal-600 hover:underline">{{ location.phone }}</a>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-2xl font-semibold mb-4 flex items-center"><span class="text-3xl mr-3">🚓</span> {{ 'police' | l10n }}</h2>
+             <div class="space-y-3">
+              @for(location of police(); track location.id) {
+                <div class="bg-gray-50 p-4 rounded-md border">
+                  <h3 class="font-bold">{{ location.name }}</h3>
+                  <p class="text-sm text-gray-600">{{ location.address }}</p>
+                  <a [href]="'tel:' + location.phone" class="text-teal-600 hover:underline">{{ location.phone }}</a>
+                </div>
+              }
+            </div>
+          </section>
         </div>
-        <div>
-          <app-map-view [locations]="mapLocations()" />
-        </div>
+        <!-- Map -->
+        <aside class="sticky top-24 h-96">
+            <app-map-view [locations]="mapLocations()" />
+        </aside>
       </div>
+
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SosPageComponent {
     private emergencyService = inject(EmergencyService);
-    
     locations = this.emergencyService.allLocations;
-    selectedType = signal<'hospital' | 'pharmacy' | 'police'>('hospital');
     
-    locationTypes: {id: 'hospital' | 'pharmacy' | 'police', label: string}[] = [
-        { id: 'hospital', label: 'Hospitais' },
-        { id: 'pharmacy', label: 'Farmácias' },
-        { id: 'police', label: 'Polícia' },
-    ];
-    
-    filteredLocations = computed(() => {
-        return this.locations().filter(loc => loc.type === this.selectedType());
-    });
+    hospitals = computed(() => this.locations().filter(l => l.type === 'hospital'));
+    pharmacies = computed(() => this.locations().filter(l => l.type === 'pharmacy'));
+    police = computed(() => this.locations().filter(l => l.type === 'police'));
 
     mapLocations = computed(() => {
-        return this.filteredLocations().map(loc => ({
-            lat: loc.location.lat,
-            lng: loc.location.lng,
-            name: loc.name
+        return this.locations().map(l => ({
+            lat: l.location.lat,
+            lng: l.location.lng,
+            name: l.name
         }));
     });
 }

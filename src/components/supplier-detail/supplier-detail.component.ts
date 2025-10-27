@@ -1,51 +1,74 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { ActivityService } from '../../services/activity.service';
 import { Supplier } from '../../models/supplier.model';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
 import { ContactModalComponent } from '../contact-modal/contact-modal.component';
+import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-supplier-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, NgOptimizedImage, StarRatingComponent, ContactModalComponent],
+  imports: [RouterLink, NgOptimizedImage, StarRatingComponent, ContactModalComponent, L10nPipe],
   template: `
-    @if (supplier(); as sup) {
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <img [ngSrc]="sup.imageUrl" [alt]="sup.name" width="600" height="400" class="w-full h-auto rounded-lg shadow-md">
-                </div>
-                <div>
-                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 rounded-full uppercase font-semibold">{{ sup.category }}</span>
-                    <h1 class="text-4xl font-bold text-gray-800 my-2">{{ sup.name }}</h1>
-                    <app-star-rating [rating]="sup.rating" [showRatingValue]="true" class="mb-4" />
-                    <p class="text-gray-700 mb-4">{{ sup.description }}</p>
-                    <p class="text-gray-600 font-semibold mb-6">📍 {{ sup.location }}</p>
-                    <button (click)="showContactModal.set(true)" class="w-full bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600">Contactar</button>
-                </div>
+    @if (supplier()) {
+      @let sup = supplier()!;
+      <div class="bg-white p-8 rounded-lg shadow-lg">
+        <button routerLink="/suppliers" class="text-teal-500 hover:text-teal-700 mb-4">&larr; {{ 'allSuppliers' | l10n }}</button>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="md:col-span-2">
+                <img [ngSrc]="sup.imageUrl" [alt]="sup.name" width="800" height="500" class="w-full rounded-lg shadow-md mb-6" priority>
+                <h1 class="text-4xl font-extrabold text-gray-800 mb-2">{{ sup.name }}</h1>
+                <p class="text-gray-600 text-lg">{{ sup.location }}</p>
+                 <section class="mt-8">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-3">{{ 'description' | l10n }}</h2>
+                    <p class="text-gray-600 leading-relaxed">{{ sup.description }}</p>
+                </section>
             </div>
+            <aside>
+                <div class="bg-gray-50 p-6 rounded-lg border">
+                    <h3 class="text-xl font-bold mb-4">{{ 'details' | l10n }}</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-lg mr-3">🏷️</span>
+                            <span>{{ sup.category }}</span>
+                        </div>
+                         <div class="flex items-center">
+                            <span class="text-lg mr-3">⭐</span>
+                            <app-star-rating [rating]="sup.rating" [showRatingValue]="true" />
+                        </div>
+                    </div>
+                    <button (click)="showContactModal.set(true)" class="w-full mt-6 bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 transition-colors">
+                        {{ 'contactSupplier' | l10n }}
+                    </button>
+                </div>
+            </aside>
         </div>
-    } @else {
-        <p>A carregar fornecedor...</p>
-    }
+      </div>
 
-    @if(showContactModal() && supplier()) {
-        <app-contact-modal [supplier]="supplier()!" (closeModal)="showContactModal.set(false)" />
+      @if(showContactModal()) {
+        <app-contact-modal [supplier]="sup" (close)="showContactModal.set(false)" />
+      }
+
+    } @else {
+      <p>A carregar fornecedor...</p>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SupplierDetailComponent {
-    private route = inject(ActivatedRoute);
-    private activityService = inject(ActivityService);
+  private route = inject(ActivatedRoute);
+  private activityService = inject(ActivityService);
+  
+  supplier = signal<Supplier | undefined>(undefined);
+  showContactModal = signal(false);
 
-    supplier = signal<Supplier | undefined>(undefined);
-    showContactModal = signal(false);
-
-    constructor() {
-        const supplierId = Number(this.route.snapshot.paramMap.get('id'));
-        this.supplier.set(this.activityService.getSupplierById(supplierId));
+  constructor() {
+    const supplierId = Number(this.route.snapshot.paramMap.get('id'));
+    if (supplierId) {
+      this.supplier.set(this.activityService.getSupplierById(supplierId));
     }
+  }
 }
