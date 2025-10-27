@@ -1,147 +1,146 @@
-import { computed, Injectable, signal, Signal, WritableSignal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { Activity } from '../models/activity.model';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
+import { Review } from '../models/review.model';
+
+// Fix: Add mock data for reviews and activities.
+const MOCK_REVIEWS: Review[] = [
+  { id: 1, activityId: 1, userName: 'Ana', rating: 5, comment: 'Incrível! As crianças adoraram.', date: '2024-07-20T10:00:00Z' },
+  { id: 2, activityId: 1, userName: 'Carlos', rating: 4, comment: 'Muito bom, mas um pouco cheio.', date: '2024-07-19T14:30:00Z' },
+  { id: 3, activityId: 2, userName: 'Beatriz', rating: 5, comment: 'Perfeito para um dia de sol. Super recomendo!', date: '2024-07-18T11:00:00Z' },
+  { id: 4, activityId: 3, userName: 'Daniel', rating: 3, comment: 'Achei a comida cara, mas o ambiente é legal.', date: '2024-07-21T19:00:00Z' },
+];
+
+const MOCK_ACTIVITIES: Activity[] = [
+  {
+    id: 1,
+    name: 'Parque de Trampolins',
+    description: 'Um parque gigante com camas elásticas, piscinas de espuma e muita diversão para todas as idades.',
+    category: 'Indoor',
+    price: 50,
+    location: { lat: -23.5505, lng: -46.6333, address: 'Rua da Consolação, 247, São Paulo' },
+    imageUrl: 'https://picsum.photos/seed/trampoline/600/400',
+    rainyDayOk: true,
+    reviews: MOCK_REVIEWS.filter(r => r.activityId === 1),
+    rating: 4.5
+  },
+  {
+    id: 2,
+    name: 'Piquenique no Parque Ibirapuera',
+    description: 'Aproveite um dia de sol com um delicioso piquenique nas áreas verdes do parque mais famoso de São Paulo.',
+    category: 'Ar Livre',
+    price: 0,
+    location: { lat: -23.5885, lng: -46.6586, address: 'Av. Pedro Álvares Cabral, s/n - Vila Mariana, São Paulo' },
+    imageUrl: 'https://picsum.photos/seed/park/600/400',
+    rainyDayOk: false,
+    reviews: MOCK_REVIEWS.filter(r => r.activityId === 2),
+    rating: 5.0
+  },
+  {
+    id: 3,
+    name: 'Feira de Artesanato da Praça da República',
+    description: 'Explore a tradicional feira de artesanato e comidas típicas que acontece todos os domingos.',
+    category: 'Cultural',
+    price: 0,
+    location: { lat: -23.5428, lng: -46.6416, address: 'Praça da República, s/n - República, São Paulo' },
+    imageUrl: 'https://picsum.photos/seed/market/600/400',
+    rainyDayOk: false,
+    reviews: MOCK_REVIEWS.filter(r => r.activityId === 3),
+    rating: 3.0
+  },
+  {
+    id: 4,
+    name: 'Museu Catavento',
+    description: 'Um museu de ciências interativo que fascina crianças e adultos com suas exposições sobre o universo, a vida e a engenharia.',
+    category: 'Indoor',
+    price: 15,
+    location: { lat: -23.5413, lng: -46.6289, address: 'Av. Mercúrio, s/n - Parque Dom Pedro II, São Paulo' },
+    imageUrl: 'https://picsum.photos/seed/museum/600/400',
+    rainyDayOk: true,
+    reviews: [],
+    rating: 4.8
+  },
+    {
+    id: 5,
+    name: 'Cinema ao Ar Livre no Parque Villa-Lobos',
+    description: 'Sessões de cinema gratuitas projetadas em uma tela gigante no gramado do parque. Leve sua canga e aproveite!',
+    category: 'Ar Livre',
+    price: 0,
+    location: { lat: -23.5419, lng: -46.7265, address: 'Av. Prof. Fonseca Rodrigues, 2001 - Alto de Pinheiros, São Paulo' },
+    imageUrl: 'https://picsum.photos/seed/cinema/600/400',
+    rainyDayOk: false,
+    reviews: [],
+    rating: 4.9
+  }
+];
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActivityService {
-  // --- State ---
-  private activities: WritableSignal<Activity[]> = signal<Activity[]>([
-    {
-      id: 1,
-      title: 'Parque Infantil da Estrela',
-      category: 'Ar Livre',
-      imageUrl: 'https://picsum.photos/seed/park1/600/400',
-      distance: 2.3,
-      price: 'Grátis',
-      ageRange: '2-10 anos',
-      tags: ['Parque Infantil', 'Natureza'],
-      isFavorite: false,
-      description: 'Um clássico jardim de Lisboa, com um parque infantil que faz as delícias dos mais novos e um café com esplanada para os pais relaxarem. Tem também um lago com patos e gansos.',
-      location: { lat: 38.715, lng: -9.16 }
-    },
-    {
-      id: 2,
-      title: 'Museu da Marioneta',
-      category: 'Cultura',
-      imageUrl: 'https://picsum.photos/seed/museum2/600/400',
-      distance: 4.1,
-      price: '€5 / pessoa',
-      ageRange: '4+ anos',
-      tags: ['Chuva OK', 'Educativo'],
-      isFavorite: true,
-      description: 'Instalado no Convento das Bernardas, este museu apresenta uma impressionante coleção de marionetas de todo o mundo. Uma viagem fascinante pela história do teatro de marionetas.',
-      location: { lat: 38.706, lng: -9.15 }
-    },
-    {
-      id: 3,
-      title: 'Praia de Carcavelos',
-      category: 'Praia',
-      imageUrl: 'https://picsum.photos/seed/beach3/600/400',
-      distance: 15.5,
-      price: 'Grátis',
-      ageRange: 'Todas as idades',
-      tags: ['Sol', 'Areia', 'Mar'],
-      isFavorite: false,
-      description: 'Uma das praias mais populares da linha de Cascais. Com um extenso areal, é ideal para construir castelos de areia, jogar à bola e dar os primeiros passos no surf.',
-      location: { lat: 38.678, lng: -9.335 }
-    },
-    {
-      id: 4,
-      title: 'KidZania Lisboa',
-      category: 'Parque Temático',
-      imageUrl: 'https://picsum.photos/seed/kidzania4/600/400',
-      distance: 8.9,
-      price: '€22 / criança',
-      ageRange: '4-15 anos',
-      tags: ['Chuva OK', 'Diversão'],
-      isFavorite: false,
-      description: 'Uma cidade à escala das crianças onde podem "brincar aos adultos". Desde ser bombeiro, médico ou jornalista, as crianças podem experimentar mais de 60 profissões.',
-      location: { lat: 38.755, lng: -9.17 }
-    },
-     {
-      id: 5,
-      title: 'Oceanário de Lisboa',
-      category: 'Natureza',
-      imageUrl: 'https://picsum.photos/seed/oceanario5/600/400',
-      distance: 10.2,
-      price: '€19 / adulto',
-      ageRange: 'Todas as idades',
-      tags: ['Chuva OK', 'Animais'],
-      isFavorite: true,
-      description: 'Considerado um dos melhores aquários do mundo, o Oceanário é a casa de milhares de animais marinhos. Uma experiência imersiva e educativa para toda a família.',
-      location: { lat: 38.763, lng: -9.094 }
-    },
-    {
-      id: 6,
-      title: 'Trilho da Cascata',
-      category: 'Aventura',
-      imageUrl: 'https://picsum.photos/seed/hike6/600/400',
-      distance: 25.0,
-      price: 'Grátis',
-      ageRange: '6+ anos',
-      tags: ['Natureza', 'Caminhada'],
-      isFavorite: false,
-      description: 'Um percurso pedestre no Parque Natural da Arrábida que culmina numa pequena e refrescante cascata. Ideal para famílias aventureiras que gostam de contacto com a natureza.',
-      location: { lat: 38.48, lng: -9.05 }
-    }
-  ]);
+  private activities = signal<Activity[]>(MOCK_ACTIVITIES);
 
-  // --- Filter State ---
   selectedCategory = signal<string | null>(null);
-  showOnlyFree = signal(false);
-  showRainyDayOk = signal(false);
+  showOnlyFree = signal<boolean>(false);
+  showRainyDayOk = signal<boolean>(false);
 
-  // --- Derived State & Selectors ---
-  uniqueCategories: Signal<string[]> = computed(() => 
-    [...new Set(this.activities().map(a => a.category))]
-  );
+  uniqueCategories = computed(() => {
+    const allActivities = this.activities();
+    const categories = allActivities.map(a => a.category);
+    return [...new Set(categories)];
+  });
 
-  filteredActivities: Signal<Activity[]> = computed(() => {
+  filteredActivities = computed(() => {
     const allActivities = this.activities();
     const category = this.selectedCategory();
     const freeOnly = this.showOnlyFree();
-    const rainyOk = this.showRainyDayOk();
+    const rainy = this.showRainyDayOk();
 
     return allActivities.filter(activity => {
       const categoryMatch = !category || activity.category === category;
-      const freeMatch = !freeOnly || activity.price === 'Grátis';
-      const rainyMatch = !rainyOk || activity.tags.includes('Chuva OK');
-      return categoryMatch && freeMatch && rainyMatch;
+      const priceMatch = !freeOnly || activity.price === 0;
+      const rainyMatch = !rainy || activity.rainyDayOk;
+      return categoryMatch && priceMatch && rainyMatch;
     });
   });
-
-  getActivityById(id: Signal<number | undefined>): Signal<Activity | undefined> {
-    return computed(() => {
-      const activityId = id();
-      if (activityId === undefined) return undefined;
-      return this.activities().find(a => a.id === activityId);
-    });
-  }
   
-  // --- Actions ---
-  setCategoryFilter(category: string | null) {
+  getActivityById(id: number) {
+      return computed(() => this.activities().find(a => a.id === id));
+  }
+
+  addReview(review: Omit<Review, 'id' | 'date'>): void {
+      this.activities.update(activities => {
+          const activityIndex = activities.findIndex(a => a.id === review.activityId);
+          if (activityIndex === -1) return activities;
+
+          const newReview: Review = {
+              ...review,
+              id: Date.now(),
+              date: new Date().toISOString()
+          };
+
+          const updatedActivities = [...activities];
+          const activityToUpdate = { ...updatedActivities[activityIndex] };
+          activityToUpdate.reviews = [...activityToUpdate.reviews, newReview];
+          
+          // Recalculate average rating
+          const totalRating = activityToUpdate.reviews.reduce((sum, r) => sum + r.rating, 0);
+          activityToUpdate.rating = totalRating / activityToUpdate.reviews.length;
+
+          updatedActivities[activityIndex] = activityToUpdate;
+          return updatedActivities;
+      });
+  }
+
+  setCategoryFilter(category: string | null): void {
     this.selectedCategory.set(category);
   }
 
-  toggleFreeFilter() {
-    this.showOnlyFree.update(val => !val);
+  toggleFreeFilter(): void {
+    this.showOnlyFree.update(value => !value);
   }
 
-  toggleRainyDayFilter() {
-    this.showRainyDayOk.update(val => !val);
-  }
-  
-  toggleFavorite(id: number) {
-    this.activities.update(activities =>
-      activities.map(activity =>
-        activity.id === id
-          ? { ...activity, isFavorite: !activity.isFavorite }
-          : activity
-      )
-    );
+  toggleRainyDayFilter(): void {
+    this.showRainyDayOk.update(value => !value);
   }
 }
