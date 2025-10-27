@@ -4,6 +4,19 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AuthService } from '../../services/auth.service';
 import { RouterLink } from '@angular/router';
 
+// Add TripPlan interface for strong typing
+interface TripPlan {
+  cidade: string;
+  roteiro: {
+    dia: number;
+    atividades: {
+      periodo: string;
+      titulo:string;
+      descricao: string;
+    }[];
+  }[];
+}
+
 @Component({
   selector: 'app-trip-planner',
   standalone: true,
@@ -107,7 +120,8 @@ export class TripPlannerComponent {
   private authService = inject(AuthService);
   
   isLoading = signal(false);
-  tripPlan = signal<any | null>(null);
+  // Change type from 'any' to 'TripPlan'
+  tripPlan = signal<TripPlan | null>(null);
   errorMessage = signal<string | null>(null);
   
   isPremium = computed(() => this.authService.currentUser()?.isPremium ?? false);
@@ -175,8 +189,12 @@ export class TripPlannerComponent {
         }
       });
 
-      const text = response.text.trim();
-      this.tripPlan.set(JSON.parse(text));
+      // Handle potential markdown in JSON response and parse
+      let text = response.text.trim();
+      if (text.startsWith('```json')) {
+        text = text.substring(7, text.length - 3);
+      }
+      this.tripPlan.set(JSON.parse(text) as TripPlan);
 
     } catch (error) {
       console.error('Error generating trip plan:', error);
