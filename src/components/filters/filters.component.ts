@@ -1,58 +1,60 @@
-import { Component, ChangeDetectionStrategy, inject, Signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { ActivityService } from '../../services/activity.service';
 
 @Component({
   selector: 'app-filters',
   standalone: true,
-  imports: [FormsModule],
   template: `
-    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+    <div class="bg-white p-4 rounded-lg shadow-md mb-6 sticky top-20 z-10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <!-- Search -->
-        <div class="md:col-span-1">
-          <label for="search" class="block text-gray-700 font-bold mb-2">Procurar por nome</label>
-          <input type="text" id="search" [ngModel]="currentFilters.searchTerm" (ngModelChange)="onSearchChange($event)"
-                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                 placeholder="Ex: Oceanário">
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700">Pesquisar</label>
+          <input 
+            type="text" 
+            id="search" 
+            placeholder="Nome da atividade..."
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+            (input)="onSearchChange($event)">
         </div>
-
+        <!-- Category -->
+        <div>
+          <label for="category" class="block text-sm font-medium text-gray-700">Categoria</label>
+          <select 
+            id="category" 
+            class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-teal-500 focus:outline-none focus:ring-teal-500 sm:text-sm"
+            (change)="onCategoryChange($event)">
+            <option value="">Todas</option>
+            @for (category of uniqueCategories(); track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+        </div>
         <!-- Price -->
-        <div class="md:col-span-2">
-          <label for="price" class="block text-gray-700 font-bold mb-2">Preço máximo: {{ currentFilters.priceRange }}€</label>
-          <input type="range" id="price" min="0" max="50" [ngModel]="currentFilters.priceRange" (ngModelChange)="onPriceChange($event)"
-                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-500">
+        <div>
+          <label for="price" class="block text-sm font-medium text-gray-700">Preço Máximo: <span class="font-bold text-teal-600">{{ currentPrice() }}€</span></label>
+          <input 
+            type="range" 
+            id="price" 
+            min="0" 
+            max="50" 
+            step="5"
+            [value]="currentPrice()"
+            class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            (input)="onPriceChange($event)">
         </div>
-      </div>
-      
-      <!-- Categories -->
-      <div class="mt-6">
-        <h3 class="block text-gray-700 font-bold mb-2">Categorias</h3>
-        <div class="flex flex-wrap gap-3">
-          @for (category of uniqueCategories(); track category) {
-            <button (click)="onCategoryToggle(category)"
-                    [class]="isCategorySelected(category) ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-700'"
-                    class="px-4 py-2 rounded-full font-semibold transition-colors duration-200 hover:bg-teal-400 hover:text-white">
-              {{ category }}
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Accessibility -->
-      <div class="mt-6 pt-4 border-t">
-        <h3 class="block text-gray-700 font-bold mb-2">Acessibilidade</h3>
-        <div class="flex flex-wrap gap-3">
-            <button (click)="onWheelchairToggle()"
-                    [class]="currentFilters.wheelchair ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'"
-                    class="px-4 py-2 rounded-full font-semibold transition-colors duration-200 hover:bg-blue-400 hover:text-white flex items-center gap-2">
-              ♿ Cadeira de Rodas
-            </button>
-             <button (click)="onStrollerToggle()"
-                    [class]="currentFilters.stroller ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'"
-                    class="px-4 py-2 rounded-full font-semibold transition-colors duration-200 hover:bg-green-400 hover:text-white flex items-center gap-2">
-              👶 Carrinho de Bebé
-            </button>
+        <!-- Rating -->
+        <div>
+          <label for="rating" class="block text-sm font-medium text-gray-700">Avaliação Mínima: <span class="font-bold text-teal-600">{{ currentRating() }} ★</span></label>
+           <input 
+            type="range" 
+            id="rating" 
+            min="0" 
+            max="5" 
+            step="0.5"
+            [value]="currentRating()"
+            class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            (input)="onRatingChange($event)">
         </div>
       </div>
     </div>
@@ -62,34 +64,29 @@ import { ActivityService } from '../../services/activity.service';
 export class FiltersComponent {
   private activityService = inject(ActivityService);
   
-  uniqueCategories: Signal<string[]> = this.activityService.uniqueCategories;
-  currentFilters = this.activityService.getCurrentFilters();
+  uniqueCategories = this.activityService.uniqueCategories;
+  currentPrice = computed(() => this.activityService.priceFilter() ?? 50);
+  currentRating = computed(() => this.activityService.ratingFilter() ?? 0);
 
-  onSearchChange(term: string): void {
-    this.activityService.setSearchTerm(term);
-  }
-
-  onPriceChange(price: any): void { // Can be string or number
-    this.activityService.setPriceRange(Number(price));
-    this.currentFilters = this.activityService.getCurrentFilters();
+  onSearchChange(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.activityService.searchQuery.set(value);
   }
   
-  onCategoryToggle(category: string): void {
-    this.activityService.toggleCategory(category);
-    this.currentFilters = this.activityService.getCurrentFilters();
+  onCategoryChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.activityService.categoryFilter.set(value || null);
   }
 
-  isCategorySelected(category: string): boolean {
-    return this.currentFilters.selectedCategories.includes(category);
+  onPriceChange(event: Event) {
+    const value = +(event.target as HTMLInputElement).value;
+    // Set to null if it's the max value to disable filter
+    this.activityService.priceFilter.set(value === 50 ? null : value);
   }
 
-  onWheelchairToggle(): void {
-    this.activityService.toggleWheelchairAccessible();
-    this.currentFilters = this.activityService.getCurrentFilters();
-  }
-
-  onStrollerToggle(): void {
-    this.activityService.toggleStrollerAccessible();
-    this.currentFilters = this.activityService.getCurrentFilters();
+  onRatingChange(event: Event) {
+    const value = +(event.target as HTMLInputElement).value;
+    // Set to null if it's the min value to disable filter
+    this.activityService.ratingFilter.set(value === 0 ? null : value);
   }
 }

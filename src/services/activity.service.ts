@@ -1,186 +1,199 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Activity } from '../models/activity.model';
+import { Review } from '../models/review.model';
 import { Event } from '../models/event.model';
 import { Supplier } from '../models/supplier.model';
-import { Review } from '../models/review.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ActivityService {
-  private reviews = signal<Review[]>([
-    { id: 1, activityId: 1, userName: 'Família Exploradora', rating: 5, comment: 'As crianças adoraram ver os peixes! Muito bem organizado.', date: new Date('2023-07-20').toISOString() },
-    { id: 2, activityId: 1, userName: 'Aventureiros Urbanos', rating: 4, comment: 'Uma ótima tarde, embora um pouco cheio ao fim de semana.', date: new Date('2023-08-01').toISOString() },
-    { id: 3, activityId: 2, userName: 'Amantes da Natureza', rating: 5, comment: 'Vistas incríveis de Lisboa. Perfeito para um piquenique.', date: new Date('2023-09-10').toISOString() },
-    { id: 4, activityId: 3, userName: 'Grupo Ciência Divertida', rating: 5, comment: 'Exposições interativas fantásticas. Aprendemos imenso!', date: new Date('2023-10-05').toISOString() },
-    { id: 5, activityId: 4, userName: 'Família Radical', rating: 4, comment: 'Muita adrenalina e diversão para todas as idades.', date: new Date('2023-06-15').toISOString() },
-  ]);
-
   private activities = signal<Activity[]>([
     {
       id: 1,
       name: 'Oceanário de Lisboa',
       category: 'Aquário',
-      description: 'Mergulhe num mundo de maravilhas aquáticas no Oceanário de Lisboa, um dos maiores aquários da Europa. Descubra pinguins, tubarões, lontras marinhas e uma incrível variedade de peixes coloridos. Uma experiência educativa e divertida para toda a família.',
+      description: 'Descubra a magia dos oceanos com milhares de espécies marinhas. Uma experiência educativa e divertida para toda a família, com tanques impressionantes e exposições interativas.',
       imageUrl: 'https://picsum.photos/seed/oceanario/400/300',
-      galleryImages: ['https://picsum.photos/seed/oceanario1/800/600', 'https://picsum.photos/seed/oceanario2/800/600', 'https://picsum.photos/seed/oceanario3/800/600'],
-      price: 19.00,
+      galleryImages: [
+        'https://picsum.photos/seed/oceanario1/400/300',
+        'https://picsum.photos/seed/oceanario2/400/300',
+        'https://picsum.photos/seed/oceanario3/400/300',
+        'https://picsum.photos/seed/oceanario4/400/300',
+        'https://picsum.photos/seed/oceanario5/400/300',
+      ],
+      price: 19,
       rating: 4.8,
-      rainyDayOk: true,
-      location: { lat: 38.7634, lng: -9.0936, address: 'Esplanada Dom Carlos I s/nº, 1990-005 Lisboa' },
-      reviews: this.reviews().filter(r => r.activityId === 1),
-      accessibility: { wheelchair: 'total', stroller: 'total' }
+      reviews: [
+        { id: 101, activityId: 1, userName: 'Família Silva', rating: 5, comment: 'As crianças adoraram os pinguins e as lontras! Um dia muito bem passado.', date: '2023-07-15T10:00:00Z' },
+        { id: 102, activityId: 1, userName: 'João P.', rating: 4, comment: 'Muito bonito, mas um pouco cheio ao fim de semana.', date: '2023-08-01T14:30:00Z' },
+      ],
+      location: { lat: 38.7634, lng: -9.0945 },
+      accessibility: { wheelchair: 'total', stroller: 'total' },
     },
     {
       id: 2,
-      name: 'Parque e Palácio da Pena',
+      name: 'Jardim Zoológico de Lisboa',
       category: 'Ar Livre',
-      description: 'Explore os jardins exóticos e o palácio de contos de fadas da Pena, em Sintra. Um local mágico com passagens secretas, vistas deslumbrantes e uma arquitetura colorida que vai encantar miúdos e graúdos.',
-      imageUrl: 'https://picsum.photos/seed/pena/400/300',
-      galleryImages: ['https://picsum.photos/seed/pena1/800/600', 'https://picsum.photos/seed/pena2/800/600'],
-      price: 14.00,
-      rating: 4.9,
-      rainyDayOk: false,
-      location: { lat: 38.7876, lng: -9.3905, address: 'Estrada da Pena, 2710-609 Sintra' },
-      reviews: this.reviews().filter(r => r.activityId === 2),
-      accessibility: { wheelchair: 'parcial', stroller: 'parcial' }
+      description: 'Um dia selvagem espera por si! Veja animais de todo o mundo, assista a espetáculos com golfinhos e explore o parque de teleférico.',
+      imageUrl: 'https://picsum.photos/seed/zoo/400/300',
+      galleryImages: [
+        'https://picsum.photos/seed/zoo1/400/300',
+        'https://picsum.photos/seed/zoo2/400/300',
+      ],
+      price: 22.5,
+      rating: 4.6,
+      reviews: [],
+      location: { lat: 38.7441, lng: -9.1733 },
+      accessibility: { wheelchair: 'parcial', stroller: 'total' },
     },
     {
       id: 3,
       name: 'Pavilhão do Conhecimento',
       category: 'Museu',
-      description: 'Ciência viva e interativa para todas as idades. No Pavilhão do Conhecimento, as crianças podem tocar, experimentar e aprender sobre o mundo da ciência de uma forma muito divertida. Ideal para mentes curiosas.',
+      description: 'Ciência divertida para todas as idades. Exposições interativas onde é proibido não tocar. Perfeito para mentes curiosas.',
       imageUrl: 'https://picsum.photos/seed/ciencia/400/300',
-      galleryImages: ['https://picsum.photos/seed/ciencia1/800/600', 'https://picsum.photos/seed/ciencia2/800/600', 'https://picsum.photos/seed/ciencia3/800/600'],
-      price: 10.00,
-      rating: 4.7,
-      rainyDayOk: true,
-      location: { lat: 38.7623, lng: -9.0949, address: 'Largo José Mariano Gago nº1, 1990-073 Lisboa' },
-      reviews: this.reviews().filter(r => r.activityId === 3),
-      accessibility: { wheelchair: 'total', stroller: 'total' }
+      galleryImages: [
+        'https://picsum.photos/seed/ciencia1/400/300',
+        'https://picsum.photos/seed/ciencia2/400/300',
+        'https://picsum.photos/seed/ciencia3/400/300',
+      ],
+      price: 10,
+      rating: 4.9,
+      reviews: [
+        { id: 103, activityId: 3, userName: 'Ana F.', rating: 5, comment: 'Os meus filhos não queriam vir embora. A exposição sobre o corpo humano é fantástica!', date: '2023-09-10T11:00:00Z' },
+      ],
+      location: { lat: 38.7628, lng: -9.0950 },
+      accessibility: { wheelchair: 'total', stroller: 'total' },
     },
     {
       id: 4,
-      name: 'Dino Parque Lourinhã',
+      name: 'KidZania Lisboa',
       category: 'Parque Temático',
-      description: 'Viaje no tempo até à era dos dinossauros! O Dino Parque é o maior museu ao ar livre de Portugal, com mais de 180 modelos de dinossauros à escala real. Uma aventura jurássica para toda a família.',
-      imageUrl: 'https://picsum.photos/seed/dino/400/300',
-      galleryImages: ['https://picsum.photos/seed/dino1/800/600', 'https://picsum.photos/seed/dino2/800/600'],
-      price: 13.00,
-      rating: 4.6,
-      rainyDayOk: false,
-      location: { lat: 39.2398, lng: -9.3142, address: 'Rua Vale dos Dinossauros 25, 2530-059 Lourinhã' },
-      reviews: this.reviews().filter(r => r.activityId === 4),
-       accessibility: { wheelchair: 'parcial', stroller: 'total' }
+      description: 'Uma cidade à escala das crianças, onde elas podem ser o que quiserem: bombeiros, médicos, jornalistas e muito mais. Uma experiência de "edutainment" única.',
+      imageUrl: 'https://picsum.photos/seed/kidzania/400/300',
+      galleryImages: [],
+      price: 25,
+      rating: 4.5,
+      reviews: [],
+      location: { lat: 38.7554, lng: -9.1628 },
+      accessibility: { wheelchair: 'total', stroller: 'total' },
     },
     {
         id: 5,
-        name: 'Zoomarine',
-        category: 'Parque Temático',
-        description: 'Um dia repleto de diversão no Algarve, com apresentações de golfinhos e focas, escorregas aquáticos, uma praia artificial e muitas outras atrações. O Zoomarine combina entretenimento com educação ambiental.',
-        imageUrl: 'https://picsum.photos/seed/zoomarine/400/300',
-        galleryImages: ['https://picsum.photos/seed/zoomarine1/800/600', 'https://picsum.photos/seed/zoomarine2/800/600', 'https://picsum.photos/seed/zoomarine3/800/600'],
-        price: 29.00,
-        rating: 4.5,
-        rainyDayOk: false,
-        location: { lat: 37.1278, lng: -8.3146, address: 'N125, KM 65, 8201-864 Guia' },
+        name: 'Quinta Pedagógica dos Olivais',
+        category: 'Ar Livre',
+        description: 'Um refúgio rural no coração da cidade. As crianças podem interagir com animais da quinta, aprender sobre hortas e participar em workshops.',
+        imageUrl: 'https://picsum.photos/seed/quinta/400/300',
+        galleryImages: [
+            'https://picsum.photos/seed/quinta1/400/300',
+            'https://picsum.photos/seed/quinta2/400/300',
+        ],
+        price: 0,
+        rating: 4.7,
         reviews: [],
-        accessibility: { wheelchair: 'total', stroller: 'total' }
-    }
+        location: { lat: 38.7709, lng: -9.1171 },
+        accessibility: { wheelchair: 'parcial', stroller: 'parcial' },
+    },
   ]);
 
   private events = signal<Event[]>([
     {
-        id: 1,
-        name: 'Festival Panda',
-        description: 'O maior evento infantil do país está de volta com muita música, dança e as personagens preferidas das crianças.',
-        imageUrl: 'https://picsum.photos/seed/panda/400/300',
-        location: 'Estádio Nacional, Oeiras',
-        price: 20.00,
-        startDate: '2024-07-05T10:00:00Z',
-        endDate: '2024-07-07T18:00:00Z'
+      id: 1,
+      name: 'Festival Panda',
+      description: 'O maior evento infantil do país está de volta com as personagens favoritas das crianças, muita música e animação.',
+      imageUrl: 'https://picsum.photos/seed/panda/400/300',
+      location: 'Estádio Nacional, Oeiras',
+      price: 20,
+      startDate: '2024-07-05T09:00:00Z',
+      endDate: '2024-07-07T19:00:00Z',
     },
     {
-        id: 2,
-        name: 'Workshop de Magia',
-        description: 'Aprende truques de magia incríveis e surpreende os teus amigos e família! Para crianças dos 6 aos 12 anos.',
-        imageUrl: 'https://picsum.photos/seed/magia/400/300',
-        location: 'Museu da Imaginação, Lisboa',
-        price: 15.00,
-        startDate: '2024-08-12T15:00:00Z',
-        endDate: '2024-08-12T17:00:00Z'
-    }
+      id: 2,
+      name: 'Exposição Dinossauros',
+      description: 'Uma viagem no tempo até à era dos gigantes. Veja réplicas animatrónicas em tamanho real e participe em escavações fósseis.',
+      imageUrl: 'https://picsum.photos/seed/dino/400/300',
+      location: 'Cordoaria Nacional, Lisboa',
+      price: 15,
+      startDate: '2024-06-15T10:00:00Z',
+      endDate: '2024-09-30T18:00:00Z',
+    },
   ]);
 
   private suppliers = signal<Supplier[]>([
     {
-        id: 1, name: 'AnimaFestas', category: 'Animação',
-        description: 'Levamos a diversão à sua festa! Insufláveis, pinturas faciais, modelagem de balões e jogos para todas as idades.',
-        imageUrl: 'https://picsum.photos/seed/animafestas/400/300',
-        rating: 4.9,
-        contact: { phone: '912345678', email: 'geral@animafestas.pt', website: 'https://animafestas.pt' },
+        id: 1,
+        name: 'Animafestas',
+        category: 'Animação',
+        description: 'Insufláveis, palhaços, pinturas faciais e modelagem de balões. A diversão para a sua festa está garantida!',
+        imageUrl: 'https://picsum.photos/seed/animafesta/400/300',
+        rating: 4.8,
+        contact: {
+            phone: '912345678',
+            email: 'contacto@animafestas.pt',
+            website: 'https://animafestas.pt'
+        },
         location: 'Lisboa'
     },
     {
-        id: 2, name: 'Bolos & Doces da Maria', category: 'Catering',
-        description: 'Bolos de aniversário personalizados, cupcakes temáticos, cake pops e tudo o que precisa para uma mesa de doces de sonho.',
-        imageUrl: 'https://picsum.photos/seed/bolos/400/300',
-        rating: 4.8,
-        contact: { phone: '934567890', email: 'encomendas@bolosdamaria.pt' },
+        id: 2,
+        name: 'Doce Magia Catering',
+        category: 'Catering',
+        description: 'Bolos de aniversário temáticos, cupcakes, cake pops e menus completos para festas infantis. Tudo delicioso e com um toque de magia.',
+        imageUrl: 'https://picsum.photos/seed/catering/400/300',
+        rating: 4.9,
+        contact: {
+            phone: '967654321',
+            email: 'encomendas@docemagia.pt'
+        },
         location: 'Porto'
     },
     {
-        id: 3, name: 'Quinta da Aventura', category: 'Espaços',
-        description: 'Um espaço amplo ao ar livre com parque infantil, campo de futebol e zona de piquenique. Ideal para festas de aniversário inesquecíveis.',
-        imageUrl: 'https://picsum.photos/seed/quinta/400/300',
+        id: 3,
+        name: 'Quinta do Sonho',
+        category: 'Espaços',
+        description: 'Um espaço amplo com jardim, parque infantil e uma sala interior perfeita para qualquer festa. O cenário ideal para um dia inesquecível.',
+        imageUrl: 'https://picsum.photos/seed/espaco/400/300',
         rating: 4.7,
-        contact: { phone: '965678901', email: 'eventos@quintaaventura.com', website: 'https://quintaaventura.com' },
+        contact: {
+            phone: '933333333',
+            email: 'reservas@quintadosonho.pt',
+            website: 'https://quintadosonho.pt'
+        },
         location: 'Sintra'
     },
-    {
-        id: 4, name: 'Balões Mágicos', category: 'Decoração',
-        description: 'Decoração temática com balões para festas de aniversário, batizados e outros eventos. Arcos, colunas e centros de mesa personalizados.',
-        imageUrl: 'https://picsum.photos/seed/baloes/400/300',
-        rating: 4.9,
-        contact: { phone: '926789012', email: 'info@baloesmagicos.pt' },
-        location: 'Coimbra'
-    }
   ]);
 
-  // Filters state
-  private searchTerm = signal('');
-  private selectedCategories = signal<string[]>([]);
-  private priceRange = signal<number>(50);
-  private showWheelchairAccessible = signal(false);
-  private showStrollerAccessible = signal(false);
-
-  // Public Signals
-  allSuppliers = this.suppliers.asReadonly();
+  // Filters
+  categoryFilter = signal<string | null>(null);
+  priceFilter = signal<number | null>(null);
+  ratingFilter = signal<number | null>(null);
+  searchQuery = signal<string>('');
+  
+  // Public readonly signals
   upcomingEvents = this.events.asReadonly();
-  uniqueCategories = computed(() => [...new Set(this.activities().map(a => a.category))]);
-
+  allSuppliers = this.suppliers.asReadonly();
+  
   filteredActivities = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    const categories = this.selectedCategories();
-    const price = this.priceRange();
-    const wheelchair = this.showWheelchairAccessible();
-    const stroller = this.showStrollerAccessible();
+    const category = this.categoryFilter();
+    const price = this.priceFilter();
+    const rating = this.ratingFilter();
+    const query = this.searchQuery().toLowerCase();
 
-    return this.activities().filter(activity => {
-      const matchesSearchTerm = activity.name.toLowerCase().includes(term);
-      const matchesCategory = categories.length === 0 || categories.includes(activity.category);
-      const matchesPrice = activity.price <= price;
-      const matchesWheelchair = !wheelchair || ['total', 'parcial'].includes(activity.accessibility.wheelchair);
-      const matchesStroller = !stroller || ['total', 'parcial'].includes(activity.accessibility.stroller);
-      return matchesSearchTerm && matchesCategory && matchesPrice && matchesWheelchair && matchesStroller;
-    });
+    return this.activities()
+      .filter(a => !category || a.category === category)
+      .filter(a => !price || a.price <= price)
+      .filter(a => !rating || a.rating >= rating)
+      .filter(a => !query || a.name.toLowerCase().includes(query) || a.description.toLowerCase().includes(query));
   });
 
-  // Public methods
+  uniqueCategories = computed(() => {
+    const categories = this.activities().map(a => a.category);
+    return [...new Set(categories)];
+  });
+
   getActivityById(id: number): Activity | undefined {
-    // Return a deep copy to avoid mutation issues outside the service
-    const activity = this.activities().find(a => a.id === id);
-    return activity ? JSON.parse(JSON.stringify(activity)) : undefined;
+    return this.activities().find(a => a.id === id);
   }
 
   getEventById(id: number): Event | undefined {
@@ -192,53 +205,21 @@ export class ActivityService {
   }
 
   addReview(review: Review): void {
-    this.reviews.update(reviews => [...reviews, review]);
-    this.activities.update(activities => activities.map(activity => {
-      if (activity.id === review.activityId) {
-        const newReviews = [...activity.reviews, review].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        const newRating = newReviews.reduce((acc, r) => acc + r.rating, 0) / newReviews.length;
-        return { ...activity, reviews: newReviews, rating: newRating };
+    this.activities.update(activities => {
+      const activityIndex = activities.findIndex(a => a.id === review.activityId);
+      if (activityIndex > -1) {
+        const activity = { ...activities[activityIndex] };
+        activity.reviews = [...activity.reviews, review];
+        
+        // Recalculate rating
+        const totalRating = activity.reviews.reduce((sum, r) => sum + r.rating, 0);
+        activity.rating = totalRating / activity.reviews.length;
+        
+        const newActivities = [...activities];
+        newActivities[activityIndex] = activity;
+        return newActivities;
       }
-      return activity;
-    }));
-  }
-
-  // Filter update methods
-  setSearchTerm(term: string): void {
-    this.searchTerm.set(term);
-  }
-
-  toggleCategory(category: string): void {
-    this.selectedCategories.update(categories => {
-      const index = categories.indexOf(category);
-      if (index > -1) {
-        return categories.filter(c => c !== category);
-      } else {
-        return [...categories, category];
-      }
+      return activities;
     });
-  }
-
-  setPriceRange(price: number): void {
-    this.priceRange.set(price);
-  }
-
-  toggleWheelchairAccessible(): void {
-    this.showWheelchairAccessible.update(v => !v);
-  }
-
-  toggleStrollerAccessible(): void {
-    this.showStrollerAccessible.update(v => !v);
-  }
-
-  // Get current filter values for filter component initialization
-  getCurrentFilters() {
-    return {
-      searchTerm: this.searchTerm(),
-      selectedCategories: this.selectedCategories(),
-      priceRange: this.priceRange(),
-      wheelchair: this.showWheelchairAccessible(),
-      stroller: this.showStrollerAccessible()
-    };
   }
 }

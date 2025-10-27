@@ -11,13 +11,11 @@ export interface Activity {
   galleryImages: string[];
   price: number;
   rating: number;
-  rainyDayOk: boolean;
+  reviews: Review[];
   location: {
     lat: number;
     lng: number;
-    address: string;
   };
-  reviews: Review[];
   accessibility: {
     wheelchair: AccessibilityLevel;
     stroller: AccessibilityLevel;

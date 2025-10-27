@@ -1,7 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, Signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './services/auth.service';
-import { User } from './models/user.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,36 +8,43 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <header class="bg-white shadow-md sticky top-0 z-50">
-      <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-        <a routerLink="/" class="text-2xl font-bold text-teal-600">
-          +JUNTOS
-        </a>
-        <div class="flex items-center space-x-4">
-          <a routerLink="/" routerLinkActive="text-teal-600" [routerLinkActiveOptions]="{exact: true}" class="text-gray-600 hover:text-teal-600">Descobrir</a>
-          <a routerLink="/suppliers" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">Fornecedores</a>
-          <a routerLink="/trip-planner" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">Roteiro IA</a>
-          @if (isLoggedIn()) {
-            <a routerLink="/profile" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">
-              <span class="hidden sm:inline">Perfil de {{ currentUser()?.name }}</span>
-              <span class="inline sm:hidden">Perfil</span>
-            </a>
-            <button (click)="logout()" class="text-gray-600 hover:text-teal-600">Sair</button>
-          } @else {
-            <a routerLink="/login" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">Entrar</a>
-          }
+    <header class="bg-white shadow-md sticky top-0 z-20">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex-shrink-0">
+            <a routerLink="/" class="text-2xl font-bold text-teal-600">+JUNTOS</a>
+          </div>
+          <div class="hidden md:flex md:items-center md:space-x-8">
+            <a routerLink="/" routerLinkActive="text-teal-600" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-500 hover:text-gray-700">Descobrir</a>
+            <a routerLink="/suppliers" routerLinkActive="text-teal-600" class="text-gray-500 hover:text-gray-700">Fornecedores</a>
+            @if (isLoggedIn() && isPremium()) {
+              <a routerLink="/trip-planner" routerLinkActive="text-teal-600" class="text-gray-500 hover:text-gray-700">Roteiro IA</a>
+            }
+          </div>
+          <div class="flex items-center">
+            @if (isLoggedIn()) {
+              <a routerLink="/profile" class="mr-4 text-gray-500 hover:text-gray-700 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0012 11z" clip-rule="evenodd" /></svg>
+                <span>Perfil</span>
+              </a>
+              <button (click)="logout()" class="text-gray-500 hover:text-gray-700">Sair</button>
+            } @else {
+              <a routerLink="/login" class="bg-teal-500 text-white font-bold py-2 px-4 rounded-full hover:bg-teal-600">Entrar</a>
+            }
+          </div>
         </div>
       </nav>
     </header>
-
-    <main class="container mx-auto p-6 bg-gray-50 min-h-screen">
+    
+    <main class="py-8 bg-gray-50 min-h-screen">
       <router-outlet></router-outlet>
     </main>
 
-    <footer class="bg-white mt-8 py-6">
-        <div class="container mx-auto px-6 text-center text-gray-500">
-            <p>&copy; 2024 +JUNTOS. Todos os direitos reservados.</p>
-        </div>
+    <footer class="bg-gray-800 text-white">
+      <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+        <p>&copy; {{ currentYear }} +JUNTOS. Todos os direitos reservados.</p>
+        <p class="text-sm text-gray-400 mt-2">Ajudando famílias a criar memórias felizes.</p>
+      </div>
     </footer>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,9 +52,10 @@ import { Router } from '@angular/router';
 export class AppComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  
-  isLoggedIn: Signal<boolean> = this.authService.isLoggedIn;
-  currentUser: Signal<User | null> = this.authService.currentUser;
+
+  isLoggedIn = this.authService.isLoggedIn;
+  isPremium = computed(() => this.authService.currentUser()?.isPremium ?? false);
+  currentYear = new Date().getFullYear();
 
   logout(): void {
     this.authService.logout();
