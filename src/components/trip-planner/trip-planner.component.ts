@@ -1,58 +1,78 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GoogleGenAI, Type } from "@google/genai";
+import { AuthService } from '../../services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-trip-planner',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   template: `
     <div class="max-w-2xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-6 text-teal-600">Planeador de Viagens IA</h2>
-        <p class="text-center text-gray-600 mb-8">
-            Deixe a nossa IA criar um roteiro perfeito para a sua família. Basta preencher os detalhes abaixo.
-        </p>
-        <form [formGroup]="plannerForm" (ngSubmit)="generatePlan()" class="bg-white p-8 rounded-lg shadow-md">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                <div>
-                    <label for="location" class="block text-gray-700 font-bold mb-2">Destino (Cidade)</label>
-                    <input type="text" id="location" formControlName="location"
+        <h2 class="text-3xl font-bold text-center mb-6 text-teal-600">Roteiro IA</h2>
+        
+        @if (isPremium()) {
+          <p class="text-center text-gray-600 mb-8">
+              Bem-vindo, membro Premium! Deixe a nossa IA criar um roteiro perfeito para a sua família.
+          </p>
+          @if (isApiConfigured) {
+            <form [formGroup]="plannerForm" (ngSubmit)="generatePlan()" class="bg-white p-8 rounded-lg shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div>
+                        <label for="location" class="block text-gray-700 font-bold mb-2">Destino (Cidade)</label>
+                        <input type="text" id="location" formControlName="location"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="duration" class="block text-gray-700 font-bold mb-2">Duração (dias)</label>
+                        <input type="number" id="duration" formControlName="duration" min="1"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="interests" class="block text-gray-700 font-bold mb-2">Interesses das Crianças</label>
+                    <input type="text" id="interests" formControlName="interests" placeholder="Ex: animais, ciência, ar livre"
                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
-                <div>
-                    <label for="duration" class="block text-gray-700 font-bold mb-2">Duração (dias)</label>
-                    <input type="number" id="duration" formControlName="duration" min="1"
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <div class="mb-6">
+                    <label for="budget" class="block text-gray-700 font-bold mb-2">Orçamento</label>
+                    <select id="budget" formControlName="budget" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="economico">Económico</option>
+                        <option value="moderado">Moderado</option>
+                        <option value="flexivel">Flexível</option>
+                    </select>
                 </div>
+                <div class="text-center">
+                    <button type="submit" [disabled]="plannerForm.invalid || isLoading()"
+                            class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-full focus:outline-none focus:shadow-outline disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center mx-auto">
+                        @if (isLoading()) {
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            A planear...
+                        } @else {
+                            <span>Gerar Roteiro</span>
+                        }
+                    </button>
+                </div>
+            </form>
+          } @else {
+            <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+              <p class="font-bold">Serviço Indisponível</p>
+              <p>A funcionalidade de IA não está configurada corretamente. Por favor, tente mais tarde.</p>
             </div>
-            <div class="mb-4">
-                <label for="interests" class="block text-gray-700 font-bold mb-2">Interesses das Crianças</label>
-                <input type="text" id="interests" formControlName="interests" placeholder="Ex: animais, ciência, ar livre"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          }
+        } @else {
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg text-center shadow-md">
+                <h3 class="text-2xl font-bold mb-3">Esta é uma funcionalidade Premium!</h3>
+                <p class="mb-4">Faça o upgrade para criar roteiros ilimitados com a nossa Inteligência Artificial e planeie as melhores viagens em família.</p>
+                <a routerLink="/premium" class="bg-yellow-400 text-teal-800 font-bold py-2 px-6 rounded-full hover:bg-yellow-500 transition-colors duration-300">
+                    Tornar-se Premium
+                </a>
             </div>
-            <div class="mb-6">
-                <label for="budget" class="block text-gray-700 font-bold mb-2">Orçamento</label>
-                <select id="budget" formControlName="budget" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    <option value="economico">Económico</option>
-                    <option value="moderado">Moderado</option>
-                    <option value="flexivel">Flexível</option>
-                </select>
-            </div>
-            <div class="text-center">
-                <button type="submit" [disabled]="plannerForm.invalid || isLoading()"
-                        class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-full focus:outline-none focus:shadow-outline disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center mx-auto">
-                    @if (isLoading()) {
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        A planear...
-                    } @else {
-                        <span>Gerar Roteiro</span>
-                    }
-                </button>
-            </div>
-        </form>
+        }
 
         @if (errorMessage()) {
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
@@ -84,10 +104,14 @@ import { GoogleGenAI, Type } from "@google/genai";
 })
 export class TripPlannerComponent {
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
   
   isLoading = signal(false);
   tripPlan = signal<any | null>(null);
   errorMessage = signal<string | null>(null);
+  
+  isPremium = computed(() => this.authService.currentUser()?.isPremium ?? false);
+  isApiConfigured = !!process.env.API_KEY;
 
   plannerForm = this.fb.group({
     location: ['Lisboa', Validators.required],
@@ -97,7 +121,7 @@ export class TripPlannerComponent {
   });
 
   async generatePlan() {
-    if (this.plannerForm.invalid) {
+    if (this.plannerForm.invalid || !this.isApiConfigured) {
       return;
     }
 

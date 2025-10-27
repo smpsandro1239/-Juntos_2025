@@ -5,7 +5,7 @@ import { User } from '../models/user.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly MOCK_USER: User = { id: 1, name: 'Utilizador Exemplo', email: 'user@example.com' };
+  private readonly MOCK_USER: User = { id: 1, name: 'Utilizador Teste', email: 'user@example.com', isPremium: false };
   
   private currentUserSignal = signal<User | null>(this.getStoredUser());
   
@@ -43,5 +43,14 @@ export class AuthService {
 
   logout(): void {
     this.currentUserSignal.set(null);
+  }
+  
+  upgradeToPremium(): void {
+    this.currentUserSignal.update(user => {
+      if (user) {
+        return { ...user, isPremium: true };
+      }
+      return null;
+    });
   }
 }

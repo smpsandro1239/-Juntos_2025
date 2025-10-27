@@ -16,6 +16,16 @@ import { User } from '../../models/user.model';
         <div class="mb-4">
           <p class="text-gray-600"><strong>Email:</strong> {{ user()?.email }}</p>
         </div>
+        <div class="mb-4">
+          <p class="text-gray-600">
+            <strong>Estado da Conta:</strong> 
+            @if (user()?.isPremium) {
+              <span class="font-semibold text-teal-600">Membro Premium</span>
+            } @else {
+              <span class="font-semibold text-gray-700">Utilizador Gratuito</span>
+            }
+          </p>
+        </div>
         <div class="mt-6 text-center">
           <button (click)="logout()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Sair
