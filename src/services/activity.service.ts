@@ -26,8 +26,10 @@ export class ActivityService {
       galleryImages: ['https://picsum.photos/seed/oceanario1/800/600', 'https://picsum.photos/seed/oceanario2/800/600', 'https://picsum.photos/seed/oceanario3/800/600'],
       price: 19.00,
       rating: 4.8,
+      rainyDayOk: true,
       location: { lat: 38.7634, lng: -9.0936, address: 'Esplanada Dom Carlos I s/nº, 1990-005 Lisboa' },
-      reviews: this.reviews().filter(r => r.activityId === 1)
+      reviews: this.reviews().filter(r => r.activityId === 1),
+      accessibility: { wheelchair: 'total', stroller: 'total' }
     },
     {
       id: 2,
@@ -38,8 +40,10 @@ export class ActivityService {
       galleryImages: ['https://picsum.photos/seed/pena1/800/600', 'https://picsum.photos/seed/pena2/800/600'],
       price: 14.00,
       rating: 4.9,
+      rainyDayOk: false,
       location: { lat: 38.7876, lng: -9.3905, address: 'Estrada da Pena, 2710-609 Sintra' },
-      reviews: this.reviews().filter(r => r.activityId === 2)
+      reviews: this.reviews().filter(r => r.activityId === 2),
+      accessibility: { wheelchair: 'parcial', stroller: 'parcial' }
     },
     {
       id: 3,
@@ -50,8 +54,10 @@ export class ActivityService {
       galleryImages: ['https://picsum.photos/seed/ciencia1/800/600', 'https://picsum.photos/seed/ciencia2/800/600', 'https://picsum.photos/seed/ciencia3/800/600'],
       price: 10.00,
       rating: 4.7,
+      rainyDayOk: true,
       location: { lat: 38.7623, lng: -9.0949, address: 'Largo José Mariano Gago nº1, 1990-073 Lisboa' },
-      reviews: this.reviews().filter(r => r.activityId === 3)
+      reviews: this.reviews().filter(r => r.activityId === 3),
+      accessibility: { wheelchair: 'total', stroller: 'total' }
     },
     {
       id: 4,
@@ -62,8 +68,10 @@ export class ActivityService {
       galleryImages: ['https://picsum.photos/seed/dino1/800/600', 'https://picsum.photos/seed/dino2/800/600'],
       price: 13.00,
       rating: 4.6,
+      rainyDayOk: false,
       location: { lat: 39.2398, lng: -9.3142, address: 'Rua Vale dos Dinossauros 25, 2530-059 Lourinhã' },
-      reviews: this.reviews().filter(r => r.activityId === 4)
+      reviews: this.reviews().filter(r => r.activityId === 4),
+       accessibility: { wheelchair: 'parcial', stroller: 'total' }
     },
     {
         id: 5,
@@ -74,8 +82,10 @@ export class ActivityService {
         galleryImages: ['https://picsum.photos/seed/zoomarine1/800/600', 'https://picsum.photos/seed/zoomarine2/800/600', 'https://picsum.photos/seed/zoomarine3/800/600'],
         price: 29.00,
         rating: 4.5,
+        rainyDayOk: false,
         location: { lat: 37.1278, lng: -8.3146, address: 'N125, KM 65, 8201-864 Guia' },
-        reviews: []
+        reviews: [],
+        accessibility: { wheelchair: 'total', stroller: 'total' }
     }
   ]);
 
@@ -141,6 +151,8 @@ export class ActivityService {
   private searchTerm = signal('');
   private selectedCategories = signal<string[]>([]);
   private priceRange = signal<number>(50);
+  private showWheelchairAccessible = signal(false);
+  private showStrollerAccessible = signal(false);
 
   // Public Signals
   allSuppliers = this.suppliers.asReadonly();
@@ -151,12 +163,16 @@ export class ActivityService {
     const term = this.searchTerm().toLowerCase();
     const categories = this.selectedCategories();
     const price = this.priceRange();
+    const wheelchair = this.showWheelchairAccessible();
+    const stroller = this.showStrollerAccessible();
 
     return this.activities().filter(activity => {
       const matchesSearchTerm = activity.name.toLowerCase().includes(term);
       const matchesCategory = categories.length === 0 || categories.includes(activity.category);
       const matchesPrice = activity.price <= price;
-      return matchesSearchTerm && matchesCategory && matchesPrice;
+      const matchesWheelchair = !wheelchair || ['total', 'parcial'].includes(activity.accessibility.wheelchair);
+      const matchesStroller = !stroller || ['total', 'parcial'].includes(activity.accessibility.stroller);
+      return matchesSearchTerm && matchesCategory && matchesPrice && matchesWheelchair && matchesStroller;
     });
   });
 
@@ -207,12 +223,22 @@ export class ActivityService {
     this.priceRange.set(price);
   }
 
+  toggleWheelchairAccessible(): void {
+    this.showWheelchairAccessible.update(v => !v);
+  }
+
+  toggleStrollerAccessible(): void {
+    this.showStrollerAccessible.update(v => !v);
+  }
+
   // Get current filter values for filter component initialization
   getCurrentFilters() {
     return {
       searchTerm: this.searchTerm(),
       selectedCategories: this.selectedCategories(),
-      priceRange: this.priceRange()
+      priceRange: this.priceRange(),
+      wheelchair: this.showWheelchairAccessible(),
+      stroller: this.showStrollerAccessible()
     };
   }
 }

@@ -38,6 +38,23 @@ import { ActivityService } from '../../services/activity.service';
           }
         </div>
       </div>
+
+      <!-- Accessibility -->
+      <div class="mt-6 pt-4 border-t">
+        <h3 class="block text-gray-700 font-bold mb-2">Acessibilidade</h3>
+        <div class="flex flex-wrap gap-3">
+            <button (click)="onWheelchairToggle()"
+                    [class]="currentFilters.wheelchair ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'"
+                    class="px-4 py-2 rounded-full font-semibold transition-colors duration-200 hover:bg-blue-400 hover:text-white flex items-center gap-2">
+              ♿ Cadeira de Rodas
+            </button>
+             <button (click)="onStrollerToggle()"
+                    [class]="currentFilters.stroller ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'"
+                    class="px-4 py-2 rounded-full font-semibold transition-colors duration-200 hover:bg-green-400 hover:text-white flex items-center gap-2">
+              👶 Carrinho de Bebé
+            </button>
+        </div>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,5 +81,15 @@ export class FiltersComponent {
 
   isCategorySelected(category: string): boolean {
     return this.currentFilters.selectedCategories.includes(category);
+  }
+
+  onWheelchairToggle(): void {
+    this.activityService.toggleWheelchairAccessible();
+    this.currentFilters = this.activityService.getCurrentFilters();
+  }
+
+  onStrollerToggle(): void {
+    this.activityService.toggleStrollerAccessible();
+    this.currentFilters = this.activityService.getCurrentFilters();
   }
 }

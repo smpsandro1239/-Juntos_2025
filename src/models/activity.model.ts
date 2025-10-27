@@ -1,5 +1,7 @@
 import { Review } from './review.model';
 
+export type AccessibilityLevel = 'total' | 'parcial' | 'nenhum';
+
 export interface Activity {
   id: number;
   name: string;
@@ -9,10 +11,15 @@ export interface Activity {
   galleryImages: string[];
   price: number;
   rating: number;
+  rainyDayOk: boolean;
   location: {
     lat: number;
     lng: number;
     address: string;
   };
   reviews: Review[];
+  accessibility: {
+    wheelchair: AccessibilityLevel;
+    stroller: AccessibilityLevel;
+  };
 }

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ActivityService } from '../../services/activity.service';
-import { Activity } from '../../models/activity.model';
+import { Activity, AccessibilityLevel } from '../../models/activity.model';
 import { Review } from '../../models/review.model';
 import { AuthService } from '../../services/auth.service';
 
@@ -34,6 +34,27 @@ import { AddToAlbumModalComponent } from '../add-to-album-modal/add-to-album-mod
             </div>
             
             <p class="text-gray-700 mb-6">{{ act.description }}</p>
+
+            <!-- Accessibility -->
+             <div class="mb-6 border-t pt-4">
+                <h2 class="text-2xl font-semibold mb-4">Acessibilidade</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex items-center p-3 rounded-lg" [class]="getAccessibilityInfo(act.accessibility.wheelchair).bgColor">
+                        <span class="text-2xl mr-3">♿</span>
+                        <div>
+                            <p class="font-semibold" [class]="getAccessibilityInfo(act.accessibility.wheelchair).textColor">Cadeira de Rodas</p>
+                            <p [class]="getAccessibilityInfo(act.accessibility.wheelchair).textColor">{{ getAccessibilityInfo(act.accessibility.wheelchair).text }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-3 rounded-lg" [class]="getAccessibilityInfo(act.accessibility.stroller).bgColor">
+                        <span class="text-2xl mr-3">👶</span>
+                        <div>
+                            <p class="font-semibold" [class]="getAccessibilityInfo(act.accessibility.stroller).textColor">Carrinho de Bebé</p>
+                            <p [class]="getAccessibilityInfo(act.accessibility.stroller).textColor">{{ getAccessibilityInfo(act.accessibility.stroller).text }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             @if (isLoggedIn()) {
               <div class="flex flex-wrap gap-4 mb-6">
@@ -166,5 +187,16 @@ export class ActivityDetailComponent implements OnInit {
       month: 'long',
       year: 'numeric'
     });
+  }
+
+  getAccessibilityInfo(level: AccessibilityLevel): { text: string; bgColor: string, textColor: string } {
+    switch (level) {
+      case 'total':
+        return { text: 'Acesso Total', bgColor: 'bg-green-100', textColor: 'text-green-800' };
+      case 'parcial':
+        return { text: 'Acesso Parcial', bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' };
+      case 'nenhum':
+        return { text: 'Acesso Difícil', bgColor: 'bg-red-100', textColor: 'text-red-800' };
+    }
   }
 }
