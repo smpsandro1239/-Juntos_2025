@@ -26,8 +26,8 @@ export const en = {
 
   // Header
   'home': 'Home',
-  'tripPlanner': 'Trip Planner',
-  'suppliers': 'Suppliers',
+  'tripPlanner': 'AI Planner',
+  'suppliers': 'Parties',
   'sos': 'SOS',
 
   // Home Page
@@ -126,7 +126,7 @@ export const en = {
   'allSuppliers': 'All Suppliers',
   'contactSupplier': 'Contact Supplier',
   'contactViaWhatsApp': 'Contact via WhatsApp',
-  'whatsappMessage': 'Hello, I found your contact on the Juntos app and I would like to know more about your services.',
+  'whatsappMessage': 'Hello {0}, I found your contact on the Juntos app and I would like to know more about your services.',
 
   // Contact Modal
   'contact': 'Contact',
@@ -140,6 +140,10 @@ export const en = {
   // Order Print
   'orderPrintTitle': 'Order Album Prints',
   'orderSummary': 'Order Summary',
+  'basePrice': 'Base price',
+  'discount': 'Points Discount',
+  'applyDiscount': 'Use {0} points for a {1}€ discount',
+  'yourBalance': 'Your balance',
   'coverType': 'Cover Type',
   'softCover': 'Soft Cover',
   'hardCover': 'Hard Cover',
@@ -166,6 +170,9 @@ export const en = {
   'premiumFeature3': 'Exclusive Discounts',
   'premiumFeature3Desc': 'Get special offers on activities and from our partners.',
   'becomePremium': 'Become Premium Now',
+  'alreadyPremium': 'Thank you for being a Premium member!',
+  'upgradeWithPoints': 'Unlock with {0} points',
+  'notEnoughPoints': 'You need {0} more points',
 
   // SOS Page
   'sosTitle': 'Emergency - SOS',

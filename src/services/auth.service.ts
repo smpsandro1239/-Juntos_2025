@@ -1,7 +1,9 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { User } from '../models/user.model';
 import { Album, AlbumPhoto } from '../models/album.model';
 import { Order } from '../models/order.model';
+import { PointTransaction } from '../models/point-transaction.model';
 
 const MOCK_USER: User = {
   id: 1,
@@ -33,11 +35,11 @@ const MOCK_USER: User = {
     ]
   },
   points: {
-    balance: 250,
+    balance: 1250,
     transactions: [
-      { id: 1, date: '2024-07-20T10:00:00Z', description: 'Completou a missão "Primeira Avaliação"', points: 50 },
-      { id: 2, date: '2024-07-21T14:00:00Z', description: 'Carimbo Passaporte: Oceanário', points: 100 },
-      { id: 3, date: '2024-07-22T18:00:00Z', description: 'Tornou-se membro Premium', points: 100 },
+      { id: 1, date: '2025-07-20T10:00:00Z', description: 'Completou a missão "Primeira Avaliação"', points: 50 },
+      { id: 2, date: '2025-07-21T14:00:00Z', description: 'Carimbo Passaporte: Oceanário', points: 100 },
+      { id: 3, date: '2025-07-22T18:00:00Z', description: 'Tornou-se membro Premium', points: 100 },
     ]
   },
   albums: [
@@ -68,6 +70,7 @@ const MOCK_USER: User = {
   providedIn: 'root'
 })
 export class AuthService {
+  private router = inject(Router);
   private currentUserSignal = signal<User | null>(null);
 
   // Public signals
@@ -97,6 +100,7 @@ export class AuthService {
   logout(): void {
     this.currentUserSignal.set(null);
     sessionStorage.removeItem('juntos-user');
+    this.router.navigate(['/']);
   }
 
   toggleFavorite(activityId: number): void {
@@ -163,6 +167,35 @@ export class AuthService {
       return { ...user, isPremium: true };
     });
     this.updateStoredUser();
+  }
+
+  spendPoints(amount: number, description: string): boolean {
+    const currentUser = this.currentUserSignal();
+    if (!currentUser || currentUser.points.balance < amount) {
+      return false; // Not enough points or not logged in
+    }
+
+    this.currentUserSignal.update(user => {
+      if (!user) return null;
+      
+      const newTransaction: PointTransaction = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        description,
+        points: -amount
+      };
+
+      return {
+        ...user,
+        points: {
+          balance: user.points.balance - amount,
+          transactions: [...user.points.transactions, newTransaction]
+        }
+      };
+    });
+
+    this.updateStoredUser();
+    return true;
   }
   
   private updateStoredUser(): void {

@@ -8,6 +8,9 @@ import { Album } from '../../models/album.model';
 import { Order } from '../../models/order.model';
 import { L10nPipe } from '../../pipes/l10n.pipe';
 
+const DISCOUNT_IN_POINTS = 500;
+const DISCOUNT_AMOUNT_EUR = 5;
+
 @Component({
   selector: 'app-order-print',
   standalone: true,
@@ -22,15 +25,27 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
                 <!-- Order Summary -->
                 <div class="bg-gray-50 p-6 rounded-lg border">
                     <h2 class="text-2xl font-semibold mb-4">{{ 'orderSummary' | l10n }}</h2>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-gray-600">{{ alb.photos.length }} fotos</span>
-                        <span></span>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">{{ 'basePrice' | l10n }}</span>
+                            <span class="font-semibold">{{ 10 | currency:'EUR' }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">{{ alb.photos.length }} {{ 'photos' | l10n }} (0,50€/foto)</span>
+                            <span class="font-semibold">{{ alb.photos.length * 0.5 | currency:'EUR' }}</span>
+                        </div>
+                         <div class="flex justify-between items-center">
+                            <span class="text-gray-600">{{ 'coverType' | l10n }}: {{ coverType() === 'soft' ? ('softCover' | l10n) : ('hardCover' | l10n) }}</span>
+                            <span class="font-semibold">{{ (coverType() === 'soft' ? 15 : 25) | currency:'EUR' }}</span>
+                        </div>
+                        @if(applyDiscount()) {
+                           <div class="flex justify-between items-center text-green-600">
+                                <span class="font-semibold">{{ 'discount' | l10n }} ({{ DISCOUNT_IN_POINTS }} {{ 'points' | l10n }})</span>
+                                <span class="font-bold">-{{ DISCOUNT_AMOUNT_EUR | currency:'EUR' }}</span>
+                            </div>
+                        }
                     </div>
-                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-gray-600">{{ 'coverType' | l10n }}</span>
-                        <span class="font-semibold">{{ coverType() === 'soft' ? ('softCover' | l10n) : ('hardCover' | l10n) }}</span>
-                    </div>
-                    <div class="border-t pt-4">
+                    <div class="border-t pt-4 mt-4">
                          <div class="flex justify-between items-center text-xl font-bold">
                             <span>{{ 'total' | l10n }}</span>
                             <span>{{ totalPrice() | currency:'EUR' }}</span>
@@ -65,7 +80,18 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
                         </div>
                     </div>
 
-                    <h3 class="text-xl font-semibold mb-3 mt-6">{{ 'shippingAddress' | l10n }}</h3>
+                     <!-- Points Discount -->
+                    <div class="my-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        <label class="flex items-center">
+                            <input type="checkbox" [disabled]="!canAffordDiscount()" (change)="applyDiscount.set($event.target.checked)" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                            <span class="ml-3 text-gray-700">
+                                {{ 'applyDiscount' | l10n:DISCOUNT_IN_POINTS:DISCOUNT_AMOUNT_EUR }}
+                                <span class="block text-sm text-gray-500">{{ 'yourBalance' | l10n }}: {{ userPoints() }} {{ 'points' | l10n }}</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mb-3">{{ 'shippingAddress' | l10n }}</h3>
                     <div class="space-y-4">
                          <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">{{ 'fullName' | l10n }}</label>
@@ -105,10 +131,17 @@ export class OrderPrintComponent {
     private authService = inject(AuthService);
     private toastService = inject(ToastService);
 
+    DISCOUNT_IN_POINTS = DISCOUNT_IN_POINTS;
+    DISCOUNT_AMOUNT_EUR = DISCOUNT_AMOUNT_EUR;
+
     albumId = signal(0);
     album = signal<Album | undefined>(undefined);
     coverType = signal<'soft' | 'hard'>('soft');
+    applyDiscount = signal(false);
     
+    userPoints = computed(() => this.authService.currentUser()?.points.balance ?? 0);
+    canAffordDiscount = computed(() => this.userPoints() >= this.DISCOUNT_IN_POINTS);
+
     constructor() {
         const id = Number(this.route.snapshot.paramMap.get('albumId'));
         this.albumId.set(id);
@@ -121,7 +154,11 @@ export class OrderPrintComponent {
         const basePrice = 10; // Base price for the book
         const photoPrice = this.album()?.photos.length ? this.album()!.photos.length * 0.5 : 0;
         const coverPrice = this.coverType() === 'soft' ? 15 : 25;
-        return basePrice + photoPrice + coverPrice;
+        let total = basePrice + photoPrice + coverPrice;
+        if (this.applyDiscount()) {
+            total -= this.DISCOUNT_AMOUNT_EUR;
+        }
+        return total;
     });
 
     placeOrder(formValue: {name: string, address: string, postalCode: string, city: string}) {
@@ -129,6 +166,14 @@ export class OrderPrintComponent {
         if (!album) {
             this.toastService.show('Álbum não encontrado.', 'error');
             return;
+        }
+
+        if (this.applyDiscount()) {
+            const success = this.authService.spendPoints(this.DISCOUNT_IN_POINTS, `Desconto na encomenda do álbum "${album.name}"`);
+            if (!success) {
+                this.toastService.show('Não foi possível aplicar o desconto de pontos.', 'error');
+                return;
+            }
         }
 
         const newOrder: Omit<Order, 'id'> = {

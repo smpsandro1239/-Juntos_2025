@@ -26,8 +26,8 @@ export const pt = {
 
   // Header
   'home': 'Início',
-  'tripPlanner': 'Planeador de Viagem',
-  'suppliers': 'Fornecedores',
+  'tripPlanner': 'Planeador IA',
+  'suppliers': 'Festas',
   'sos': 'SOS',
 
   // Home Page
@@ -126,7 +126,7 @@ export const pt = {
   'allSuppliers': 'Todos os Fornecedores',
   'contactSupplier': 'Contactar Fornecedor',
   'contactViaWhatsApp': 'Contactar via WhatsApp',
-  'whatsappMessage': 'Olá, encontrei o vosso contacto na app Juntos e gostaria de saber mais sobre os vossos serviços.',
+  'whatsappMessage': 'Olá {0}, encontrei o vosso contacto na app Juntos e gostaria de saber mais sobre os vossos serviços.',
 
   // Modal Contacto
   'contact': 'Contacto',
@@ -140,6 +140,10 @@ export const pt = {
   // Encomendar Impressão
   'orderPrintTitle': 'Encomendar Impressão do Álbum',
   'orderSummary': 'Resumo da Encomenda',
+  'basePrice': 'Preço base',
+  'discount': 'Desconto de Pontos',
+  'applyDiscount': 'Usar {0} pontos por {1}€ de desconto',
+  'yourBalance': 'O seu saldo',
   'coverType': 'Tipo de Capa',
   'softCover': 'Capa Mole',
   'hardCover': 'Capa Dura',
@@ -166,6 +170,9 @@ export const pt = {
   'premiumFeature3': 'Descontos Exclusivos',
   'premiumFeature3Desc': 'Tenha acesso a ofertas especiais em atividades e nos nossos parceiros.',
   'becomePremium': 'Tornar-se Premium Agora',
+  'alreadyPremium': 'Obrigado por ser um membro Premium!',
+  'upgradeWithPoints': 'Desbloquear com {0} pontos',
+  'notEnoughPoints': 'Faltam {0} pontos',
   
   // Página SOS
   'sosTitle': 'Emergência - SOS',
