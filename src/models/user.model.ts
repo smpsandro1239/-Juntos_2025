@@ -15,12 +15,12 @@ export interface User {
     balance: number;
     transactions: PointTransaction[];
   };
-  missions: Mission[];
   passport: {
-    stampsCollected: number[]; // Array of stamp IDs (which are activity IDs)
     thematicSeries: ThematicSeries[];
+    stampsCollected: number[]; // Array of stamp IDs
   };
   albums: Album[];
   orders: Order[];
+  missions: Mission[];
   savedPlans: TripPlan[];
 }

@@ -1,133 +1,144 @@
 export const pt = {
-  // Common
+  // Geral
+  home: 'Início',
   all: 'Todos',
-  price: 'Preço',
-  free: 'Grátis',
-  paid: 'Pago',
-  search: 'Pesquisar',
-  searchPlaceholder: 'Pesquisar atividades...',
-  filtersCategory: 'Categoria',
-  allCategories: 'Todas as categorias',
-  allPrices: 'Todos os preços',
-  noResults: 'Nenhum resultado encontrado.',
-  description: 'Descrição',
-  details: 'Detalhes',
-  gallery: 'Galeria',
-  reviews: 'Avaliações',
-  login: 'Entrar',
-  logout: 'Sair',
-  cancel: 'Cancelar',
-  add: 'Adicionar',
-  create: 'Criar',
-  createNew: 'Criar Novo',
-  points: 'pontos',
-  completed: 'Concluído',
-  collected: 'Recolhido',
-  title: 'Título',
-  content: 'Conteúdo',
-  
-  // App Component (Header/Footer)
+  allRightsReserved: 'Todos os direitos reservados',
+
+  // App Component
   tripPlanner: 'Planeador de Viagem',
-  community: 'Comunidade',
   suppliers: 'Fornecedores',
-  allRightsReserved: 'Todos os direitos reservados.',
-  sos: 'SOS - Emergência',
+  community: 'Comunidade',
+  profile: 'Perfil',
 
   // Home Component
-  welcomeTitle: 'Bem-vindo ao Juntos',
-  welcomeSubtitle: 'Descubra as melhores atividades para fazer em família.',
-  upcomingEvents: 'Eventos Futuros',
+  welcomeTitle: 'Bem-vindo ao Juntos!',
+  welcomeSubtitle: 'Descubra as melhores atividades em família em Lisboa',
+  upcomingEvents: 'Próximos Eventos',
   discoverActivities: 'Descubra Atividades',
+  noResults: 'Nenhuma atividade encontrada para os filtros selecionados.',
+
+  // Filters Component
+  search: 'Pesquisar',
+  searchPlaceholder: 'Pesquisar por atividades...',
+  filtersCategory: 'Categoria',
+  allCategories: 'Todas as categorias',
+  price: 'Preço',
+  allPrices: 'Todos os preços',
+  free: 'Grátis',
+  paid: 'Pago',
 
   // Discover Feed
   sustainable: 'Sustentável',
 
   // Activity Detail
   backToActivities: 'Voltar às atividades',
+  description: 'Descrição',
+  gallery: 'Galeria',
+  reviews: 'Avaliações',
+  loginToReview: 'Para deixar uma avaliação, precisa de',
+  loginHere: 'iniciar sessão aqui',
+  noReviews: 'Seja o primeiro a avaliar esta atividade!',
+  details: 'Detalhes',
   wheelchair: 'Cadeira de rodas',
   stroller: 'Carrinho de bebé',
-  addFavorite: 'Adicionar aos Favoritos',
   unfavorite: 'Remover dos Favoritos',
+  addFavorite: 'Adicionar aos Favoritos',
   addToAlbum: 'Adicionar ao Álbum',
-  noReviews: 'Ainda não existem avaliações. Seja o primeiro a deixar uma!',
-  loginToReview: 'Para deixar uma avaliação, precisa de',
-  loginHere: 'entrar na sua conta',
+
+  // Map View
+  noLocationsMap: 'Nenhum local para mostrar no mapa.',
+
+  // Login
+  loginTitle: 'Inicie sessão na sua conta',
+  email: 'Email',
+  password: 'Password',
+  loginHint: 'Dica: Use user@juntos.com / 123456',
+  login: 'Iniciar Sessão',
   
+  // Profile
+  yourAlbums: 'Os Seus Álbuns',
+  myPassport: 'O Meu Passaporte',
+  myPoints: 'Os Meus Pontos',
+  myFavorites: 'Os Meus Favoritos',
+  myMissions: 'As Minhas Missões',
+  mySavedPlans: 'Os Meus Planos',
+  myOrders: 'As Minhas Encomendas',
+  premiumMembership: 'Membro Premium',
+  logout: 'Terminar Sessão',
+
   // Review Form
-  leaveReviewTitle: 'Deixe a sua avaliação',
+  leaveReviewTitle: 'Deixe uma avaliação',
   rating: 'Classificação',
   comment: 'Comentário',
   submitReview: 'Submeter Avaliação',
-
-  // Login
-  loginTitle: 'Aceda à sua conta',
-  email: 'Email',
-  password: 'Password',
-  loginHint: 'Use ana@juntos.pt e 1234 para entrar.',
-
-  // Profile
-  premiumMember: 'Membro Premium',
-  myFavorites: 'Os Meus Favoritos',
-  favoritesDesc: 'Veja as suas atividades guardadas.',
-  yourAlbums: 'Os Seus Álbuns',
-  albumsDesc: 'Recorde os seus momentos especiais.',
-  passport: 'Passaporte',
-  passportDesc: 'Colecione selos das suas aventuras.',
-  missions: 'Missões',
-  missionsDesc: 'Complete desafios e ganhe pontos.',
-  pointsMenuTitle: 'Histórico de Pontos',
-  pointsDesc: 'Consulte os seus pontos e transações.',
-  orderHistory: 'Histórico de Encomendas',
-  orderHistoryDesc: 'Veja as suas encomendas de álbuns.',
-  savedPlans: 'Planos Guardados',
-  savedPlansDesc: 'Aceda aos seus roteiros de viagem.',
-  becomePremium: 'Tornar-se Premium',
-  premiumCta: 'Desbloqueie benefícios exclusivos.',
+  
+  // Premium Page
+  premiumTitle: 'Juntos Premium',
+  premiumSubtitle: 'Desbloqueie funcionalidades exclusivas e melhore as suas aventuras em família!',
+  premiumFeature1: 'Planeador de Viagem IA',
+  premiumFeature1Desc: 'Obtenha itinerários personalizados criados pela nossa IA, à medida dos interesses da sua família.',
+  premiumFeature2: 'Criador de Vídeos IA',
+  premiumFeature2Desc: 'Crie automaticamente vídeos memoráveis a partir dos seus álbuns de fotos.',
+  premiumFeature3: 'Descontos Exclusivos',
+  premiumFeature3Desc: 'Use os seus pontos para obter descontos na impressão de álbuns de fotos e outros produtos.',
+  alreadyPremium: 'Já é um membro Premium! Obrigado!',
+  becomePremium: 'Torne-se Premium Agora!',
+  upgradeWithPoints: 'Upgrade com {0} Pontos',
+  notEnoughPoints: 'Precisa de mais {0} pontos',
 
   // Passport
-  passportTitle: 'O seu Passaporte de Aventuras',
-  passportSubtitle: 'Colecione selos digitais ao visitar locais e completar atividades.',
-  
+  passportTitle: 'O Meu Passaporte',
+  passportSubtitle: 'Colecione selos ao visitar atividades e complete as suas séries temáticas!',
+  collected: 'Colecionado',
+
   // Event Detail
   eventDetails: 'Detalhes do Evento',
   when: 'Quando',
-  location: 'Localização',
+  location: 'Local',
 
   // Suppliers
-  allSuppliers: 'Fornecedores para a sua Festa',
+  allSuppliers: 'Todos os Fornecedores',
   contactViaWhatsApp: 'Contactar via WhatsApp',
   contactSupplier: 'Contactar Fornecedor',
+
+  // Contact Modal
+  contact: 'Contacto',
   phone: 'Telefone',
   website: 'Website',
-  contact: 'Contacto',
-  
-  // Albums
-  albumName: 'Nome do álbum',
-  photos: 'fotos',
-  viewAlbum: 'Ver álbum',
-  noAlbums: 'Ainda não criou nenhum álbum.',
-  allAlbums: 'Todos os álbuns',
-  orderPrint: 'Encomendar Impressão',
-  createVideo: 'Criar Vídeo',
-  noPhotos: 'Este álbum está vazio.',
-  uploadSome: 'Adicione algumas fotos para começar!',
-  uploadPhoto: 'Carregar Foto',
   
   // Add to Album Modal
   selectAlbum: 'Selecione um álbum',
   or: 'ou',
   createNewAlbum: 'Crie um novo álbum',
+  cancel: 'Cancelar',
+  add: 'Adicionar',
 
+  // Albums Page
+  createNew: 'Criar Novo',
+  albumName: 'Nome do álbum',
+  create: 'Criar',
+  photos: 'fotos',
+  viewAlbum: 'Ver Álbum',
+  noAlbums: 'Ainda não criou nenhum álbum.',
+  
+  // Album Detail
+  allAlbums: 'Todos os Álbuns',
+  createVideo: 'Criar Vídeo',
+  orderPrint: 'Encomendar Impressão',
+  uploadPhoto: 'Carregar Foto',
+  noPhotos: 'Este álbum está vazio.',
+  uploadSome: 'Carregue algumas fotos para começar!',
+  
   // Order Print
-  orderPrintTitle: 'Encomendar impressão do álbum',
+  orderPrintTitle: 'Encomendar Impressão',
   orderSummary: 'Resumo da Encomenda',
-  basePrice: 'Preço base do álbum',
-  coverType: 'Tipo de capa',
+  basePrice: 'Preço Base',
+  coverType: 'Tipo de Capa',
   softCover: 'Capa Mole',
   hardCover: 'Capa Dura',
-  discount: 'Desconto de Pontos',
+  discount: 'Desconto',
   total: 'Total',
-  applyDiscount: 'Usar {0} pontos para um desconto de {1}€',
+  applyDiscount: 'Use {0} pontos por um desconto de {1}€',
   yourBalance: 'O seu saldo',
   shippingAddress: 'Morada de Envio',
   fullName: 'Nome Completo',
@@ -135,123 +146,121 @@ export const pt = {
   postalCode: 'Código Postal',
   city: 'Cidade',
   placeOrder: 'Finalizar Encomenda',
-
+  
   // Order Success
-  orderSuccessTitle: 'Encomenda Recebida!',
-  orderSuccessMessage: 'Obrigado! A sua encomenda foi processada com sucesso. Irá receber um email de confirmação em breve.',
+  orderSuccessTitle: 'Encomenda Realizada com Sucesso!',
+  orderSuccessMessage: 'O seu álbum de fotos está a ser preparado. Receberá um email de confirmação em breve.',
   backToProfile: 'Voltar ao Perfil',
 
   // Order History
+  orderHistory: 'Histórico de Encomendas',
   order: 'Encomenda',
   date: 'Data',
-  noOrders: 'Ainda não efetuou nenhuma encomenda.',
+  noOrders: 'Não tem encomendas anteriores.',
+
+  // Weather Widget
+  weatherIn: 'Meteorologia em',
+  loadingWeather: 'A carregar meteorologia...',
+  uvIndex: 'Índice UV',
+  airQuality: 'Qualidade do Ar',
+  weather_sunny: 'Sol',
+  weather_cloudy: 'Nublado',
+  weather_rainy: 'Chuva',
+  weather_partlycloudy: 'Parcialmente Nublado',
+  airQuality_Good: 'Boa',
+  airQuality_Moderate: 'Moderada',
+  airQuality_Poor: 'Má',
   
-  // Points History
-  pointsHistory: 'Histórico de Pontos',
-  currentBalance: 'Saldo Atual',
-  noTransactions: 'Não existem transações.',
-
-  // Favorites
-  noFavorites: 'Ainda não tem atividades favoritas.',
-
-  // Missions
-  missionsSubtitle: 'Complete missões para ganhar pontos e desbloquear recompensas!',
-  progress: 'Progresso',
-
-  // Saved Plans
-  savedPlansTitle: 'Os Seus Planos de Viagem',
-  savedPlansSubtitle: 'Aqui pode encontrar todos os roteiros que guardou.',
-  noSavedPlans: 'Ainda não tem planos guardados.',
-  backToSavedPlans: 'Voltar aos planos guardados',
-
-  // Trip Planner
-  planYourTrip: 'Planeie a sua Viagem',
-  destination: 'Destino',
-  duration: 'Duração',
-  travelers: 'Viajantes',
-  interests: 'Interesses',
-  generatePlan: 'Gerar Plano',
-  generating: 'A gerar...',
-  savePlan: 'Guardar Plano',
-  fillFormToGenerate: 'Preencha o formulário para gerar um roteiro de viagem personalizado com IA.',
-
-  // Community
-  communityTitle: 'Comunidade Juntos',
-  communitySubtitle: 'Partilhe dicas, faça perguntas e conecte-se com outras famílias.',
-  newPost: 'Novo Post',
-  likes: 'gostos',
-  comments: 'comentários',
-  readMore: 'Ler mais',
-  noPosts: 'Ainda não há posts nesta categoria.',
-  backToCommunity: 'Voltar à Comunidade',
-  writeComment: 'Escreva um comentário...',
-  submitComment: 'Publicar Comentário',
-  loginToComment: 'Para comentar, precisa de',
-  publishPost: 'Publicar Post',
-  
-  // SOS
-  sosTitle: 'Emergência',
-  sosSubtitle: 'Contactos e locais importantes para a sua segurança.',
+  // SOS Page
+  sosTitle: 'Emergência - SOS',
+  sosSubtitle: 'Encontre contactos e locais importantes para emergências.',
   emergencyNumber: 'Número Nacional de Emergência',
   callNow: 'Ligar Agora',
   hospitals: 'Hospitais',
   policeStations: 'Esquadras de Polícia',
   pharmacies: 'Farmácias',
+
+  // Points History
+  pointsHistory: 'Histórico de Pontos',
+  currentBalance: 'Saldo Atual',
+  points: 'pontos',
+  noTransactions: 'Ainda não tem transações.',
+
+  // Favorites
+  myFavorites: 'Os Meus Favoritos',
+  noFavorites: 'Ainda não adicionou nenhuma atividade aos seus favoritos.',
   
-  // Map View
-  noLocationsMap: 'Nenhuma localização para mostrar no mapa.',
+  // Missions
+  missions: 'Missões',
+  missionsSubtitle: 'Complete missões para ganhar pontos e recompensas!',
+  progress: 'Progresso',
+  completed: 'Concluída',
 
-  // Weather Widget
-  weatherIn: 'Tempo em',
-  weather_sunny: 'Ensolarado',
-  weather_cloudy: 'Nublado',
-  weather_rainy: 'Chuvoso',
-  weather_partlycloudy: 'Parcialmente Nublado',
-  uvIndex: 'Índice UV',
-  airQuality: 'Qual. Ar',
-  airQuality_Good: 'Boa',
-  airQuality_Moderate: 'Moderada',
-  airQuality_Poor: 'Fraca',
-  loadingWeather: 'A carregar meteorologia...',
+  // Saved Plans
+  savedPlansTitle: 'Os Meus Planos Guardados',
+  savedPlansSubtitle: 'Aqui estão os planos de viagem que gerou e guardou.',
+  noSavedPlans: 'Não tem planos guardados.',
+  backToSavedPlans: 'Voltar aos Planos Guardados',
+  interests: 'Interesses',
 
-  // Toasts
+  // Community
+  communityTitle: 'Comunidade',
+  communitySubtitle: 'Partilhe dicas e faça perguntas a outras famílias.',
+  newPost: 'Novo Post',
+  likes: 'Gostos',
+  comments: 'Comentários',
+  readMore: 'Ler mais',
+  noPosts: 'Ainda não existem posts nesta categoria.',
+  
+  // Post Detail
+  backToCommunity: 'Voltar à Comunidade',
+  writeComment: 'Escreva um comentário...',
+  submitComment: 'Submeter Comentário',
+  noComments: 'Seja o primeiro a comentar!',
+  loginToComment: 'Para deixar um comentário, precisa de',
+
+  // Create Post
+  title: 'Título',
+  content: 'Conteúdo',
+  publishPost: 'Publicar Post',
+  
+  // Toasts / Messages
   reviewSubmitted: 'Avaliação submetida com sucesso!',
   favoriteAdded: 'Adicionado aos favoritos!',
   favoriteRemoved: 'Removido dos favoritos!',
-  loginToAddPhoto: 'Precisa de iniciar sessão para adicionar fotos.',
+  loginToAddPhoto: 'Precisa de ter sessão iniciada para adicionar fotos.',
   photoAdded: 'Foto adicionada ao álbum!',
-  loggedOut: 'Sessão terminada.',
   commentAdded: 'Comentário adicionado!',
-  postCreated: 'Post publicado com sucesso!',
+  postCreated: 'Post criado com sucesso!',
   
-  // Premium
-  premiumTitle: 'Juntos Premium',
-  premiumSubtitle: 'Leve a sua experiência em família para o próximo nível.',
-  premiumFeature1: 'Planos de Viagem Ilimitados',
-  premiumFeature1Desc: 'Crie quantos roteiros personalizados com IA desejar.',
-  premiumFeature2: 'Vídeos de Memórias',
-  premiumFeature2Desc: 'Transforme os seus álbuns de fotos em vídeos emocionantes com um clique.',
-  premiumFeature3: 'Descontos Exclusivos',
-  premiumFeature3Desc: 'Use os seus pontos para obter descontos em impressões de álbuns e mais.',
-  alreadyPremium: 'Já é um membro Premium! Aproveite todos os benefícios.',
-  upgradeWithPoints: 'Desbloquear com {0} pontos',
-  notEnoughPoints: 'Faltam {0} pontos.',
+  // Trip Planner
+  tripPlannerTitle: 'Planeador de Viagem IA',
+  tripPlannerSubtitle: 'Deixe o nosso assistente de IA criar o itinerário familiar perfeito para si em Lisboa!',
+  destination: 'Destino',
+  duration: 'Duração (ex: 3 dias)',
+  travelers: 'Quem vai viajar? (ex: 2 adultos, 2 crianças de 5 e 8 anos)',
+  interestsLabel: 'Quais são os vossos interesses?',
+  generatePlan: 'Gerar Plano',
+  generatingPlan: 'A gerar o seu plano...',
+  generatingPlanMessage1: 'A nossa IA está a criar a aventura familiar perfeita...',
+  generatingPlanMessage2: 'A encontrar os locais mais divertidos de Lisboa...',
+  generatingPlanMessage3: 'Só mais uns segundos...',
+  savePlan: 'Guardar Plano',
+  planSaved: 'Plano guardado com sucesso!',
   
   // Create Video Modal
-  createVideoTitle: 'Criar Vídeo do Álbum',
-  createVideoDesc: 'Use a primeira foto do seu álbum de {0} fotos e uma descrição para criar um vídeo com IA.',
-  prompt: 'Descrição para o vídeo',
-  firstImage: 'Primeira imagem do álbum (para inspiração)',
-  generate: 'Gerar',
+  createVideoTitle: 'Criar Vídeo com IA',
+  createVideoSubtitle: 'Selecione um tema e deixe a nossa IA criar um vídeo a partir das fotos do seu álbum.',
+  videoTheme: 'Tema do Vídeo',
+  videoThemePlaceholder: 'ex: Dia de Verão Divertido, Aventura em Família',
+  generatingVideo: 'A gerar o vídeo...',
+  generatingVideoMessage1: 'A nossa IA está a selecionar os melhores momentos...',
+  generatingVideoMessage2: 'A adicionar um pouco de pó de fada...',
+  generatingVideoMessage3: 'O seu vídeo está quase pronto!',
   videoReady: 'O seu vídeo está pronto!',
+  downloadVideo: 'Descarregar Vídeo',
   close: 'Fechar',
-  videoMessage1: 'A reunir as suas memórias...',
-  videoMessage2: 'A escolher a banda sonora perfeita...',
-  videoMessage3: 'Os nossos realizadores de IA estão a trabalhar...',
-  videoMessage4: 'A adicionar um toque de magia...',
-  videoMessage5: 'Quase pronto!',
-  errorGeneratingVideo: 'Ocorreu um erro ao gerar o vídeo. Por favor, tente novamente.',
   
-  // WhatsApp
-  whatsappMessage: 'Olá! Encontrei a vossa empresa, {0}, na app Juntos e gostaria de pedir mais informações.'
+  // Whatsapp
+  whatsappMessage: 'Olá, gostaria de saber mais sobre os serviços de {0}.'
 };

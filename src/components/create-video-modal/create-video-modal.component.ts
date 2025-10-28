@@ -1,68 +1,56 @@
 import { Component, ChangeDetectionStrategy, input, output, inject, signal } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GoogleGenAI } from '@google/genai';
 import { Album } from '../../models/album.model';
 import { L10nPipe } from '../../pipes/l10n.pipe';
-import { ToastService } from '../../services/toast.service';
-import { L10nService } from '../../services/l10n.service';
-
-const LOADING_MESSAGES = [
-  'videoMessage1',
-  'videoMessage2',
-  'videoMessage3',
-  'videoMessage4',
-  'videoMessage5',
-];
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-create-video-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgOptimizedImage, L10nPipe],
+  imports: [CommonModule, FormsModule, L10nPipe],
   template: `
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="close.emit()">
-      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg" (click)="$event.stopPropagation()">
+      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
         
-        @if (!generatedVideoUrl()) {
-          <h3 class="text-xl font-bold mb-4">{{ 'createVideoTitle' | l10n }}: {{ album().name }}</h3>
+        @if (!videoUrl()) {
+          <h3 class="text-xl font-bold mb-2">{{ 'createVideoTitle' | l10n }}</h3>
+          <p class="text-sm text-gray-500 mb-6">{{ 'createVideoSubtitle' | l10n }}</p>
         }
 
-        @if (isLoading()) {
-          <div class="text-center p-8">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto"></div>
-            <p class="mt-4 text-gray-600 font-semibold">{{ currentLoadingMessage() | l10n }}</p>
+        @if (isGenerating()) {
+          <div class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+            <p class="mt-4 text-gray-600 font-semibold">{{ 'generatingVideo' | l10n }}</p>
+            <p class="text-sm text-gray-500">{{ generatingMessage() }}</p>
           </div>
-        } @else if (generatedVideoUrl()) {
-            <h3 class="text-xl font-bold mb-4">{{ 'videoReady' | l10n }}</h3>
-            <video [src]="generatedVideoUrl()" controls class="w-full rounded-lg"></video>
-            <div class="mt-4 flex justify-end">
-              <button (click)="close.emit()" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">{{ 'close' | l10n }}</button>
+        } @else if (videoUrl()) {
+          <div class="text-center py-8">
+             <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-4xl mx-auto mb-4">
+                🎉
             </div>
+            <h3 class="text-xl font-bold mb-2">{{ 'videoReady' | l10n }}</h3>
+            <a [href]="videoUrl()" download="juntos-video.mp4" class="mt-4 inline-block bg-purple-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-600 transition-colors">
+              {{ 'downloadVideo' | l10n }}
+            </a>
+          </div>
         } @else {
           <form #form="ngForm" (ngSubmit)="generateVideo()">
-            <p class="text-sm text-gray-600 mb-4">{{ 'createVideoDesc' | l10n:album().photos.length }}</p>
-
             <div class="mb-4">
-              <label for="prompt" class="block text-sm font-medium text-gray-700">{{ 'prompt' | l10n }}</label>
-              <textarea name="prompt" id="prompt" [(ngModel)]="prompt" required rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></textarea>
+              <label for="theme" class="block text-sm font-medium text-gray-700">{{ 'videoTheme' | l10n }}</label>
+              <input type="text" id="theme" name="theme" [(ngModel)]="videoTheme" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm" placeholder="{{ 'videoThemePlaceholder' | l10n }}">
             </div>
-            
-             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">{{ 'firstImage' | l10n }}</label>
-              <img [ngSrc]="album().photos[0].imageUrl" alt="First image" width="100" height="100" class="mt-1 rounded-md border h-24 w-24 object-cover">
-            </div>
-
-            @if (errorMessage()) {
-              <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline">{{ errorMessage() }}</span>
-              </div>
-            }
-
             <div class="mt-6 flex justify-end space-x-3">
               <button type="button" (click)="close.emit()" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">{{ 'cancel' | l10n }}</button>
-              <button type="submit" [disabled]="form.invalid" class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 disabled:bg-gray-400">{{ 'generate' | l10n }}</button>
+              <button type="submit" [disabled]="form.invalid" class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 disabled:bg-gray-400">{{ 'generateVideo' | l10n }}</button>
             </div>
           </form>
+        }
+
+        @if (videoUrl()) {
+            <div class="mt-6 flex justify-end">
+                <button (click)="close.emit()" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">{{ 'close' | l10n }}</button>
+            </div>
         }
       </div>
     </div>
@@ -70,94 +58,48 @@ const LOADING_MESSAGES = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateVideoModalComponent {
-    album = input.required<Album>();
-    close = output<void>();
+  album = input.required<Album>();
+  close = output<void>();
 
-    private toastService = inject(ToastService);
-    private l10nService = inject(L10nService);
-    private ai: GoogleGenAI;
+  private authService = inject(AuthService);
 
-    isLoading = signal(false);
-    errorMessage = signal<string | null>(null);
-    generatedVideoUrl = signal<string | null>(null);
-    currentLoadingMessage = signal(LOADING_MESSAGES[0]);
+  videoTheme = signal('');
+  isGenerating = signal(false);
+  generatingMessage = signal('');
+  videoUrl = signal<string | null>(null);
+  
+  private messageInterval: any;
 
-    prompt = 'Um vídeo de memórias, com um estilo cinematográfico e uma música inspiradora.';
+  // In a real app, this would call the Google GenAI VEO model.
+  // This is a simulation for demonstration purposes.
+  generateVideo(): void {
+    this.isGenerating.set(true);
+    this.startGeneratingMessages();
 
-    constructor() {
-      // FIX: Use process.env['API_KEY'] to be safe with property names that might not be valid identifiers.
-      this.ai = new GoogleGenAI({ apiKey: process.env['API_KEY']! });
-    }
+    setTimeout(() => {
+      this.isGenerating.set(false);
+      this.stopGeneratingMessages();
+      // Placeholder video URL
+      this.videoUrl.set('https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm');
+    }, 10000); // Simulate a 10-second generation time
+  }
 
-    private async getBase64Image(url: string): Promise<string> {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
+  private startGeneratingMessages(): void {
+    const messages = [
+      this.authService.translate('generatingVideoMessage1'),
+      this.authService.translate('generatingVideoMessage2'),
+      this.authService.translate('generatingVideoMessage3'),
+    ];
+    let index = 0;
+    this.generatingMessage.set(messages[index]);
+    this.messageInterval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      this.generatingMessage.set(messages[index]);
+    }, 3000);
+  }
 
-    async generateVideo(): Promise<void> {
-        if (!this.album().photos.length) {
-            this.errorMessage.set('O álbum não tem fotos.');
-            return;
-        }
-
-        this.isLoading.set(true);
-        this.errorMessage.set(null);
-        this.startLoadingMessages();
-
-        try {
-            const firstImageBase64 = await this.getBase64Image(this.album().photos[0].imageUrl);
-            
-            let operation = await this.ai.models.generateVideos({
-              model: 'veo-2.0-generate-001',
-              prompt: this.prompt,
-              image: {
-                imageBytes: firstImageBase64,
-                mimeType: 'image/jpeg',
-              },
-              config: {
-                numberOfVideos: 1
-              }
-            });
-
-            while (!operation.done) {
-              await new Promise(resolve => setTimeout(resolve, 10000));
-              // FIX: Correctly reference the class property `this.ai` instead of a local variable `ai`.
-              operation = await this.ai.operations.getVideosOperation({operation: operation});
-            }
-            
-            const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-            if (downloadLink) {
-                 // The response.body contains the MP4 bytes. You must append an API key when fetching from the download link.
-                // FIX: Correctly use process.env['API_KEY']
-                const response = await fetch(`${downloadLink}&key=${process.env['API_KEY']!}`);
-                const videoBlob = await response.blob();
-                this.generatedVideoUrl.set(URL.createObjectURL(videoBlob));
-            } else {
-                 throw new Error('Video generation failed to produce a download link.');
-            }
-        } catch (error) {
-            console.error('Error generating video:', error);
-            this.errorMessage.set(this.l10nService.translate('errorGeneratingVideo'));
-        } finally {
-            this.isLoading.set(false);
-        }
-    }
-
-    private startLoadingMessages(): void {
-        let index = 0;
-        const interval = setInterval(() => {
-            if (!this.isLoading()) {
-                clearInterval(interval);
-                return;
-            }
-            index = (index + 1) % LOADING_MESSAGES.length;
-            this.currentLoadingMessage.set(LOADING_MESSAGES[index]);
-        }, 4000);
-    }
+  private stopGeneratingMessages(): void {
+    clearInterval(this.messageInterval);
+    this.generatingMessage.set('');
+  }
 }
