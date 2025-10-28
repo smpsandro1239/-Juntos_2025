@@ -1,39 +1,34 @@
-
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivityService } from '../../services/activity.service';
-import { FiltersComponent, ActivityFilters } from '../filters/filters.component';
+import { FiltersComponent } from '../filters/filters.component';
 import { DiscoverFeedComponent } from '../discover-feed/discover-feed.component';
-import { L10nPipe } from '../../pipes/l10n.pipe';
 import { EventCarouselComponent } from '../event-carousel/event-carousel.component';
+import { L10nPipe } from '../../pipes/l10n.pipe';
 import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FiltersComponent, DiscoverFeedComponent, L10nPipe, EventCarouselComponent, WeatherWidgetComponent],
+  imports: [CommonModule, FiltersComponent, DiscoverFeedComponent, EventCarouselComponent, L10nPipe, WeatherWidgetComponent],
   template: `
     <div class="space-y-8">
-      <header class="text-center py-8 bg-teal-500 text-white rounded-lg shadow-md">
-        <h1 class="text-4xl font-extrabold">{{ 'welcomeTitle' | l10n }}</h1>
-        <p class="mt-2 text-lg">{{ 'welcomeSubtitle' | l10n }}</p>
+      <header class="text-center">
+        <h1 class="text-4xl font-extrabold text-gray-800">{{ 'welcomeTitle' | l10n }}</h1>
+        <p class="mt-2 text-lg text-gray-600">{{ 'welcomeSubtitle' | l10n }}</p>
       </header>
+      
+      <app-filters (filtersChanged)="onFiltersChanged($event)" />
 
-      <app-weather-widget location="Lisboa" />
+      <app-weather-widget location="Lisboa" class="my-6" />
 
       <section>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
         <app-event-carousel [events]="events()" />
       </section>
 
       <section>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'discoverActivities' | l10n }}</h2>
-        <app-filters 
-          [allCategories]="allCategories()"
-          [maxPrice]="maxPrice()"
-          [filters]="filters()"
-          (filtersChanged)="onFiltersChanged($event)" 
-        />
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ 'discoverActivities' | l10n }}</h2>
         <app-discover-feed [activities]="filteredActivities()" />
       </section>
     </div>
@@ -46,34 +41,37 @@ export class HomeComponent {
   allActivities = this.activityService.allActivities;
   events = this.activityService.allEvents;
 
-  filters = signal<ActivityFilters>({
-    search: '',
-    category: 'all',
-    minPrice: 0,
-    maxPrice: 100,
-    minRating: 0
+  private activeFilters = signal<{searchTerm: string, category: string, price: string}>({
+      searchTerm: '',
+      category: 'all',
+      price: 'all'
   });
-
-  allCategories = computed(() => [...new Set(this.allActivities().map(a => a.category))]);
-  maxPrice = computed(() => Math.max(...this.allActivities().map(a => a.price), 100));
 
   filteredActivities = computed(() => {
-    const activities = this.allActivities();
-    const filters = this.filters();
+    let activities = this.allActivities();
+    const filters = this.activeFilters();
 
-    return activities.filter(activity => {
-      const searchMatch = filters.search 
-        ? activity.name.toLowerCase().includes(filters.search.toLowerCase()) || activity.description.toLowerCase().includes(filters.search.toLowerCase())
-        : true;
-      const categoryMatch = filters.category === 'all' || activity.category === filters.category;
-      const priceMatch = activity.price <= filters.maxPrice;
-      const ratingMatch = activity.rating >= filters.minRating;
-      
-      return searchMatch && categoryMatch && priceMatch && ratingMatch;
-    });
+    if (filters.searchTerm) {
+      const searchTermLower = filters.searchTerm.toLowerCase();
+      activities = activities.filter(a => 
+        a.name.toLowerCase().includes(searchTermLower) ||
+        a.description.toLowerCase().includes(searchTermLower)
+      );
+    }
+    if (filters.category && filters.category !== 'all') {
+      activities = activities.filter(a => a.category === filters.category);
+    }
+    if (filters.price) {
+      if (filters.price === 'free') {
+        activities = activities.filter(a => a.price === 0);
+      } else if (filters.price === 'paid') {
+        activities = activities.filter(a => a.price > 0);
+      }
+    }
+    return activities;
   });
 
-  onFiltersChanged(newFilters: ActivityFilters): void {
-    this.filters.set(newFilters);
+  onFiltersChanged(filters: {searchTerm: string, category: string, price: string}): void {
+    this.activeFilters.set(filters);
   }
 }

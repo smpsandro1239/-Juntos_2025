@@ -1,172 +1,128 @@
-
 export const en = {
-  // General
-  home: 'Home',
+  // Common
   all: 'All',
-  login: 'Login',
-  logout: 'Logout',
-  email: 'Email',
-  password: 'Password',
-  cancel: 'Cancel',
-  create: 'Create',
-  add: 'Add',
-  close: 'Close',
-  or: 'or',
-  points: 'points',
-  free: 'Free',
-  date: 'Date',
   price: 'Price',
-  rating: 'Rating',
-  description: 'Description',
-  comment: 'Comment',
-  location: 'Location',
-  photos: 'photos',
-  title: 'Title',
-  content: 'Content',
-  completed: 'Completed',
-
-  // App Component
-  tripPlanner: 'Trip Planner',
-  community: 'Community',
-  suppliers: 'Suppliers',
-  footerRights: 'All rights reserved.',
-
-  // Home
-  welcomeTitle: 'Welcome to Juntos!',
-  welcomeSubtitle: 'Discover the best family activities in Lisbon.',
-  upcomingEvents: 'Upcoming Events',
-  discoverActivities: 'Discover Activities',
-
-  // Filters
+  free: 'Free',
+  paid: 'Paid',
   search: 'Search',
   searchPlaceholder: 'Search for activities...',
   filtersCategory: 'Category',
-  maxPrice: 'Max Price',
+  allCategories: 'All categories',
+  allPrices: 'All prices',
+  noResults: 'No results found.',
+  description: 'Description',
+  details: 'Details',
+  gallery: 'Gallery',
+  reviews: 'Reviews',
+  login: 'Login',
+  logout: 'Logout',
+  cancel: 'Cancel',
+  add: 'Add',
+  create: 'Create',
+  createNew: 'Create New',
+  points: 'points',
+  completed: 'Completed',
+  collected: 'Collected',
+  title: 'Title',
+  content: 'Content',
+
+  // App Component (Header/Footer)
+  tripPlanner: 'Trip Planner',
+  community: 'Community',
+  suppliers: 'Suppliers',
+  allRightsReserved: 'All rights reserved.',
+  sos: 'SOS - Emergency',
+
+  // Home Component
+  welcomeTitle: 'Welcome to Juntos',
+  welcomeSubtitle: 'Discover the best activities for your family.',
+  upcomingEvents: 'Upcoming Events',
+  discoverActivities: 'Discover Activities',
 
   // Discover Feed
   sustainable: 'Sustainable',
-  noResults: 'No activities found. Try changing your filters.',
 
   // Activity Detail
   backToActivities: 'Back to activities',
-  gallery: 'Gallery',
-  reviews: 'Reviews',
-  loginToReview: 'To leave a review, you need to',
-  loginHere: 'log into your account',
-  noReviews: 'There are no reviews for this activity yet.',
-  details: 'Details',
   wheelchair: 'Wheelchair',
   stroller: 'Stroller',
-  unfavorite: 'Unfavorite',
   addFavorite: 'Add to Favorites',
+  unfavorite: 'Remove from Favorites',
   addToAlbum: 'Add to Album',
-  reviewSubmitted: 'Review submitted successfully!',
-  favoriteAdded: 'Activity added to favorites!',
-  favoriteRemoved: 'Activity removed from favorites.',
-  loginToAddPhoto: 'You need to be logged in to add photos.',
-  photoAdded: 'Photo added to album successfully!',
+  noReviews: 'There are no reviews yet. Be the first to leave one!',
+  loginToReview: 'To leave a review, you need to',
+  loginHere: 'log in to your account',
 
-  // Map View
-  noLocationsMap: 'No locations to show on the map.',
-  
+  // Review Form
+  leaveReviewTitle: 'Leave your review',
+  rating: 'Rating',
+  comment: 'Comment',
+  submitReview: 'Submit Review',
+
   // Login
   loginTitle: 'Access your account',
+  email: 'Email',
+  password: 'Password',
   loginHint: 'Use ana@juntos.pt and 1234 to log in.',
-  loggedOut: 'You have been logged out.',
 
   // Profile
   premiumMember: 'Premium Member',
   myFavorites: 'My Favorites',
-  favoritesDesc: 'See your saved activities.',
+  favoritesDesc: 'View your saved activities.',
   yourAlbums: 'Your Albums',
-  albumsDesc: 'Relive your best moments.',
+  albumsDesc: 'Relive your special moments.',
   passport: 'Passport',
   passportDesc: 'Collect stamps from your adventures.',
   missions: 'Missions',
   missionsDesc: 'Complete challenges and earn points.',
   pointsMenuTitle: 'Points History',
-  pointsDesc: 'Check your balance and transactions.',
+  pointsDesc: 'Check your points and transactions.',
   orderHistory: 'Order History',
-  orderHistoryDesc: 'View your album print orders.',
+  orderHistoryDesc: 'View your album orders.',
   savedPlans: 'Saved Plans',
-  savedPlansDesc: 'Access your trip itineraries.',
+  savedPlansDesc: 'Access your travel itineraries.',
   becomePremium: 'Become Premium',
   premiumCta: 'Unlock exclusive benefits.',
 
-  // Review Form
-  leaveReviewTitle: 'Leave your review',
-  submitReview: 'Submit Review',
-
-  // Trip Planner
-  tripPlannerTitle: 'AI Trip Planner',
-  tripPlannerSubtitle: 'Let our artificial intelligence create the perfect itinerary for your family.',
-  duration: 'Duration',
-  travelers: 'Travelers',
-  interests: 'Interests',
-  cultural: 'Cultural',
-  outdoor: 'Outdoor',
-  sports: 'Sports',
-  creative: 'Creative',
-  food: 'Food',
-  generatingPlan: 'Generating your plan...',
-  generatePlan: 'Generate Plan',
-  errorGeneratingPlan: 'An error occurred while generating the plan. Please try again.',
-  savePlan: 'Save Plan',
-  planSaved: 'Plan saved successfully!',
-
-  // Premium
-  premiumTitle: 'Juntos Premium',
-  premiumSubtitle: 'Elevate your family experience with exclusive advantages.',
-  premiumFeature1: 'AI Trip Planner',
-  premiumFeature1Desc: 'Create unlimited and personalized itineraries for your trips.',
-  premiumFeature2: 'AI Magic Videos',
-  premiumFeature2Desc: 'Turn your photo albums into memorable videos with one click.',
-  premiumFeature3: 'Exclusive Discounts',
-  premiumFeature3Desc: 'Use your points to get discounts on album prints.',
-  alreadyPremium: "You're already a Premium member! Thank you for your support.",
-  upgradeWithPoints: 'Subscribe with {0} points',
-  notEnoughPoints: 'You need {0} more points.',
-
   // Passport
-  passportTitle: 'My Digital Passport',
-  passportSubtitle: 'Collect souvenir stamps from each activity you visit.',
-  collected: 'Collected',
+  passportTitle: 'Your Adventure Passport',
+  passportSubtitle: 'Collect digital stamps by visiting places and completing activities.',
 
   // Event Detail
   eventDetails: 'Event Details',
   when: 'When',
-  
+  location: 'Location',
+
   // Suppliers
-  allSuppliers: 'All Suppliers',
+  allSuppliers: 'Suppliers for your Party',
   contactViaWhatsApp: 'Contact via WhatsApp',
   contactSupplier: 'Contact Supplier',
-  whatsappMessage: 'Hello, I found your company {0} on the Juntos app and would like to request more information.',
-
-  // Contact Modal
-  contact: 'Contact',
   phone: 'Phone',
   website: 'Website',
+  contact: 'Contact',
 
   // Albums
-  uploadPhoto: 'Upload Photo',
-  selectAlbum: 'Select an album',
-  createNewAlbum: 'Or create a new album',
-  createNew: 'Create New',
-  albumName: 'Album Name',
-  yourAlbums: 'Your Albums',
+  albumName: 'Album name',
+  photos: 'photos',
   viewAlbum: 'View album',
-  noAlbums: 'You have not created any albums yet.',
-  allAlbums: 'All Albums',
-  createVideo: 'Create AI Video',
+  noAlbums: 'You haven\'t created any albums yet.',
+  allAlbums: 'All albums',
   orderPrint: 'Order Print',
+  createVideo: 'Create Video',
   noPhotos: 'This album is empty.',
-  uploadSome: 'Start by uploading some photos!',
+  uploadSome: 'Add some photos to get started!',
+  uploadPhoto: 'Upload Photo',
+
+  // Add to Album Modal
+  selectAlbum: 'Select an album',
+  or: 'or',
+  createNewAlbum: 'Create a new album',
 
   // Order Print
-  orderPrintTitle: 'Order Album Print',
+  orderPrintTitle: 'Order album print',
   orderSummary: 'Order Summary',
-  basePrice: 'Base album price',
-  coverType: 'Cover Type',
+  basePrice: 'Album base price',
+  coverType: 'Cover type',
   softCover: 'Soft Cover',
   hardCover: 'Hard Cover',
   discount: 'Points Discount',
@@ -182,13 +138,68 @@ export const en = {
 
   // Order Success
   orderSuccessTitle: 'Order Received!',
-  orderSuccessMessage: 'Thank you! Your order has been processed successfully. Your memories will be on their way soon.',
+  orderSuccessMessage: 'Thank you! Your order has been processed successfully. You will receive a confirmation email shortly.',
   backToProfile: 'Back to Profile',
-  
+
   // Order History
   order: 'Order',
-  album: 'Album',
+  date: 'Date',
   noOrders: 'You have not placed any orders yet.',
+
+  // Points History
+  pointsHistory: 'Points History',
+  currentBalance: 'Current Balance',
+  noTransactions: 'There are no transactions.',
+
+  // Favorites
+  noFavorites: 'You have no favorite activities yet.',
+
+  // Missions
+  missionsSubtitle: 'Complete missions to earn points and unlock rewards!',
+  progress: 'Progress',
+
+  // Saved Plans
+  savedPlansTitle: 'Your Saved Trip Plans',
+  savedPlansSubtitle: 'Here you can find all the itineraries you have saved.',
+  noSavedPlans: 'You have no saved plans yet.',
+  backToSavedPlans: 'Back to saved plans',
+
+  // Trip Planner
+  planYourTrip: 'Plan Your Trip',
+  destination: 'Destination',
+  duration: 'Duration',
+  travelers: 'Travelers',
+  interests: 'Interests',
+  generatePlan: 'Generate Plan',
+  generating: 'Generating...',
+  savePlan: 'Save Plan',
+  fillFormToGenerate: 'Fill out the form to generate a custom travel itinerary with AI.',
+
+  // Community
+  communityTitle: 'Juntos Community',
+  communitySubtitle: 'Share tips, ask questions, and connect with other families.',
+  newPost: 'New Post',
+  likes: 'likes',
+  comments: 'comments',
+  readMore: 'Read more',
+  noPosts: 'There are no posts in this category yet.',
+  backToCommunity: 'Back to Community',
+  writeComment: 'Write a comment...',
+  submitComment: 'Post Comment',
+  loginToComment: 'To comment, you need to',
+  publishPost: 'Publish Post',
+
+  // SOS
+  sosTitle: 'Emergency',
+  sosSubtitle: 'Important contacts and locations for your safety.',
+  emergencyNumber: 'National Emergency Number',
+  callNow: 'Call Now',
+  hospitals: 'Hospitals',
+  policeStations: 'Police Stations',
+  pharmacies: 'Pharmacies',
+
+  // Map View
+  noLocationsMap: 'No locations to show on the map.',
 
   // Weather Widget
   weatherIn: 'Weather in',
@@ -203,61 +214,44 @@ export const en = {
   airQuality_Poor: 'Poor',
   loadingWeather: 'Loading weather...',
 
-  // SOS Page
-  sosTitle: 'Emergency (SOS)',
-  sosSubtitle: 'Important contacts and locations for your safety in Lisbon.',
-  emergencyNumber: 'National Emergency Number',
-  callNow: 'Call Now',
-  hospitals: 'Hospitals',
-  policeStations: 'Police Stations',
-  pharmacies: 'Pharmacies',
-
-  // Points History
-  pointsHistory: 'Points History',
-  currentBalance: 'Current Balance',
-  noTransactions: 'There are no transactions yet.',
-  
-  // Favorites
-  myFavorites: 'My Favorites',
-  noFavorites: 'You have not added any activities to your favorites yet.',
-
-  // Missions
-  progress: 'Progress',
-  missionsSubtitle: 'Complete tasks, earn points, and unlock rewards!',
-
-  // Saved Plans
-  savedPlansTitle: 'My Saved Plans',
-  savedPlansSubtitle: 'Here are the itineraries you saved from our AI Planner.',
-  noSavedPlans: 'You have not saved any trip plans yet.',
-
-  // Community
-  communityTitle: 'Juntos Community',
-  communitySubtitle: 'Share tips, ask questions, and connect with other families.',
-  newPost: 'New Post',
-  likes: 'likes',
-  comments: 'comments',
-  readMore: 'Read more',
-  noPosts: 'There are no posts in this category yet.',
-  backToCommunity: 'Back to Community',
-  writeComment: 'Write your comment...',
-  submitComment: 'Post Comment',
-  loginToComment: 'To comment, you need to',
-  noComments: 'Be the first to comment!',
+  // Toasts
+  reviewSubmitted: 'Review submitted successfully!',
+  favoriteAdded: 'Added to favorites!',
+  favoriteRemoved: 'Removed from favorites!',
+  loginToAddPhoto: 'You need to be logged in to add photos.',
+  photoAdded: 'Photo added to album!',
+  loggedOut: 'Logged out.',
   commentAdded: 'Comment added!',
-  postCreated: 'Post created successfully!',
-  publishPost: 'Publish Post',
-  
+  postCreated: 'Post published successfully!',
+
+  // Premium
+  premiumTitle: 'Juntos Premium',
+  premiumSubtitle: 'Take your family experience to the next level.',
+  premiumFeature1: 'Unlimited Trip Plans',
+  premiumFeature1Desc: 'Create as many AI-powered custom itineraries as you want.',
+  premiumFeature2: 'Memory Videos',
+  premiumFeature2Desc: 'Turn your photo albums into exciting videos with one click.',
+  premiumFeature3: 'Exclusive Discounts',
+  premiumFeature3Desc: 'Use your points to get discounts on album prints and more.',
+  alreadyPremium: 'You are already a Premium member! Enjoy all the benefits.',
+  upgradeWithPoints: 'Unlock with {0} points',
+  notEnoughPoints: 'You need {0} more points.',
+
   // Create Video Modal
-  createVideoTitle: 'Create Magic Video',
+  createVideoTitle: 'Create Album Video',
+  createVideoDesc: 'Use the first photo from your album of {0} photos and a prompt to create an AI-powered video.',
+  prompt: 'Prompt for the video',
+  firstImage: 'First image from the album (for inspiration)',
+  generate: 'Generate',
   videoReady: 'Your video is ready!',
-  createVideoDesc: 'Use AI to create a video with the {0} photos from this album.',
-  prompt: 'Describe the video style',
-  firstImage: 'The video will be based on this initial image:',
-  generate: 'Generate Video',
+  close: 'Close',
+  videoMessage1: 'Gathering your memories...',
+  videoMessage2: 'Choosing the perfect soundtrack...',
+  videoMessage3: 'Our AI directors are at work...',
+  videoMessage4: 'Adding a touch of magic...',
+  videoMessage5: 'Almost ready!',
   errorGeneratingVideo: 'An error occurred while generating the video. Please try again.',
-  videoMessage1: 'Warming up the creativity engines...',
-  videoMessage2: 'Selecting the best moments...',
-  videoMessage3: 'Adding a pinch of magic...',
-  videoMessage4: 'Composing the perfect soundtrack...',
-  videoMessage5: 'Almost ready! Adding the final touches...',
+  
+  // WhatsApp
+  whatsappMessage: 'Hello! I found your company, {0}, on the Juntos app and I would like to request more information.'
 };
