@@ -1,15 +1,16 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage, CurrencyPipe } from '@angular/common';
 import { ActivityService } from '../../services/activity.service';
-import { Activity, AccessibilityLevel } from '../../models/activity.model';
-import { Review } from '../../models/review.model';
-import { StarRatingComponent } from '../star-rating/star-rating.component';
-import { MapViewComponent } from '../map-view/map-view.component';
-import { ReviewFormComponent } from '../review-form/review-form.component';
 import { AuthService } from '../../services/auth.service';
-import { AddToAlbumModalComponent } from '../add-to-album-modal/add-to-album-modal.component';
+import { Activity } from '../../models/activity.model';
+import { Review } from '../../models/review.model';
 import { L10nPipe } from '../../pipes/l10n.pipe';
+import { MapViewComponent } from '../map-view/map-view.component';
+import { StarRatingComponent } from '../star-rating/star-rating.component';
+import { ReviewFormComponent } from '../review-form/review-form.component';
+import { AddToAlbumModalComponent } from '../add-to-album-modal/add-to-album-modal.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-activity-detail',
@@ -18,119 +19,101 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
     CommonModule,
     RouterLink,
     NgOptimizedImage,
-    StarRatingComponent,
+    CurrencyPipe,
+    L10nPipe,
     MapViewComponent,
+    StarRatingComponent,
     ReviewFormComponent,
-    AddToAlbumModalComponent,
-    L10nPipe
+    AddToAlbumModalComponent
   ],
   template: `
     @if (activity()) {
       @let act = activity()!;
-      <div class="bg-white p-8 rounded-lg shadow-lg">
+      <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
         <button routerLink="/" class="text-teal-500 hover:text-teal-700 mb-4">&larr; {{ 'backToActivities' | l10n }}</button>
 
-        <header class="mb-8">
-          <h1 class="text-4xl font-extrabold text-gray-800">{{ act.name }}</h1>
-          <div class="flex items-center mt-2">
-            <app-star-rating [rating]="act.rating" [showRatingValue]="true" />
-            <span class="mx-2 text-gray-400">|</span>
-            <span class="text-gray-600">{{ act.category }}</span>
-          </div>
+        <header class="mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <img [ngSrc]="act.imageUrl" [alt]="act.name" width="800" height="600" class="w-full h-80 object-cover rounded-lg shadow-md" priority>
+              <div class="grid grid-cols-2 gap-2">
+                @for(img of act.gallery.slice(0, 4); track img) {
+                   <img [ngSrc]="img" [alt]="act.name" width="400" height="300" class="w-full h-full object-cover rounded-lg shadow-sm">
+                }
+              </div>
+            </div>
+            <h1 class="text-4xl font-extrabold text-gray-800">{{ act.name }}</h1>
+            <p class="text-lg text-gray-500">{{ act.category }}</p>
         </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="md:col-span-2">
-            <img [ngSrc]="act.imageUrl" [alt]="act.name" width="800" height="600" class="w-full rounded-lg shadow-md mb-6" priority>
-
-            <section class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-700 mb-3">{{ 'description' | l10n }}</h2>
-                <p class="text-gray-600 leading-relaxed">{{ act.description }}</p>
-            </section>
-            
-            <section class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-700 mb-3">{{ 'gallery' | l10n }}</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    @for(image of act.galleryImages; track image) {
-                        <img [ngSrc]="image" alt="Gallery image for {{ act.name }}" width="300" height="200" class="rounded-md object-cover w-full h-32 cursor-pointer hover:opacity-80 transition-opacity">
-                    }
-                </div>
-            </section>
-
-          </div>
-          <aside>
-            <div class="bg-gray-50 p-6 rounded-lg border">
-              <h3 class="text-xl font-bold mb-4">{{ 'details' | l10n }}</h3>
-              <div class="space-y-3">
-                <div class="flex items-center">
-                  <span class="text-2xl mr-3">💰</span>
-                  <span>{{ act.price > 0 ? (act.price | currency:'EUR') : ('free' | l10n) }}</span>
-                </div>
-                <div class="flex items-center">
-                  <span class="text-2xl mr-3">♿</span>
-                  <span>{{ 'wheelchair' | l10n }}: {{ accessibilityText(act.accessibility.wheelchair) }}</span>
-                </div>
-                <div class="flex items-center">
-                  <span class="text-2xl mr-3">👶</span>
-                  <span>{{ 'stroller' | l10n }}: {{ accessibilityText(act.accessibility.stroller) }}</span>
-                </div>
-              </div>
-              @if(authService.isLoggedIn()) {
-                <button (click)="markVisited(act.id)" [disabled]="isVisited()" class="w-full mt-6 bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
-                  {{ isVisited() ? ('activityVisited' | l10n) : ('markAsVisited' | l10n) }}
-                </button>
-                <button (click)="showAddToAlbumModal.set(true)" class="w-full mt-2 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors">
-                  {{ 'addToAlbum' | l10n }}
-                </button>
-              }
-            </div>
-            
-            <div class="mt-6">
-                <h3 class="text-xl font-bold mb-2">{{ 'location' | l10n }}</h3>
-                <app-map-view [locations]="[{lat: act.location.lat, lng: act.location.lng, name: act.name}]" />
-            </div>
-
-          </aside>
-        </div>
-
-        <hr class="my-8">
-
-        <section>
-          <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ 'reviews' | l10n }} ({{ act.reviews.length }})</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            @for(review of act.reviews; track review.id) {
-              <div class="bg-gray-50 p-4 rounded-lg border">
-                <div class="flex items-center mb-2">
-                  <app-star-rating [rating]="review.rating" />
-                  <span class="font-semibold ml-auto">{{ review.userName }}</span>
-                </div>
-                <p class="text-gray-600 italic">"{{ review.comment }}"</p>
-                <p class="text-right text-sm text-gray-400 mt-2">{{ review.date | date:'mediumDate' }}</p>
-              </div>
-            }
-            @if(act.reviews.length === 0) {
-              <p class="text-gray-500">{{ 'noReviews' | l10n }}</p>
-            }
-          </div>
-
-          @if (authService.isLoggedIn()) {
-            <app-review-form [activityId]="act.id" (reviewSubmitted)="onReviewSubmitted($event)" />
-          } @else {
-            <div class="text-center bg-gray-100 p-4 rounded-md">
-                <p>{{ 'logInToReview' | l10n }} <a routerLink="/login" class="text-teal-600 font-semibold hover:underline">{{ 'login' | l10n }}</a></p>
-            </div>
-          }
-        </section>
         
-        @if(showAddToAlbumModal()) {
-          <app-add-to-album-modal
-            [activityName]="act.name"
-            [activityImageUrl]="act.imageUrl"
-            (close)="showAddToAlbumModal.set(false)"
-          />
-        }
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="md:col-span-2">
+                 <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-3">{{ 'description' | l10n }}</h2>
+                    <p class="text-gray-600 leading-relaxed">{{ act.description }}</p>
+                </section>
+                
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ 'reviews' | l10n }} ({{ reviews().length }})</h2>
+                    @if (isLoggedIn()) {
+                      <app-review-form [activityId]="act.id" (reviewSubmitted)="onReviewSubmitted($event)" class="mb-6"/>
+                    }
+                    <div class="space-y-4">
+                      @for (review of reviews(); track review.id) {
+                        <div class="border-b pb-4">
+                          <div class="flex items-center mb-1">
+                              <app-star-rating [rating]="review.rating" />
+                              <p class="ml-4 font-semibold text-gray-800">{{ review.userName }}</p>
+                          </div>
+                          <p class="text-gray-600">{{ review.comment }}</p>
+                           <p class="text-xs text-gray-400 mt-1">{{ review.date | date:'medium' }}</p>
+                        </div>
+                      } @empty {
+                         <p class="text-gray-500">{{ 'noReviews' | l10n }}</p>
+                      }
+                    </div>
+                </section>
+            </div>
+            <aside>
+                <div class="bg-gray-50 p-6 rounded-lg border sticky top-24 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-bold text-teal-600">{{ act.price > 0 ? (act.price | currency:'EUR') : ('free' | l10n) }}</span>
+                         <app-star-rating [rating]="act.rating" [showRatingValue]="true" />
+                    </div>
+                     <div class="flex space-x-2">
+                        @if (isLoggedIn()) {
+                            <button (click)="toggleFavorite()" class="flex-1 p-2 rounded-md border transition-colors flex items-center justify-center" [class.bg-red-100]="isFavorite()" [class.text-red-500]="isFavorite()" [class.border-red-300]="isFavorite()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                            </button>
+                             <button (click)="showAlbumModal.set(true)" class="flex-1 p-2 rounded-md border transition-colors flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            </button>
+                        }
+                    </div>
 
+                    <div>
+                      <h3 class="font-bold text-gray-700 mb-2">{{ 'location' | l10n }}</h3>
+                      <p class="text-sm text-gray-600 mb-2">{{ act.location.address }}</p>
+                      <app-map-view [locations]="[{...act.location, name: act.name}]" />
+                    </div>
+
+                     <div>
+                      <h3 class="font-bold text-gray-700 mb-2">{{ 'accessibility' | l10n }}</h3>
+                      <p class="text-sm text-gray-600">♿ {{ 'wheelchair' | l10n }}: {{ act.accessibility.wheelchair }}</p>
+                      <p class="text-sm text-gray-600">👶 {{ 'stroller' | l10n }}: {{ act.accessibility.stroller }}</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
       </div>
+      
+      @if (showAlbumModal()) {
+        <app-add-to-album-modal 
+            [activityName]="activity()!.name" 
+            [imageUrl]="activity()!.imageUrl"
+            (close)="showAlbumModal.set(false)"
+            (photoAdded)="onPhotoAddedToAlbum()"
+        />
+      }
     } @else {
       <p>A carregar atividade...</p>
     }
@@ -140,43 +123,44 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
 export class ActivityDetailComponent {
   private route = inject(ActivatedRoute);
   private activityService = inject(ActivityService);
-  authService = inject(AuthService);
-
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
+  
+  activityId = signal(0);
   activity = signal<Activity | undefined>(undefined);
-  showAddToAlbumModal = signal(false);
+  reviews = signal<Review[]>([]);
+  isLoggedIn = this.authService.isLoggedIn;
+  showAlbumModal = signal(false);
 
-  isVisited = computed(() => {
+  isFavorite = computed(() => {
     const user = this.authService.currentUser();
-    const act = this.activity();
-    if (!user || !act) return false;
-    return user.visitedActivityIds.includes(act.id);
+    if (!user) return false;
+    return user.favorites.includes(this.activityId());
   });
 
   constructor() {
-    const activityId = Number(this.route.snapshot.paramMap.get('id'));
-    if (activityId) {
-      this.activity.set(this.activityService.getActivityById(activityId));
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.activityId.set(id);
+    if (id) {
+      this.activity.set(this.activityService.getActivityById(id));
+      this.reviews.set(this.activityService.getReviewsForActivity(id));
     }
   }
 
   onReviewSubmitted(review: Review): void {
     this.activityService.addReview(review);
-    // Refresh activity data to show new review
-    const act = this.activity();
-    if (act) {
-        this.activity.set(this.activityService.getActivityById(act.id));
-    }
+    this.reviews.set(this.activityService.getReviewsForActivity(this.activityId()));
+    this.toastService.show('Obrigado pela sua avaliação!', 'success');
   }
 
-  markVisited(activityId: number): void {
-    this.authService.markAsVisited(activityId);
+  toggleFavorite(): void {
+    this.authService.toggleFavorite(this.activityId());
+    const message = this.isFavorite() ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.';
+    this.toastService.show(message, 'info');
   }
 
-  accessibilityText(level: AccessibilityLevel): string {
-    switch (level) {
-      case 'total': return 'Total';
-      case 'parcial': return 'Parcial';
-      case 'nenhum': return 'Nenhuma';
-    }
+  onPhotoAddedToAlbum(): void {
+    this.showAlbumModal.set(false);
+    this.toastService.show('Foto adicionada ao álbum!', 'success');
   }
 }

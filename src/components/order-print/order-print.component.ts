@@ -1,65 +1,101 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule, CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, CurrencyPipe } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 import { Album } from '../../models/album.model';
+import { Order } from '../../models/order.model';
 import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
   selector: 'app-order-print',
   standalone: true,
-  imports: [FormsModule, CommonModule, CurrencyPipe, L10nPipe],
+  imports: [CommonModule, RouterLink, FormsModule, NgOptimizedImage, L10nPipe, CurrencyPipe],
   template: `
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">{{ 'orderPrintTitle' | l10n }}</h1>
-      @if (album()) {
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Order Form -->
-            <form #form="ngForm" (ngSubmit)="placeOrder(form.value)">
-                <div class="mb-4">
-                    <h3 class="font-semibold text-lg mb-2">{{ 'coverType' | l10n }}</h3>
-                    <select name="coverType" ngModel required class="w-full border-gray-300 rounded-md shadow-sm">
-                        <option value="Capa Mole">{{ 'softCover' | l10n }} (+19.99€)</option>
-                        <option value="Capa Dura">{{ 'hardCover' | l10n }} (+29.99€)</option>
-                    </select>
-                </div>
+    @if(album()) {
+        @let alb = album()!;
+         <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">{{ 'orderPrintTitle' | l10n }}: {{ alb.name }}</h1>
 
-                <div class="mb-6">
-                    <h3 class="font-semibold text-lg mb-2">{{ 'shippingAddress' | l10n }}</h3>
-                    <div class="space-y-3">
-                        <input type="text" name="name" ngModel required placeholder="{{ 'name' | l10n }}" class="w-full border-gray-300 rounded-md shadow-sm">
-                        <input type="text" name="address" ngModel required placeholder="{{ 'address' | l10n }}" class="w-full border-gray-300 rounded-md shadow-sm">
-                        <input type="text" name="postalCode" ngModel required placeholder="{{ 'postalCode' | l10n }}" class="w-full border-gray-300 rounded-md shadow-sm">
-                        <input type="text" name="city" ngModel required placeholder="{{ 'city' | l10n }}" class="w-full border-gray-300 rounded-md shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Order Summary -->
+                <div class="bg-gray-50 p-6 rounded-lg border">
+                    <h2 class="text-2xl font-semibold mb-4">{{ 'orderSummary' | l10n }}</h2>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">{{ alb.photos.length }} fotos</span>
+                        <span></span>
+                    </div>
+                     <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-600">{{ 'coverType' | l10n }}</span>
+                        <span class="font-semibold">{{ coverType() === 'soft' ? ('softCover' | l10n) : ('hardCover' | l10n) }}</span>
+                    </div>
+                    <div class="border-t pt-4">
+                         <div class="flex justify-between items-center text-xl font-bold">
+                            <span>{{ 'total' | l10n }}</span>
+                            <span>{{ totalPrice() | currency:'EUR' }}</span>
+                        </div>
+                    </div>
+                     <div class="mt-6 grid grid-cols-3 gap-2 h-32">
+                        @for (photo of alb.photos.slice(0, 3); track photo.imageUrl) {
+                           <img [ngSrc]="photo.imageUrl" [alt]="photo.activityName" width="100" height="100" class="w-full h-full object-cover rounded">
+                        }
                     </div>
                 </div>
 
-                <div class="border-t pt-4">
-                    <div class="flex justify-between items-center text-xl font-bold">
-                        <span>{{ 'total' | l10n }}:</span>
-                        <span>{{ totalPrice(form.value.coverType) | currency:'EUR' }}</span>
+                <!-- Form -->
+                <form #form="ngForm" (ngSubmit)="placeOrder(form.value)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'coverType' | l10n }}</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer" [class.border-teal-500]="coverType() === 'soft'" [class.bg-teal-50]="coverType() === 'soft'">
+                                <input type="radio" name="coverType" value="soft" [(ngModel)]="coverType" class="mr-2">
+                                <div>
+                                    <p class="font-semibold">{{ 'softCover' | l10n }}</p>
+                                    <p class="text-sm text-gray-600">+15,00 €</p>
+                                </div>
+                            </label>
+                             <label class="flex items-center p-4 border rounded-lg cursor-pointer" [class.border-teal-500]="coverType() === 'hard'" [class.bg-teal-50]="coverType() === 'hard'">
+                                <input type="radio" name="coverType" value="hard" [(ngModel)]="coverType" class="mr-2">
+                                <div>
+                                    <p class="font-semibold">{{ 'hardCover' | l10n }}</p>
+                                    <p class="text-sm text-gray-600">+25,00 €</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                    <button type="submit" [disabled]="form.invalid" class="w-full mt-4 bg-teal-500 text-white py-3 rounded-md font-semibold hover:bg-teal-600 disabled:bg-gray-400">
+
+                    <h3 class="text-xl font-semibold mb-3 mt-6">{{ 'shippingAddress' | l10n }}</h3>
+                    <div class="space-y-4">
+                         <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">{{ 'fullName' | l10n }}</label>
+                            <input type="text" name="name" id="name" required ngModel class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label for="address" class="block text-sm font-medium text-gray-700">{{ 'address' | l10n }}</label>
+                            <input type="text" name="address" id="address" required ngModel class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="postalCode" class="block text-sm font-medium text-gray-700">{{ 'postalCode' | l10n }}</label>
+                                <input type="text" name="postalCode" id="postalCode" required ngModel class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                            </div>
+                             <div>
+                                <label for="city" class="block text-sm font-medium text-gray-700">{{ 'city' | l10n }}</label>
+                                <input type="text" name="city" id="city" required ngModel class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" [disabled]="form.invalid" class="w-full mt-8 bg-green-500 text-white font-bold py-3 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400">
                         {{ 'placeOrder' | l10n }}
                     </button>
-                </div>
-            </form>
-            
-            <!-- Album Preview -->
-            <div class="bg-gray-50 p-4 rounded-lg border">
-                <h3 class="font-semibold text-lg mb-2">{{ album()?.name }}</h3>
-                <div class="grid grid-cols-4 gap-2">
-                    @for (photo of album()?.photos; track photo.imageUrl) {
-                        <img [src]="photo.imageUrl" [alt]="photo.activityName" class="aspect-square object-cover rounded">
-                    }
-                </div>
+                </form>
             </div>
-        </div>
-      } @else {
+         </div>
+    } @else {
         <p>A carregar álbum...</p>
-      }
-    </div>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -67,10 +103,12 @@ export class OrderPrintComponent {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private authService = inject(AuthService);
-    
-    albumId = signal<number>(0);
-    album = signal<Album | undefined>(undefined);
+    private toastService = inject(ToastService);
 
+    albumId = signal(0);
+    album = signal<Album | undefined>(undefined);
+    coverType = signal<'soft' | 'hard'>('soft');
+    
     constructor() {
         const id = Number(this.route.snapshot.paramMap.get('albumId'));
         this.albumId.set(id);
@@ -79,28 +117,34 @@ export class OrderPrintComponent {
         }
     }
 
-    totalPrice(coverType: string): number {
-        if (coverType === 'Capa Dura') {
-            return 29.99;
-        }
-        return 19.99;
-    }
+    totalPrice = computed(() => {
+        const basePrice = 10; // Base price for the book
+        const photoPrice = this.album()?.photos.length ? this.album()!.photos.length * 0.5 : 0;
+        const coverPrice = this.coverType() === 'soft' ? 15 : 25;
+        return basePrice + photoPrice + coverPrice;
+    });
 
-    placeOrder(formValue: any) {
-        if (!this.album()) return;
-        
-        const order = this.authService.placeOrder({
-            album: this.album()!,
-            coverType: formValue.coverType,
-            price: this.totalPrice(formValue.coverType),
+    placeOrder(formValue: {name: string, address: string, postalCode: string, city: string}) {
+        const album = this.album();
+        if (!album) {
+            this.toastService.show('Álbum não encontrado.', 'error');
+            return;
+        }
+
+        const newOrder: Omit<Order, 'id'> = {
+            date: new Date().toISOString(),
+            album,
+            coverType: this.coverType() === 'soft' ? 'Capa Mole' : 'Capa Dura',
+            price: this.totalPrice(),
             shippingAddress: {
                 name: formValue.name,
                 address: formValue.address,
                 postalCode: formValue.postalCode,
                 city: formValue.city,
             }
-        });
+        };
         
-        this.router.navigate(['/order-success'], { queryParams: { orderId: order.id } });
+        this.authService.addOrder(newOrder);
+        this.router.navigate(['/order-success']);
     }
 }

@@ -8,7 +8,7 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
 @Component({
   selector: 'app-discover-feed',
   standalone: true,
-  imports: [CommonModule, RouterLink, NgOptimizedImage, StarRatingComponent, L10nPipe],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, StarRatingComponent, L10nPipe, CurrencyPipe],
   template: `
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (activity of activities(); track activity.id) {
@@ -18,8 +18,8 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
             <p class="text-sm text-gray-500">{{ activity.category }}</p>
             <h3 class="font-bold text-lg text-gray-800 truncate">{{ activity.name }}</h3>
             <div class="flex justify-between items-center mt-2">
+              <span class="text-lg font-bold text-teal-600">{{ activity.price > 0 ? (activity.price | currency:'EUR') : ('free' | l10n) }}</span>
               <app-star-rating [rating]="activity.rating" />
-              <span class="font-semibold text-teal-600">{{ activity.price > 0 ? (activity.price | currency:'EUR') : ('free' | l10n) }}</span>
             </div>
           </div>
         </a>

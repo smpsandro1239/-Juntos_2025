@@ -1,72 +1,87 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { RouterLink } from '@angular/router';
 import { L10nPipe } from '../../pipes/l10n.pipe';
+import { PassportComponent } from '../passport/passport.component';
+import { AlbumsPageComponent } from '../albums-page/albums-page.component';
+import { FavoritesPageComponent } from '../favorites-page/favorites-page.component';
+import { MissionsPageComponent } from '../missions-page/missions-page.component';
+import { PointsHistoryComponent } from '../points-history/points-history.component';
+import { OrderHistoryComponent } from '../order-history/order-history.component';
+
+type ProfileTab = 'passport' | 'albums' | 'favorites' | 'missions' | 'points' | 'orders';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink, L10nPipe],
+  imports: [
+    CommonModule,
+    RouterLink,
+    L10nPipe,
+    PassportComponent,
+    AlbumsPageComponent,
+    FavoritesPageComponent,
+    MissionsPageComponent,
+    PointsHistoryComponent,
+    OrderHistoryComponent
+  ],
   template: `
     @if (user()) {
       @let u = user()!;
-      <div class="bg-white p-8 rounded-lg shadow-lg">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">{{ 'welcome' | l10n }}, {{ u.name }}!</h1>
-            @if(u.isPremium) {
-                <span class="bg-yellow-200 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">⭐ Premium</span>
-            }
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <!-- Profile Info -->
-            <div class="bg-gray-50 p-6 rounded-lg border">
-                <h2 class="text-xl font-semibold mb-4">{{ 'profileInfo' | l10n }}</h2>
-                <p><strong>{{ 'name' | l10n }}:</strong> {{ u.name }}</p>
-                <p><strong>{{ 'email' | l10n }}:</strong> {{ u.email }}</p>
-                <p><strong>{{ 'membership' | l10n }}:</strong> {{ u.isPremium ? ('premium' | l10n) : ('standard' | l10n) }}</p>
-            </div>
-            
-            <!-- Quick Links -->
-            <div class="bg-gray-50 p-6 rounded-lg border">
-                <h2 class="text-xl font-semibold mb-4">{{ 'quickLinks' | l10n }}</h2>
-                <ul class="space-y-2">
-                    <li><a routerLink="/passport" class="text-teal-600 hover:underline">{{ 'myPassport' | l10n }}</a></li>
-                    <li><a routerLink="/albums" class="text-teal-600 hover:underline">{{ 'myAlbums' | l10n }}</a></li>
-                    <li><a routerLink="/orders" class="text-teal-600 hover:underline">{{ 'orderHistory' | l10n }}</a></li>
-                </ul>
-            </div>
-            
-             <!-- Premium Upgrade -->
-            @if(!u.isPremium) {
-                <div class="bg-teal-50 p-6 rounded-lg border border-teal-200">
-                    <h2 class="text-xl font-semibold mb-2">{{ 'upgradeToPremium' | l10n }}</h2>
-                    <p class="text-gray-600 mb-4">{{ 'premiumDescriptionShort' | l10n }}</p>
-                    <a routerLink="/premium" class="inline-block bg-teal-500 text-white font-bold py-2 px-4 rounded hover:bg-teal-600 transition-colors">{{ 'learnMore' | l10n }}</a>
+      <div class="max-w-6xl mx-auto">
+        <header class="bg-white p-6 rounded-lg shadow-md mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-800">Bem-vindo, {{ u.name }}!</h1>
+            @if (!u.isPremium) {
+                <div class="mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg">
+                    <p>{{ 'notPremium' | l10n }} <a routerLink="/premium" class="font-bold hover:underline">{{ 'upgradeHere' | l10n }}</a></p>
                 </div>
             }
+        </header>
 
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <aside class="md:col-span-1">
+                <nav class="bg-white p-4 rounded-lg shadow-md space-y-1 sticky top-24">
+                    @for (tab of tabs; track tab.id) {
+                        <button (click)="activeTab.set(tab.id)" 
+                                class="w-full text-left px-4 py-2 rounded-md transition-colors font-medium"
+                                [class.bg-teal-100]="activeTab() === tab.id"
+                                [class.text-teal-700]="activeTab() === tab.id"
+                                [class.hover:bg-gray-100]="activeTab() !== tab.id">
+                            {{ tab.label | l10n }}
+                        </button>
+                    }
+                </nav>
+            </aside>
+
+            <main class="md:col-span-3">
+                @switch (activeTab()) {
+                    @case ('passport') { <app-passport /> }
+                    @case ('albums') { <app-albums-page /> }
+                    @case ('favorites') { <app-favorites-page /> }
+                    @case ('missions') { <app-missions-page /> }
+                    @case ('points') { <app-points-history /> }
+                    @case ('orders') { <app-order-history /> }
+                }
+            </main>
         </div>
-
-         <div class="mt-8 text-center">
-            <button (click)="logout()" class="text-gray-500 hover:text-red-600 hover:underline">{{ 'logout' | l10n }}</button>
-        </div>
-
       </div>
-    } @else {
-      <p>A carregar perfil...</p>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
-  authService = inject(AuthService);
-  private router = inject(Router);
+  private authService = inject(AuthService);
   user = this.authService.currentUser;
+  
+  activeTab = signal<ProfileTab>('passport');
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
+  tabs: {id: ProfileTab, label: string}[] = [
+    { id: 'passport', label: 'passportTitle' },
+    { id: 'albums', label: 'yourAlbums' },
+    { id: 'favorites', label: 'myFavorites' },
+    { id: 'missions', label: 'missions' },
+    { id: 'points', label: 'pointsHistory' },
+    { id: 'orders', label: 'orderHistory' },
+  ];
 }

@@ -1,23 +1,19 @@
-import { Review } from './review.model';
-
-export type AccessibilityLevel = 'total' | 'parcial' | 'nenhum';
-
 export interface Activity {
   id: number;
   name: string;
-  category: string;
+  category: 'Cultura' | 'Ar Livre' | 'Comida' | 'Oficinas';
   description: string;
   imageUrl: string;
+  gallery: string[];
   price: number;
   rating: number;
-  reviews: Review[];
   location: {
+    address: string;
     lat: number;
     lng: number;
   };
   accessibility: {
-    wheelchair: AccessibilityLevel;
-    stroller: AccessibilityLevel;
+    wheelchair: 'Total' | 'Partial' | 'None';
+    stroller: 'Total' | 'Partial' | 'None';
   };
-  galleryImages: string[];
 }

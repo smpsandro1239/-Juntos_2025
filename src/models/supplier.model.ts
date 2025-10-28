@@ -9,6 +9,7 @@ export interface Supplier {
     phone: string;
     email: string;
     website?: string;
+    whatsapp?: string;
   };
   location: string;
 }

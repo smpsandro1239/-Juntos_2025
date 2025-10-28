@@ -1,172 +1,185 @@
 export const en = {
-    // Navigation
-    navHome: 'Home',
-    navSuppliers: 'Suppliers',
-    navTripPlanner: 'Trip Planner',
-    navSOS: 'SOS',
-    navProfile: 'Profile',
-    navLogout: 'Logout',
-    navLogin: 'Login',
+  // General
+  'all': 'All',
+  'back': 'Back',
+  'cancel': 'Cancel',
+  'create': 'Create',
+  'createNew': 'Create New',
+  'date': 'Date',
+  'description': 'Description',
+  'details': 'Details',
+  'email': 'Email',
+  'free': 'Free',
+  'location': 'Location',
+  'login': 'Login',
+  'logout': 'Logout',
+  'myProfile': 'My Profile',
+  'noResults': 'No results found.',
+  'or': 'or',
+  'password': 'Password',
+  'phone': 'Phone',
+  'points': 'points',
+  'price': 'Price',
+  'rating': 'Rating',
+  'searchPlaceholder': 'Search by name...',
+  'website': 'Website',
 
-    // Footer
-    footerRights: 'All rights reserved.',
+  // Header
+  'home': 'Home',
+  'tripPlanner': 'Trip Planner',
+  'suppliers': 'Suppliers',
+  'sos': 'SOS',
 
-    // Common
-    free: 'Free',
-    noResults: 'No results found.',
-    description: 'Description',
-    gallery: 'Gallery',
-    details: 'Details',
-    location: 'Location',
-    price: 'Price',
-    rating: 'Rating',
-    name: 'Name',
-    email: 'Email',
-    password: 'Password',
-    login: 'Login',
-    logout: 'Logout',
-    or: 'or',
-    create: 'Create',
-    cancel: 'Cancel',
-    add: 'Add',
-    all: 'All',
-    photos: 'photos',
-    days: 'days',
-    adults: 'Adults',
-    children: 'Children',
+  // Home Page
+  'upcomingEvents': 'Upcoming Events',
+  'discoverActivities': 'Discover Activities',
 
-    // Home Page
-    upcomingEvents: 'Upcoming Events',
-    discoverActivities: 'Discover Activities',
+  // Filters
+  'filtersTitle': 'Filters',
+  'filtersCategory': 'Category',
+  'filtersAllCategories': 'All Categories',
+  'filtersPrice': 'Max Price',
+  'filtersRating': 'Min Rating',
+  'filtersApply': 'Apply Filters',
 
-    // Filters
-    filtersTitle: 'Filter Activities',
-    searchPlaceholder: 'Search by name...',
-    filtersCategory: 'Category',
-    filtersAllCategories: 'All categories',
-    filtersPrice: 'Maximum Price',
-    filtersRating: 'Minimum Rating',
-    filtersApply: 'Apply Filters',
+  // Activity Detail
+  'backToActivities': 'Back to activities',
+  'reviews': 'Reviews',
+  'noReviews': 'Be the first to leave a review!',
+  'accessibility': 'Accessibility',
+  'wheelchair': 'Wheelchair',
+  'stroller': 'Stroller',
+  'leaveReviewTitle': 'Leave a review',
+  'comment': 'Comment',
+  'submitReview': 'Submit Review',
 
-    // Activity Detail
-    backToActivities: 'Back to activities',
-    wheelchair: 'Wheelchair',
-    stroller: 'Stroller',
-    activityVisited: 'Activity Visited',
-    markAsVisited: 'Mark as Visited',
-    addToAlbum: 'Add to Album',
-    reviews: 'Reviews',
-    noReviews: 'There are no reviews yet. Be the first!',
-    logInToReview: 'To leave a review, please',
+  // Login Page
+  'loginTitle': 'Access your account',
+  'loginHint': 'Hint: Use user@juntos.com / 123456',
 
-    // Review Form
-    leaveReviewTitle: 'Leave Your Review',
-    comment: 'Comment',
-    submitReview: 'Submit Review',
+  // Profile Page
+  'notPremium': 'You are not a Premium member.',
+  'upgradeHere': 'Upgrade here!',
+  'passportTitle': 'Passport',
+  'yourAlbums': 'Your Albums',
+  'myFavorites': 'My Favorites',
+  'missions': 'Missions',
+  'pointsHistory': 'Points History',
+  'orderHistory': 'Order History',
 
-    // Map
-    noLocationsMap: 'No locations to display.',
+  // Passport
+  'passportSubtitle': 'Collect stamps by participating in activities and complete thematic series!',
+  'collected': 'Collected',
 
-    // Login Page
-    loginTitle: 'Sign in to your account',
-    loginHint: 'Use user@example.com / password',
+  // Albums
+  'myAlbums': 'My Albums',
+  'viewAlbum': 'View Album',
+  'photos': 'photos',
+  'noAlbums': 'You have no albums yet. Create one!',
+  'albumName': 'Album Name',
 
-    // Profile Page
-    welcome: 'Welcome',
-    profileInfo: 'Profile Information',
-    membership: 'Membership',
-    premium: 'Premium',
-    standard: 'Standard',
-    quickLinks: 'Quick Links',
-    myPassport: 'My Passport',
-    myAlbums: 'My Albums',
-    orderHistory: 'Order History',
-    upgradeToPremium: 'Upgrade to Premium',
-    premiumDescriptionShort: 'Unlock exclusive features like the trip planner and unlimited albums.',
-    learnMore: 'Learn More',
+  // Album Detail
+  'uploadPhoto': 'Upload a new photo',
+  'printAlbum': 'Order Prints',
+  'noPhotos': 'This album is empty. Add some photos!',
 
-    // Passport Page
-    passportTitle: 'Adventure Passport',
-    passportDescription: 'Here are all the activities you\'ve visited. Keep exploring!',
-    visitedActivities: 'Visited Activities',
-    noVisitedActivities: 'You haven\'t marked any activity as visited yet. Start exploring!',
+  // Favorites
+  'noFavorites': 'You have not added any activities to your favorites yet.',
 
-    // Trip Planner
-    tripPlannerTitle: 'AI Trip Planner',
-    tripPlannerSubtitle: 'Let our artificial intelligence create the perfect itinerary for your family.',
-    tripDuration: 'Trip Duration',
-    numberOfPeople: 'Number of People',
-    interests: 'Interests',
-    interestsPlaceholder: 'E.g., museums, outdoors, local food',
-    travelPace: 'Travel Pace',
-    relaxed: 'Relaxed',
-    moderate: 'Moderate',
-    fastPaced: 'Fast-Paced',
-    generating: 'Generating plan...',
-    generatePlan: 'Generate Plan',
-    yourPlan: 'Your Custom Trip Plan',
+  // Missions
+  'missionsSubtitle': 'Complete missions to earn points and rewards!',
+  'progress': 'Progress',
+  'completed': 'Completed',
 
-    // Premium Page
-    upgradeSuccess: 'Upgrade Successful!',
-    backToProfile: 'Back to Profile',
-    premiumTitle: 'Become a Premium Member',
-    premiumBenefits: 'Premium Benefits',
-    premiumBenefit1: 'Unlimited access to our AI Trip Planner.',
-    premiumBenefit2: 'Create unlimited photo albums to save your memories.',
-    premiumBenefit3: 'Order physical prints of your photo albums.',
-    premiumBenefit4: 'Exclusive discounts on partner activities.',
-    upgradeNow: 'Upgrade Now',
+  // Points
+  'currentBalance': 'Current Balance',
+  'noTransactions': 'No transactions yet.',
 
-    // Suppliers
-    allSuppliers: 'Suppliers for your Party',
-    contactSupplier: 'Contact Supplier',
-    contact: 'Contact',
-    phone: 'Phone',
-    website: 'Website',
+  // Orders
+  'order': 'Order',
+  'album': 'Album',
+  'noOrders': 'You have not placed any orders yet.',
 
-    // Events
-    eventDetails: 'Event Details',
-    when: 'When',
-    
-    // Albums
-    yourAlbums: 'Your Albums',
-    createNew: 'Create New',
-    albumName: 'Album name',
-    viewAlbum: 'View album',
-    noAlbums: 'You haven\'t created any albums yet.',
-    selectAlbum: 'Select an album',
-    createNewAlbum: 'Or create a new album',
-    printAlbum: 'Order Print',
-    noPhotos: 'This album has no photos yet.',
-    uploadPhoto: 'Upload Photo',
+  // Trip Planner
+  'tripPlannerTitle': 'AI Trip Planner',
+  'tripPlannerSubtitle': 'Describe your ideal trip and our AI will create a personalized plan for you in Lisbon!',
+  'tripDuration': 'Trip Duration',
+  'days': 'days',
+  'numberOfPeople': 'Number of People',
+  'adults': 'Adults',
+  'children': 'Children',
+  'interests': 'Interests',
+  'interestsPlaceholder': 'e.g., museums, parks, traditional food',
+  'travelPace': 'Travel Pace',
+  'relaxed': 'Relaxed',
+  'moderate': 'Moderate',
+  'fastPaced': 'Fast-Paced',
+  'generating': 'Generating...',
+  'generatePlan': 'Generate Plan',
+  'yourPlan': 'Your Personalized Plan',
 
-    // Orders
-    orderPrintTitle: 'Order Album Print',
-    coverType: 'Cover Type',
-    softCover: 'Soft Cover',
-    hardCover: 'Hard Cover',
-    shippingAddress: 'Shipping Address',
-    address: 'Address',
-    postalCode: 'Postal Code',
-    city: 'City',
-    total: 'Total',
-    placeOrder: 'Place Order',
-    orderSuccessTitle: 'Order Received!',
-    orderSuccessMessage: 'Your order has been submitted successfully. You will receive a confirmation email shortly.',
-    order: 'Order',
-    date: 'Date',
-    noOrders: 'You have not placed any orders yet.',
-    
-    // SOS Page
-    sosTitle: 'SOS - Emergency',
-    sosSubtitle: 'Important contacts and locations for your safety.',
-    emergencyNumber: 'National Emergency Number',
-    callNow: 'Call Now',
-    hospitals: 'Hospitals',
-    policeStations: 'Police',
-    pharmacies: 'Pharmacies',
+  // Event Detail
+  'eventDetails': 'Event Details',
+  'when': 'When',
 
-    // Weather Widget
-    weatherIn: 'Weather in',
-    loadingWeather: 'Loading weather...',
+  // Suppliers
+  'allSuppliers': 'All Suppliers',
+  'contactSupplier': 'Contact Supplier',
+  'contactViaWhatsApp': 'Contact via WhatsApp',
+  'whatsappMessage': 'Hello, I found your contact on the Juntos app and I would like to know more about your services.',
+
+  // Contact Modal
+  'contact': 'Contact',
+
+  // Add to Album Modal
+  'addToAlbum': 'Add to Album',
+  'selectAlbum': 'Select an album',
+  'createNewAlbum': 'Create a new album',
+  'add': 'Add',
+  
+  // Order Print
+  'orderPrintTitle': 'Order Album Prints',
+  'orderSummary': 'Order Summary',
+  'coverType': 'Cover Type',
+  'softCover': 'Soft Cover',
+  'hardCover': 'Hard Cover',
+  'shippingAddress': 'Shipping Address',
+  'fullName': 'Full Name',
+  'address': 'Address',
+  'postalCode': 'Postal Code',
+  'city': 'City',
+  'total': 'Total',
+  'placeOrder': 'Place Order',
+
+  // Order Success
+  'orderSuccessTitle': 'Order Placed!',
+  'orderSuccessMessage': 'Thank you! Your order has been successfully placed. We will notify you when it ships.',
+  'backToProfile': 'Back to Profile',
+
+  // Premium Page
+  'premiumTitle': 'Become a Juntos Premium Member!',
+  'premiumSubtitle': 'Unlock exclusive features and get the most out of your family adventures.',
+  'premiumFeature1': 'AI Trip Planner',
+  'premiumFeature1Desc': 'Create personalized itineraries instantly.',
+  'premiumFeature2': 'Unlimited Photo Albums',
+  'premiumFeature2Desc': 'Save and organize all your memories without limits.',
+  'premiumFeature3': 'Exclusive Discounts',
+  'premiumFeature3Desc': 'Get special offers on activities and from our partners.',
+  'becomePremium': 'Become Premium Now',
+
+  // SOS Page
+  'sosTitle': 'Emergency - SOS',
+  'sosSubtitle': 'Find important contacts and locations for emergency situations.',
+  'emergencyNumber': 'National Emergency Number',
+  'callNow': 'Call 112 Now',
+  'hospitals': 'Hospitals',
+  'policeStations': 'Police Stations',
+  'pharmacies': 'Pharmacies',
+
+  // Map
+  'noLocationsMap': 'No locations to display on the map.',
+  
+  // Weather
+  'weatherIn': 'Weather in',
+  'loadingWeather': 'Loading weather...'
 };
