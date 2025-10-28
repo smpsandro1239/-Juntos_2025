@@ -1,74 +1,79 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivityService, ActivityFilters } from '../../services/activity.service';
-import { FiltersComponent } from '../filters/filters.component';
+import { ActivityService } from '../../services/activity.service';
+import { FiltersComponent, ActivityFilters } from '../filters/filters.component';
 import { DiscoverFeedComponent } from '../discover-feed/discover-feed.component';
-import { EventCarouselComponent } from '../event-carousel/event-carousel.component';
 import { L10nPipe } from '../../pipes/l10n.pipe';
+import { EventCarouselComponent } from '../event-carousel/event-carousel.component';
 import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
-import { WeatherService } from '../../services/weather.service';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [
-    CommonModule,
-    FiltersComponent,
-    DiscoverFeedComponent,
-    EventCarouselComponent,
-    WeatherWidgetComponent,
-    L10nPipe
-  ],
+  imports: [CommonModule, FiltersComponent, DiscoverFeedComponent, L10nPipe, EventCarouselComponent, WeatherWidgetComponent],
   template: `
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      <aside class="lg:col-span-1">
-        <div class="sticky top-24 space-y-6">
-            <app-filters (filtersChanged)="onFiltersChanged($event)" />
-            <app-weather-widget location="Lisbon" />
-        </div>
-      </aside>
+    <div class="space-y-8">
+      <header class="text-center py-8 bg-teal-500 text-white rounded-lg shadow-md">
+        <h1 class="text-4xl font-extrabold">{{ 'welcomeTitle' | l10n }}</h1>
+        <p class="mt-2 text-lg">{{ 'welcomeSubtitle' | l10n }}</p>
+      </header>
 
-      <div class="lg:col-span-3">
-        <!-- Contextual Alerts -->
-        @if(weather(); as w) {
-          @if(w.condition === 'Rainy') {
-            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-r-lg mb-6" role="alert">
-              <p class="font-bold">{{ 'rainyDay' | l10n }}</p>
-              <p>{{ 'rainyDaySuggestion' | l10n }}</p>
-            </div>
-          }
-          @if(w.uvIndex >= 8) {
-             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg mb-6" role="alert">
-              <p class="font-bold">{{ 'highUv' | l10n }}</p>
-              <p>{{ 'highUvSuggestion' | l10n }}</p>
-            </div>
-          }
-        }
+      <app-weather-widget location="Lisboa" />
 
-        <section class="mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
-            <app-event-carousel [events]="upcomingEvents()" />
-        </section>
+      <section>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
+        <app-event-carousel [events]="events()" />
+      </section>
 
-        <section>
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ 'discoverActivities' | l10n }}</h2>
-            <app-discover-feed [activities]="filteredActivities()" />
-        </section>
-      </div>
+      <section>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'discoverActivities' | l10n }}</h2>
+        <app-filters 
+          [allCategories]="allCategories()"
+          [maxPrice]="maxPrice()"
+          [filters]="filters()"
+          (filtersChanged)="onFiltersChanged($event)" 
+        />
+        <app-discover-feed [activities]="filteredActivities()" />
+      </section>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
   private activityService = inject(ActivityService);
-  private weatherService = inject(WeatherService);
   
-  filteredActivities = this.activityService.filteredActivities;
-  upcomingEvents = this.activityService.upcomingEvents;
-  weather = toSignal(this.weatherService.getWeather('Lisbon'));
+  allActivities = this.activityService.allActivities;
+  events = this.activityService.allEvents;
 
-  onFiltersChanged(filters: ActivityFilters): void {
-    this.activityService.applyFilters(filters);
+  filters = signal<ActivityFilters>({
+    search: '',
+    category: 'all',
+    minPrice: 0,
+    maxPrice: 100,
+    minRating: 0
+  });
+
+  allCategories = computed(() => [...new Set(this.allActivities().map(a => a.category))]);
+  maxPrice = computed(() => Math.max(...this.allActivities().map(a => a.price), 100));
+
+  filteredActivities = computed(() => {
+    const activities = this.allActivities();
+    const filters = this.filters();
+
+    return activities.filter(activity => {
+      const searchMatch = filters.search 
+        ? activity.name.toLowerCase().includes(filters.search.toLowerCase()) || activity.description.toLowerCase().includes(filters.search.toLowerCase())
+        : true;
+      const categoryMatch = filters.category === 'all' || activity.category === filters.category;
+      const priceMatch = activity.price <= filters.maxPrice;
+      const ratingMatch = activity.rating >= filters.minRating;
+      
+      return searchMatch && categoryMatch && priceMatch && ratingMatch;
+    });
+  });
+
+  onFiltersChanged(newFilters: ActivityFilters): void {
+    this.filters.set(newFilters);
   }
 }

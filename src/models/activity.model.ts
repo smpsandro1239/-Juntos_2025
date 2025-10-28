@@ -1,20 +1,20 @@
+
 export interface Activity {
   id: number;
   name: string;
-  category: 'Cultura' | 'Ar Livre' | 'Comida' | 'Oficinas';
+  category: string;
   description: string;
   imageUrl: string;
   gallery: string[];
   price: number;
-  rating: number;
+  rating: number; // 1-5
   location: {
-    address: string;
     lat: number;
     lng: number;
   };
+  isSustainable: boolean;
   accessibility: {
-    wheelchair: 'Total' | 'Partial' | 'None';
-    stroller: 'Total' | 'Partial' | 'None';
+    wheelchair: string;
+    stroller: string;
   };
-  isSustainable?: boolean;
 }

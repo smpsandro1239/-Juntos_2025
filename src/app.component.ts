@@ -1,73 +1,87 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from './services/auth.service';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { L10nService } from './services/l10n.service';
-import { L10nPipe } from './pipes/l10n.pipe';
+import { AuthService } from './services/auth.service';
 import { ToastComponent } from './components/toast/toast.component';
+import { L10nPipe } from './pipes/l10n.pipe';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, L10nPipe, ToastComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ToastComponent, L10nPipe],
   template: `
-    <header class="bg-white shadow-md sticky top-0 z-40">
-      <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-        <a routerLink="/" class="text-2xl font-bold text-teal-600">Juntos</a>
-        
-        <div class="hidden md:flex items-center space-x-6">
-          <a routerLink="/" class="text-gray-600 hover:text-teal-600">{{ 'home' | l10n }}</a>
-          @if (isLoggedIn()) {
-            <a routerLink="/trip-planner" class="text-gray-600 hover:text-teal-600">{{ 'tripPlanner' | l10n }}</a>
-          }
-          <a routerLink="/suppliers" class="text-gray-600 hover:text-teal-600">{{ 'suppliers' | l10n }}</a>
-          <a routerLink="/sos" class="text-gray-600 hover:text-teal-600 font-semibold text-red-500">{{ 'sos' | l10n }}</a>
-        </div>
-
-        <div class="flex items-center space-x-4">
-          @if (isLoggedIn()) {
-            <a routerLink="/profile" class="font-medium text-gray-600 hover:text-teal-600">{{ currentUser()?.name }}</a>
-            <button (click)="logout()" class="text-sm text-gray-500 hover:underline">{{ 'logout' | l10n }}</button>
-          } @else {
-            <a routerLink="/login" class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">{{ 'login' | l10n }}</a>
-          }
-          <div class="flex items-center">
-            <button (click)="setLang('pt')" class="px-2 font-bold" [class.text-teal-600]="currentLang() === 'pt'">PT</button>
-            <span class="text-gray-300">|</span>
-            <button (click)="setLang('en')" class="px-2 font-bold" [class.text-teal-600]="currentLang() === 'en'">EN</button>
+    <div class="bg-gray-100 min-h-screen font-sans">
+      <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+              <a routerLink="/" class="text-2xl font-bold text-teal-500">Juntos</a>
+              <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                  <a routerLink="/" routerLinkActive="text-teal-500 border-b-2 border-teal-500" [routerLinkActiveOptions]="{exact: true}" class="text-gray-700 hover:text-teal-500 px-3 py-2 text-sm font-medium">{{ 'home' | l10n }}</a>
+                  <a routerLink="/trip-planner" routerLinkActive="text-teal-500 border-b-2 border-teal-500" class="text-gray-700 hover:text-teal-500 px-3 py-2 text-sm font-medium">{{ 'tripPlanner' | l10n }}</a>
+                  <a routerLink="/community" routerLinkActive="text-teal-500 border-b-2 border-teal-500" class="text-gray-700 hover:text-teal-500 px-3 py-2 text-sm font-medium">{{ 'community' | l10n }}</a>
+                  <a routerLink="/suppliers" routerLinkActive="text-teal-500 border-b-2 border-teal-500" class="text-gray-700 hover:text-teal-500 px-3 py-2 text-sm font-medium">{{ 'suppliers' | l10n }}</a>
+                  <a routerLink="/sos" routerLinkActive="text-red-500 border-b-2 border-red-500" class="text-gray-700 hover:text-red-500 px-3 py-2 text-sm font-medium">🆘 SOS</a>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              @if(isLoggedIn()) {
+                <a routerLink="/profile" class="flex items-center text-gray-700 hover:text-teal-500">
+                  <span class="mr-2">{{ user()?.name }}</span>
+                  <div class="w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold">
+                    {{ userInitial() }}
+                  </div>
+                </a>
+              } @else {
+                <a routerLink="/login" class="bg-teal-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-teal-600">{{ 'login' | l10n }}</a>
+              }
+              <div class="relative">
+                <select (change)="setLanguage($any($event).target.value)" [value]="currentLang()" class="appearance-none bg-transparent border-none text-sm cursor-pointer p-2">
+                  <option value="pt">🇵🇹 PT</option>
+                  <option value="en">🇬🇧 EN</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
-    </header>
-
-    <main class="container mx-auto p-4 md:p-6 lg:p-8">
-      <router-outlet></router-outlet>
-    </main>
-
-    <footer class="bg-gray-100 mt-12">
-        <div class="container mx-auto px-6 py-4 text-center text-gray-500 text-sm">
-            &copy; {{ currentYear }} Juntos. All rights reserved.
+      
+      <main>
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <router-outlet></router-outlet>
         </div>
-    </footer>
-    
-    <app-toast></app-toast>
+      </main>
+
+      <footer class="bg-white mt-8 py-6">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+              <p>&copy; 2024 Juntos. {{ 'footerRights' | l10n }}</p>
+          </div>
+      </footer>
+      
+      <app-toast></app-toast>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  private authService = inject(AuthService);
   private l10nService = inject(L10nService);
-  
+  private authService = inject(AuthService);
+
   isLoggedIn = this.authService.isLoggedIn;
-  currentUser = this.authService.currentUser;
+  user = this.authService.currentUser;
+  
+  userInitial = computed(() => {
+    const name = this.user()?.name;
+    return name ? name.charAt(0).toUpperCase() : '';
+  });
+
   currentLang = this.l10nService.language;
-  currentYear = new Date().getFullYear();
 
-  logout(): void {
-    this.authService.logout();
-  }
-
-  setLang(lang: 'pt' | 'en'): void {
+  setLanguage(lang: 'en' | 'pt'): void {
     this.l10nService.setLanguage(lang);
   }
 }

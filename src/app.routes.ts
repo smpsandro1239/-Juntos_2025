@@ -1,104 +1,118 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { ActivityDetailComponent } from './components/activity-detail/activity-detail.component';
-import { LoginComponent } from './components/login/login.component';
-import { ProfileComponent } from './components/profile/profile.component';
-import { TripPlannerComponent } from './components/trip-planner/trip-planner.component';
 import { authGuard } from './guards/auth.guard';
-import { SuppliersPageComponent } from './components/suppliers-page/suppliers-page.component';
-import { SupplierDetailComponent } from './components/supplier-detail/supplier-detail.component';
-import { SosPageComponent } from './components/sos-page/sos-page.component';
-import { EventDetailComponent } from './components/event-detail/event-detail.component';
-import { AlbumsPageComponent } from './components/albums-page/albums-page.component';
-import { AlbumDetailComponent } from './components/album-detail/album-detail.component';
-import { OrderPrintComponent } from './components/order-print/order-print.component';
-import { OrderSuccessComponent } from './components/order-success/order-success.component';
-import { FavoritesPageComponent } from './components/favorites-page/favorites-page.component';
-import { MissionsPageComponent } from './components/missions-page/missions-page.component';
-import { PointsHistoryComponent } from './components/points-history/points-history.component';
-import { OrderHistoryComponent } from './components/order-history/order-history.component';
-import { PassportComponent } from './components/passport/passport.component';
-import { PremiumComponent } from './components/premium/premium.component';
-import { SavedPlansPageComponent } from './components/saved-plans-page/saved-plans-page.component';
-import { PlanDetailComponent } from './components/plan-detail/plan-detail.component';
 
 export const appRoutes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'activity/:id', component: ActivityDetailComponent },
-  { path: 'event/:id', component: EventDetailComponent },
-  { path: 'suppliers', component: SuppliersPageComponent },
-  { path: 'supplier/:id', component: SupplierDetailComponent },
-  { path: 'sos', component: SosPageComponent },
-  { path: 'login', component: LoginComponent },
-  { 
-    path: 'profile', 
-    component: ProfileComponent,
-    canActivate: [authGuard] 
+  {
+    path: '',
+    loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent)
   },
-  { 
-    path: 'trip-planner', 
-    component: TripPlannerComponent,
+  {
+    path: 'activity/:id',
+    loadComponent: () => import('./components/activity-detail/activity-detail.component').then(m => m.ActivityDetailComponent)
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'trip-planner',
+    loadComponent: () => import('./components/trip-planner/trip-planner.component').then(m => m.TripPlannerComponent)
+  },
+  {
+    path: 'premium',
+    loadComponent: () => import('./components/premium/premium.component').then(m => m.PremiumComponent)
+  },
+  {
+    path: 'passport',
+    loadComponent: () => import('./components/passport/passport.component').then(m => m.PassportComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'event/:id',
+    loadComponent: () => import('./components/event-detail/event-detail.component').then(m => m.EventDetailComponent)
+  },
+  {
+    path: 'suppliers',
+    loadComponent: () => import('./components/suppliers-page/suppliers-page.component').then(m => m.SuppliersPageComponent)
+  },
+  {
+    path: 'supplier/:id',
+    loadComponent: () => import('./components/supplier-detail/supplier-detail.component').then(m => m.SupplierDetailComponent)
+  },
+  {
+    path: 'albums',
+    loadComponent: () => import('./components/albums-page/albums-page.component').then(m => m.AlbumsPageComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'album/:id',
+    loadComponent: () => import('./components/album-detail/album-detail.component').then(m => m.AlbumDetailComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'order-print/:albumId',
+    loadComponent: () => import('./components/order-print/order-print.component').then(m => m.OrderPrintComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'order-success',
+    loadComponent: () => import('./components/order-success/order-success.component').then(m => m.OrderSuccessComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'order-history',
+    loadComponent: () => import('./components/order-history/order-history.component').then(m => m.OrderHistoryComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'sos',
+    loadComponent: () => import('./components/sos-page/sos-page.component').then(m => m.SosPageComponent)
+  },
+  {
+    path: 'points',
+    loadComponent: () => import('./components/points-history/points-history.component').then(m => m.PointsHistoryComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'favorites',
+    loadComponent: () => import('./components/favorites-page/favorites-page.component').then(m => m.FavoritesPageComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'missions',
+    loadComponent: () => import('./components/missions-page/missions-page.component').then(m => m.MissionsPageComponent),
     canActivate: [authGuard]
   },
   {
     path: 'saved-plans',
-    component: SavedPlansPageComponent,
+    loadComponent: () => import('./components/saved-plans-page/saved-plans-page.component').then(m => m.SavedPlansPageComponent),
     canActivate: [authGuard]
   },
   {
     path: 'plan/:id',
-    component: PlanDetailComponent,
-    canActivate: [authGuard]
-  },
-  { 
-    path: 'albums', 
-    component: AlbumsPageComponent, 
-    canActivate: [authGuard]
-  },
-  { 
-    path: 'album/:id', 
-    component: AlbumDetailComponent, 
-    canActivate: [authGuard]
-  },
-  { 
-    path: 'order-print/:albumId', 
-    component: OrderPrintComponent, 
-    canActivate: [authGuard]
-  },
-  { 
-    path: 'order-success', 
-    component: OrderSuccessComponent, 
+    loadComponent: () => import('./components/plan-detail/plan-detail.component').then(m => m.PlanDetailComponent),
     canActivate: [authGuard]
   },
   {
-    path: 'orders',
-    component: OrderHistoryComponent,
-    canActivate: [authGuard]
+    path: 'community',
+    loadComponent: () => import('./components/community-page/community-page.component').then(m => m.CommunityPageComponent)
   },
-  { 
-    path: 'favorites', 
-    component: FavoritesPageComponent, 
-    canActivate: [authGuard]
+  {
+    path: 'post/:id',
+    loadComponent: () => import('./components/post-detail/post-detail.component').then(m => m.PostDetailComponent)
   },
-  { 
-    path: 'missions', 
-    component: MissionsPageComponent, 
-    canActivate: [authGuard]
-  },
-  { 
-    path: 'points', 
-    component: PointsHistoryComponent, 
-    canActivate: [authGuard]
-  },
-  { 
-    path: 'passport', 
-    component: PassportComponent, 
+  {
+    path: 'create-post',
+    loadComponent: () => import('./components/create-post/create-post.component').then(m => m.CreatePostComponent),
     canActivate: [authGuard]
   },
   {
-    path: 'premium',
-    component: PremiumComponent,
-    canActivate: [authGuard]
-  },
-  { path: '**', redirectTo: '' }
+    path: '**',
+    redirectTo: ''
+  }
 ];
