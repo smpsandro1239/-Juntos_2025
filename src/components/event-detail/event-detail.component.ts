@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivityService } from '../../services/activity.service';
 import { Event } from '../../models/event.model';
 import { L10nPipe } from '../../pipes/l10n.pipe';
@@ -8,7 +8,7 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, NgOptimizedImage, L10nPipe],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, L10nPipe, CurrencyPipe, DatePipe],
   template: `
     @if (event()) {
       @let ev = event()!;

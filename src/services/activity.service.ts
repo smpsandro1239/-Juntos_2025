@@ -35,7 +35,8 @@ const MOCK_ACTIVITIES: Activity[] = [
     price: 3,
     rating: 4.5,
     location: { address: 'Praça Martim Moniz, Lisboa', lat: 38.7163, lng: -9.1368 },
-    accessibility: { wheelchair: 'None', stroller: 'Partial' }
+    accessibility: { wheelchair: 'None', stroller: 'Partial' },
+    isSustainable: true
   },
   {
     id: 3,
@@ -59,7 +60,8 @@ const MOCK_ACTIVITIES: Activity[] = [
     price: 35,
     rating: 4.6,
     location: { address: 'Praça da Estrela, 1200-667 Lisboa', lat: 38.7153, lng: -9.1594 },
-    accessibility: { wheelchair: 'Total', stroller: 'Total' }
+    accessibility: { wheelchair: 'Total', stroller: 'Total' },
+    isSustainable: true
   },
   {
     id: 5,

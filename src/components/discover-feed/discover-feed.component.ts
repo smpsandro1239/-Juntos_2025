@@ -13,7 +13,12 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (activity of activities(); track activity.id) {
         <a [routerLink]="['/activity', activity.id]" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-          <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="400" height="300" class="w-full h-48 object-cover">
+          <div class="relative">
+            <img [ngSrc]="activity.imageUrl" [alt]="activity.name" width="400" height="300" class="w-full h-48 object-cover">
+            @if (activity.isSustainable) {
+              <span class="absolute top-2 left-2 bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">💚 {{ 'sustainable' | l10n }}</span>
+            }
+          </div>
           <div class="p-4">
             <p class="text-sm text-gray-500">{{ activity.category }}</p>
             <h3 class="font-bold text-lg text-gray-800 truncate">{{ activity.name }}</h3>

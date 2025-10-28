@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { L10nPipe } from '../../pipes/l10n.pipe';
@@ -7,7 +7,7 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
 @Component({
   selector: 'app-order-history',
   standalone: true,
-  imports: [CommonModule, RouterLink, L10nPipe],
+  imports: [CommonModule, RouterLink, L10nPipe, CurrencyPipe],
   template: `
     <div class="bg-white p-8 rounded-lg shadow-lg">
       <h1 class="text-3xl font-bold text-gray-800 mb-6">{{ 'orderHistory' | l10n }}</h1>

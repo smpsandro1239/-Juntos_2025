@@ -16,4 +16,5 @@ export interface Activity {
     wheelchair: 'Total' | 'Partial' | 'None';
     stroller: 'Total' | 'Partial' | 'None';
   };
+  isSustainable?: boolean;
 }

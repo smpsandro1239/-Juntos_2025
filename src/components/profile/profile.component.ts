@@ -1,69 +1,61 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { L10nPipe } from '../../pipes/l10n.pipe';
-import { PassportComponent } from '../passport/passport.component';
-import { AlbumsPageComponent } from '../albums-page/albums-page.component';
-import { FavoritesPageComponent } from '../favorites-page/favorites-page.component';
-import { MissionsPageComponent } from '../missions-page/missions-page.component';
-import { PointsHistoryComponent } from '../points-history/points-history.component';
-import { OrderHistoryComponent } from '../order-history/order-history.component';
-
-type ProfileTab = 'passport' | 'albums' | 'favorites' | 'missions' | 'points' | 'orders';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    L10nPipe,
-    PassportComponent,
-    AlbumsPageComponent,
-    FavoritesPageComponent,
-    MissionsPageComponent,
-    PointsHistoryComponent,
-    OrderHistoryComponent
-  ],
+  imports: [CommonModule, RouterLink, L10nPipe],
   template: `
-    @if (user()) {
-      @let u = user()!;
-      <div class="max-w-6xl mx-auto">
-        <header class="bg-white p-6 rounded-lg shadow-md mb-8 text-center">
-            <h1 class="text-3xl font-bold text-gray-800">Bem-vindo, {{ u.name }}!</h1>
-            @if (!u.isPremium) {
-                <div class="mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg">
-                    <p>{{ 'notPremium' | l10n }} <a routerLink="/premium" class="font-bold hover:underline">{{ 'upgradeHere' | l10n }}</a></p>
-                </div>
-            }
-        </header>
+    @if(currentUser()) {
+      <div class="bg-white p-8 rounded-lg shadow-lg">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-gray-800">{{ 'hello' | l10n }}, {{ currentUser()!.name }}!</h1>
+          @if(isPremium()) {
+            <p class="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">{{ 'premiumMember' | l10n }} ✨</p>
+          } @else {
+            <p class="text-gray-600">{{ 'regularMember' | l10n }}</p>
+          }
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <aside class="md:col-span-1">
-                <nav class="bg-white p-4 rounded-lg shadow-md space-y-1 sticky top-24">
-                    @for (tab of tabs; track tab.id) {
-                        <button (click)="activeTab.set(tab.id)" 
-                                class="w-full text-left px-4 py-2 rounded-md transition-colors font-medium"
-                                [class.bg-teal-100]="activeTab() === tab.id"
-                                [class.text-teal-700]="activeTab() === tab.id"
-                                [class.hover:bg-gray-100]="activeTab() !== tab.id">
-                            {{ tab.label | l10n }}
-                        </button>
-                    }
-                </nav>
-            </aside>
-
-            <main class="md:col-span-3">
-                @switch (activeTab()) {
-                    @case ('passport') { <app-passport /> }
-                    @case ('albums') { <app-albums-page /> }
-                    @case ('favorites') { <app-favorites-page /> }
-                    @case ('missions') { <app-missions-page /> }
-                    @case ('points') { <app-points-history /> }
-                    @case ('orders') { <app-order-history /> }
-                }
-            </main>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Profile Links -->
+          <a routerLink="/favorites" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">❤️ {{ 'myFavorites' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'myFavoritesDesc' | l10n }}</p>
+          </a>
+          <a routerLink="/albums" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">📸 {{ 'myAlbums' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'myAlbumsDesc' | l10n }}</p>
+          </a>
+          <a routerLink="/passport" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">🛂 {{ 'myPassport' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'myPassportDesc' | l10n }}</p>
+          </a>
+          <a routerLink="/missions" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">🎯 {{ 'myMissions' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'myMissionsDesc' | l10n }}</p>
+          </a>
+          <a routerLink="/points" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">💰 {{ 'myPoints' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'myPointsDesc' | l10n }}</p>
+          </a>
+           <a routerLink="/orders" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">📦 {{ 'orderHistory' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'orderHistoryDesc' | l10n }}</p>
+          </a>
+          <a routerLink="/saved-plans" class="group block p-6 bg-gray-50 rounded-lg border hover:shadow-lg hover:border-teal-500 transition-all">
+            <h2 class="font-bold text-xl text-gray-800 mb-2">🗺️ {{ 'savedPlans' | l10n }}</h2>
+            <p class="text-gray-600">{{ 'savedPlansDesc' | l10n }}</p>
+          </a>
+          @if(!isPremium()) {
+             <a routerLink="/premium" class="group block p-6 rounded-lg border bg-gradient-to-r from-teal-50 to-cyan-50 hover:shadow-lg hover:border-teal-500 transition-all">
+                <h2 class="font-bold text-xl text-gray-800 mb-2">🌟 {{ 'becomePremium' | l10n }}</h2>
+                <p class="text-gray-600">{{ 'becomePremiumDesc' | l10n }}</p>
+              </a>
+          }
         </div>
       </div>
     }
@@ -72,16 +64,7 @@ type ProfileTab = 'passport' | 'albums' | 'favorites' | 'missions' | 'points' | 
 })
 export class ProfileComponent {
   private authService = inject(AuthService);
-  user = this.authService.currentUser;
   
-  activeTab = signal<ProfileTab>('passport');
-
-  tabs: {id: ProfileTab, label: string}[] = [
-    { id: 'passport', label: 'passportTitle' },
-    { id: 'albums', label: 'yourAlbums' },
-    { id: 'favorites', label: 'myFavorites' },
-    { id: 'missions', label: 'missions' },
-    { id: 'points', label: 'pointsHistory' },
-    { id: 'orders', label: 'orderHistory' },
-  ];
+  currentUser = this.authService.currentUser;
+  isPremium = this.authService.isPremium;
 }

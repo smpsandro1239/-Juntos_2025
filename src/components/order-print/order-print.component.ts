@@ -83,7 +83,7 @@ const DISCOUNT_AMOUNT_EUR = 5;
                      <!-- Points Discount -->
                     <div class="my-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                         <label class="flex items-center">
-                            <input type="checkbox" [disabled]="!canAffordDiscount()" (change)="applyDiscount.set($event.target.checked)" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                            <input type="checkbox" [disabled]="!canAffordDiscount()" (change)="applyDiscount.set($any($event.target).checked)" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
                             <span class="ml-3 text-gray-700">
                                 {{ 'applyDiscount' | l10n:DISCOUNT_IN_POINTS:DISCOUNT_AMOUNT_EUR }}
                                 <span class="block text-sm text-gray-500">{{ 'yourBalance' | l10n }}: {{ userPoints() }} {{ 'points' | l10n }}</span>

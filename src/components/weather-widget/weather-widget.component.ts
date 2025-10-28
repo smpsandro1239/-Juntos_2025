@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WeatherService, WeatherData } from '../../services/weather.service';
+import { WeatherService, WeatherData, AirQualityLevel } from '../../services/weather.service';
 import { L10nPipe } from '../../pipes/l10n.pipe';
 
 @Component({
@@ -12,19 +12,31 @@ import { L10nPipe } from '../../pipes/l10n.pipe';
       <h3 class="font-bold text-lg mb-2 text-blue-800">{{ 'weatherIn' | l10n }} {{ location() }}</h3>
       @if (weather()) {
         @let w = weather()!;
-        <div class="flex items-center space-x-4">
-          <div class="text-4xl">
-            @switch (w.condition) {
-              @case ('Sunny') { ☀️ }
-              @case ('Cloudy') { ☁️ }
-              @case ('Rainy') { 🌧️ }
-              @case ('Partly Cloudy') { ⛅ }
-            }
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-blue-900">{{ w.temperature }}°C</p>
-            <p class="text-blue-700">{{ w.condition }}</p>
-          </div>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="text-4xl">
+                @switch (w.condition) {
+                  @case ('Sunny') { ☀️ }
+                  @case ('Cloudy') { ☁️ }
+                  @case ('Rainy') { 🌧️ }
+                  @case ('Partly Cloudy') { ⛅ }
+                }
+              </div>
+              <div>
+                <p class="text-3xl font-bold text-blue-900">{{ w.temperature }}°C</p>
+                <p class="text-blue-700">{{ 'weather_' + w.condition.toLowerCase().replace(' ', '') | l10n }}</p>
+              </div>
+            </div>
+            <div class="text-right space-y-1">
+                <div class="flex items-center justify-end">
+                    <span class="text-xs font-semibold mr-2">{{ 'uvIndex' | l10n }}:</span>
+                    <span class="font-bold" [class]="getUvIndexClass(w.uvIndex)">{{ w.uvIndex }}</span>
+                </div>
+                <div class="flex items-center justify-end">
+                     <span class="text-xs font-semibold mr-2">{{ 'airQuality' | l10n }}:</span>
+                     <span class="font-bold" [class]="getAirQualityClass(w.airQuality.level)">{{ 'airQuality_' + w.airQuality.level | l10n }}</span>
+                </div>
+            </div>
         </div>
       } @else {
         <p class="text-blue-700">{{ 'loadingWeather' | l10n }}</p>
@@ -42,5 +54,21 @@ export class WeatherWidgetComponent implements OnInit {
     this.weatherService.getWeather(this.location()).subscribe(data => {
       this.weather.set(data);
     });
+  }
+
+  getUvIndexClass(uvIndex: number): string {
+    if (uvIndex <= 2) return 'text-green-600';
+    if (uvIndex <= 5) return 'text-yellow-600';
+    if (uvIndex <= 7) return 'text-orange-600';
+    return 'text-red-600';
+  }
+  
+  getAirQualityClass(level: AirQualityLevel): string {
+    switch(level) {
+        case 'Good': return 'text-green-600';
+        case 'Moderate': return 'text-yellow-600';
+        case 'Poor': return 'text-red-600';
+        default: return 'text-gray-600';
+    }
   }
 }

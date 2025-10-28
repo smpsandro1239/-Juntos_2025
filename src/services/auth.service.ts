@@ -1,97 +1,101 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
 import { Album, AlbumPhoto } from '../models/album.model';
 import { Order } from '../models/order.model';
-import { PointTransaction } from '../models/point-transaction.model';
+import { TripPlan } from '../models/trip-plan.model';
+import { L10nService } from './l10n.service';
 
 const MOCK_USER: User = {
   id: 1,
   name: 'Ana Silva',
-  email: 'user@juntos.com',
+  email: 'ana@juntos.pt',
   isPremium: false,
   favorites: [1, 3],
-  passport: {
-    stampsCollected: [1, 5, 8, 10],
-    thematicSeries: [
-      {
-        id: 1,
-        name: 'Exploradores da Natureza',
-        description: 'Descubra os espaços verdes de Lisboa.',
-        stamps: [
-          { id: 4, name: 'Jardim da Estrela', imageUrl: 'https://picsum.photos/seed/stamp-estrela/100/100', collected: false },
-          { id: 8, name: 'Parque de Monsanto', imageUrl: 'https://picsum.photos/seed/stamp-monsanto/100/100', collected: false },
-        ]
-      },
-      {
-        id: 2,
-        name: 'Mestres Culinários',
-        description: 'Prove os sabores de Portugal.',
-        stamps: [
-          { id: 3, name: 'Pastel de Nata', imageUrl: 'https://picsum.photos/seed/stamp-pastel/100/100', collected: false },
-          { id: 10, name: 'Mercado da Ribeira', imageUrl: 'https://picsum.photos/seed/stamp-ribeira/100/100', collected: false },
-        ]
-      },
-    ]
-  },
   points: {
     balance: 1250,
     transactions: [
-      { id: 1, date: '2025-07-20T10:00:00Z', description: 'Completou a missão "Primeira Avaliação"', points: 50 },
-      { id: 2, date: '2025-07-21T14:00:00Z', description: 'Carimbo Passaporte: Oceanário', points: 100 },
-      { id: 3, date: '2025-07-22T18:00:00Z', description: 'Tornou-se membro Premium', points: 100 },
+      { id: 1, date: new Date(Date.now() - 86400000 * 2).toISOString(), description: 'Completou a missão "Primeira Avaliação"', points: 50 },
+      { id: 2, date: new Date(Date.now() - 86400000).toISOString(), description: 'Adicionou 5 fotos ao álbum "Férias de Verão"', points: 100 },
+    ],
+  },
+  missions: [
+    { id: 1, title: 'Primeira Avaliação', description: 'Deixe a sua primeira avaliação numa atividade', points: 50, isCompleted: true, activityId: 3 },
+    { id: 2, title: 'Fotógrafo de Verão', description: 'Adicione 5 fotos a um álbum', points: 100, isCompleted: true },
+    { id: 3, title: 'Explorador Cultural', description: 'Visite 3 locais culturais', points: 150, isCompleted: false },
+  ],
+  passport: {
+    stampsCollected: [1, 5],
+    thematicSeries: [
+      {
+        id: 1,
+        name: 'Descobridor de Lisboa',
+        description: 'Colecione selos dos locais mais icónicos da cidade.',
+        stamps: [
+          { id: 1, name: 'Oceanário', imageUrl: 'https://picsum.photos/seed/stamp1/100/100', collected: false },
+          { id: 2, name: 'Elétrico 28', imageUrl: 'https://picsum.photos/seed/stamp2/100/100', collected: false },
+          { id: 5, name: 'Azulejos', imageUrl: 'https://picsum.photos/seed/stamp5/100/100', collected: false },
+          { id: 6, name: 'Passeio de Barco', imageUrl: 'https://picsum.photos/seed/stamp6/100/100', collected: false },
+        ]
+      }
     ]
   },
   albums: [
-    {
-      id: 1,
-      name: 'Verão em Lisboa',
-      photos: [
-        { imageUrl: 'https://picsum.photos/seed/album1-1/400/400', activityName: 'Oceanário de Lisboa' },
-        { imageUrl: 'https://picsum.photos/seed/album1-2/400/400', activityName: 'Passeio de Elétrico 28' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Fim de Semana',
-      photos: []
-    }
+    { id: 1, name: 'Férias de Verão', photos: [
+      { imageUrl: 'https://picsum.photos/seed/album1-1/400/400', activityName: 'Oceanário de Lisboa' },
+      { imageUrl: 'https://picsum.photos/seed/album1-2/400/400', activityName: 'Piquenique no Jardim' },
+      { imageUrl: 'https://picsum.photos/seed/album1-3/400/400', activityName: 'Passeio de Barco' },
+      { imageUrl: 'https://picsum.photos/seed/album1-4/400/400', activityName: 'Passeio de Barco' },
+      { imageUrl: 'https://picsum.photos/seed/album1-5/400/400', activityName: 'Oceanário de Lisboa' },
+    ]},
+    { id: 2, name: 'Aniversário do Zé', photos: [] }
   ],
   orders: [],
-  missions: [
-    { id: 1, title: 'Primeira Avaliação', description: 'Deixe a sua primeira avaliação numa atividade.', points: 50, isCompleted: true, activityId: 1 },
-    { id: 2, title: 'Explorador', description: 'Visite 3 locais da categoria "Ar Livre".', points: 100, isCompleted: false },
-    { id: 3, title: 'Fotógrafo', description: 'Adicione 5 fotos a um álbum.', points: 75, isCompleted: false },
-  ]
+  savedPlans: []
 };
 
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private router = inject(Router);
+  private router = new Router();
+  private l10n = new L10nService();
+
   private currentUserSignal = signal<User | null>(null);
 
-  // Public signals
-  currentUser = this.currentUserSignal.asReadonly();
   isLoggedIn = computed(() => !!this.currentUserSignal());
+  currentUser = this.currentUserSignal.asReadonly();
   isPremium = computed(() => this.currentUserSignal()?.isPremium ?? false);
   userAlbums = computed(() => this.currentUserSignal()?.albums ?? []);
-  userOrders = computed(() => this.currentUserSignal()?.orders ?? []);
+  userOrders = computed(() => this.currentUserSignal()?.orders.slice().reverse() ?? []);
+  savedPlans = computed(() => this.currentUserSignal()?.savedPlans ?? []);
 
   constructor() {
-    // Check for logged-in user in session storage to persist login
-    const storedUser = sessionStorage.getItem('juntos-user');
+    // Check local storage for a logged-in user on startup
+    const storedUser = localStorage.getItem('juntos_user');
     if (storedUser) {
       this.currentUserSignal.set(JSON.parse(storedUser));
     }
+
+    // Persist user data to local storage on change
+    effect(() => {
+        const user = this.currentUserSignal();
+        if(user) {
+            localStorage.setItem('juntos_user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem('juntos_user');
+        }
+    });
+  }
+  
+  translate(key: any, ...args: any[]): string {
+    return this.l10n.translate(key, ...args);
   }
 
   login(email: string, password: string): boolean {
-    if (email.toLowerCase() === MOCK_USER.email.toLowerCase() && password === '123456') {
-      this.currentUserSignal.set(JSON.parse(JSON.stringify(MOCK_USER))); // Deep copy to avoid mutation issues
-      this.updateStoredUser();
+    if (email.toLowerCase() === 'ana@juntos.pt' && password === '1234') {
+      this.currentUserSignal.set(MOCK_USER);
       return true;
     }
     return false;
@@ -99,109 +103,104 @@ export class AuthService {
 
   logout(): void {
     this.currentUserSignal.set(null);
-    sessionStorage.removeItem('juntos-user');
     this.router.navigate(['/']);
   }
 
   toggleFavorite(activityId: number): void {
     this.currentUserSignal.update(user => {
-      if (!user) return null;
-      const favorites = user.favorites;
-      const index = favorites.indexOf(activityId);
-      if (index > -1) {
-        favorites.splice(index, 1);
-      } else {
-        favorites.push(activityId);
-      }
-      return { ...user, favorites: [...favorites] };
+        if (!user) return user;
+        const favorites = user.favorites;
+        const index = favorites.indexOf(activityId);
+        if (index > -1) {
+            favorites.splice(index, 1);
+        } else {
+            favorites.push(activityId);
+        }
+        return { ...user, favorites };
     });
-    this.updateStoredUser();
   }
-
+  
   addAlbum(name: string): void {
-    this.currentUserSignal.update(user => {
-      if (!user) return null;
-      const newAlbum: Album = {
-        id: Date.now(),
-        name,
-        photos: []
-      };
-      return { ...user, albums: [...user.albums, newAlbum] };
-    });
-    this.updateStoredUser();
+      this.currentUserSignal.update(user => {
+          if (!user) return user;
+          const newAlbum: Album = {
+              id: Date.now(),
+              name,
+              photos: []
+          };
+          return { ...user, albums: [...user.albums, newAlbum] };
+      });
   }
 
-  getAlbumById(albumId: number): Album | undefined {
-    return this.userAlbums().find(album => album.id === albumId);
+  getAlbumById(id: number): Album | undefined {
+      return this.currentUserSignal()?.albums.find(a => a.id === id);
   }
 
   addPhotoToAlbum(albumId: number, photo: AlbumPhoto): void {
-    this.currentUserSignal.update(user => {
-      if (!user) return null;
-      const albums = user.albums.map(album => {
-        if (album.id === albumId) {
-          return { ...album, photos: [...album.photos, photo] };
-        }
-        return album;
+      this.currentUserSignal.update(user => {
+          if (!user) return user;
+          const albums = user.albums.map(album => {
+              if (album.id === albumId) {
+                  return { ...album, photos: [...album.photos, photo] };
+              }
+              return album;
+          });
+          return { ...user, albums };
       });
-      return { ...user, albums };
-    });
-    this.updateStoredUser();
   }
 
-  addOrder(orderData: Omit<Order, 'id'>): void {
-    this.currentUserSignal.update(user => {
-        if (!user) return null;
+  addOrder(newOrderData: Omit<Order, 'id'>) {
+      this.currentUserSignal.update(user => {
+        if (!user) return user;
         const newOrder: Order = {
+            ...newOrderData,
             id: Date.now(),
-            ...orderData
         };
-        return { ...user, orders: [newOrder, ...user.orders] };
-    });
-    this.updateStoredUser();
-  }
-  
-  becomePremium(): void {
-    this.currentUserSignal.update(user => {
-      if (!user) return null;
-      return { ...user, isPremium: true };
-    });
-    this.updateStoredUser();
+        return { ...user, orders: [...user.orders, newOrder] };
+      });
   }
 
   spendPoints(amount: number, description: string): boolean {
-    const currentUser = this.currentUserSignal();
-    if (!currentUser || currentUser.points.balance < amount) {
-      return false; // Not enough points or not logged in
-    }
-
+    let success = false;
     this.currentUserSignal.update(user => {
-      if (!user) return null;
-      
-      const newTransaction: PointTransaction = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        description,
-        points: -amount
-      };
-
-      return {
-        ...user,
-        points: {
-          balance: user.points.balance - amount,
-          transactions: [...user.points.transactions, newTransaction]
+        if (!user || user.points.balance < amount) {
+            success = false;
+            return user;
         }
-      };
+        const newTransaction = {
+            id: Date.now(),
+            date: new Date().toISOString(),
+            description,
+            points: -amount,
+        };
+        const newBalance = user.points.balance - amount;
+        success = true;
+        return { 
+            ...user, 
+            points: {
+                balance: newBalance,
+                transactions: [...user.points.transactions, newTransaction]
+            }
+        };
     });
-
-    this.updateStoredUser();
-    return true;
+    return success;
   }
-  
-  private updateStoredUser(): void {
-    const currentUser = this.currentUser();
-    if (currentUser) {
-      sessionStorage.setItem('juntos-user', JSON.stringify(currentUser));
-    }
+
+  becomePremium(): void {
+    this.currentUserSignal.update(user => {
+        if (!user) return user;
+        return { ...user, isPremium: true };
+    });
+  }
+
+  addSavedPlan(plan: TripPlan): void {
+      this.currentUserSignal.update(user => {
+          if (!user) return user;
+          return { ...user, savedPlans: [...user.savedPlans, plan] };
+      });
+  }
+
+  getPlanById(id: number): TripPlan | undefined {
+      return this.currentUserSignal()?.savedPlans.find(p => p.id === id);
   }
 }

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule, NgOptimizedImage, CurrencyPipe } from '@angular/common';
+import { CommonModule, NgOptimizedImage, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivityService } from '../../services/activity.service';
 import { AuthService } from '../../services/auth.service';
 import { Activity } from '../../models/activity.model';
@@ -20,6 +20,7 @@ import { ToastService } from '../../services/toast.service';
     RouterLink,
     NgOptimizedImage,
     CurrencyPipe,
+    DatePipe,
     L10nPipe,
     MapViewComponent,
     StarRatingComponent,
@@ -101,6 +102,13 @@ import { ToastService } from '../../services/toast.service';
                       <p class="text-sm text-gray-600">♿ {{ 'wheelchair' | l10n }}: {{ act.accessibility.wheelchair }}</p>
                       <p class="text-sm text-gray-600">👶 {{ 'stroller' | l10n }}: {{ act.accessibility.stroller }}</p>
                     </div>
+
+                    @if (act.isSustainable) {
+                        <div>
+                          <h3 class="font-bold text-gray-700 mb-2">💚 {{ 'sustainable' | l10n }}</h3>
+                          <p class="text-sm text-gray-600">{{ 'sustainableDesc' | l10n }}</p>
+                        </div>
+                    }
                 </div>
             </aside>
         </div>
@@ -155,7 +163,7 @@ export class ActivityDetailComponent {
 
   toggleFavorite(): void {
     this.authService.toggleFavorite(this.activityId());
-    const message = this.isFavorite() ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.';
+    const message = this.isFavorite() ? 'Removido dos favoritos.' : 'Adicionado aos favoritos!';
     this.toastService.show(message, 'info');
   }
 
