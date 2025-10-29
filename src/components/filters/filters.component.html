@@ -1,1 +1,48 @@
-full contents of src/components/filters/filters.component.html
+<div class="bg-white p-4 rounded-lg shadow-sm border mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+    <!-- Search -->
+    <div>
+      <label for="search" class="block text-sm font-medium text-gray-700">{{ 'search' | l10n }}</label>
+      <input type="text" id="search" [ngModel]="activityService.searchQuery()" (ngModelChange)="onSearchChange($event)" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+    </div>
+    <!-- Category -->
+    <div>
+      <label for="category" class="block text-sm font-medium text-gray-700">{{ 'filtersCategory' | l10n }}</label>
+      <select id="category" [ngModel]="activityService.selectedCategory()" (ngModelChange)="onCategoryChange($event)" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+        <option [ngValue]="null">{{ 'all' | l10n }}</option>
+        @for(cat of categories(); track cat) {
+          <option [value]="cat">{{ cat }}</option>
+        }
+      </select>
+    </div>
+    <!-- Price -->
+    <div>
+      <label for="price" class="block text-sm font-medium text-gray-700">{{ 'price' | l10n }}: {{ activityService.maxPrice() | currency:'EUR' }}</label>
+      <input type="range" id="price" min="0" max="30" [ngModel]="activityService.maxPrice()" (ngModelChange)="onPriceChange($event)" class="mt-1 w-full">
+    </div>
+    <!-- Rating -->
+    <div>
+      <label for="rating" class="block text-sm font-medium text-gray-700">{{ 'rating' | l10n }}: {{ activityService.minRating() }}+ ⭐</label>
+      <input type="range" id="rating" min="0" max="5" step="0.5" [ngModel]="activityService.minRating()" (ngModelChange)="onRatingChange($event)" class="mt-1 w-full">
+    </div>
+  </div>
+  <!-- Toggle Filters -->
+  <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+      <button (click)="toggleFree()" class="px-3 py-1 text-sm font-semibold rounded-full border transition-colors"
+        [class.bg-teal-500]="activityService.showOnlyFree()" [class.text-white]="activityService.showOnlyFree()">
+        💰 {{ 'free' | l10n }}
+      </button>
+      <button (click)="toggleRainy()" class="px-3 py-1 text-sm font-semibold rounded-full border transition-colors"
+        [class.bg-teal-500]="activityService.showRainyDayOk()" [class.text-white]="activityService.showRainyDayOk()">
+        ☔ {{ 'rainyDayOk' | l10n }}
+      </button>
+      <button (click)="toggleWheelchair()" class="px-3 py-1 text-sm font-semibold rounded-full border transition-colors"
+        [class.bg-teal-500]="activityService.showWheelchairAccessible()" [class.text-white]="activityService.showWheelchairAccessible()">
+        ♿ {{ 'wheelchair' | l10n }}
+      </button>
+      <button (click)="toggleStroller()" class="px-3 py-1 text-sm font-semibold rounded-full border transition-colors"
+        [class.bg-teal-500]="activityService.showStrollerAccessible()" [class.text-white]="activityService.showStrollerAccessible()">
+        👶 {{ 'stroller' | l10n }}
+      </button>
+  </div>
+</div>

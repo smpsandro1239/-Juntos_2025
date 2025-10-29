@@ -1,1 +1,27 @@
-full contents of src/components/login/login.component.html
+<div class="max-w-md mx-auto mt-10">
+  <div class="bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">{{ 'login' | l10n }}</h2>
+    <form #form="ngForm" (ngSubmit)="login(form)">
+      <div class="mb-4">
+        <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+        <input type="email" id="email" name="email" required email ngModel class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+      </div>
+      <div class="mb-6">
+        <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+        <input type="password" id="password" name="password" required ngModel class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+      </div>
+      @if(error()) {
+        <p class="text-red-500 text-sm text-center mb-4">{{ error() }}</p>
+      }
+      <button type="submit" [disabled]="form.invalid" class="w-full bg-teal-500 text-white py-2 rounded-md hover:bg-teal-600 disabled:bg-gray-400 transition-colors">{{ 'login' | l10n }}</button>
+    </form>
+  </div>
+
+  <div class="bg-white p-8 rounded-lg shadow-lg mt-6">
+      <h3 class="text-xl font-bold text-center text-gray-700 mb-4">{{ 'quickAccess' | l10n }}</h3>
+      <p class="text-center text-gray-600 text-sm mb-4">{{ 'quickAccessSub' | l10n }}</p>
+      <button (click)="loginAsPremium()" class="w-full bg-yellow-500 text-white py-2 rounded-md hover:bg-yellow-600 transition-colors">
+        ⭐ {{ 'loginAsPremium' | l10n }}
+      </button>
+  </div>
+</div>

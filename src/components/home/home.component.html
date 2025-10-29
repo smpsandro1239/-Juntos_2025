@@ -1,1 +1,48 @@
-full contents of src/components/home/home.component.html
+<div class="space-y-8">
+  <!-- Weather & Alerts -->
+  <section>
+    <app-weather-widget location="Lisboa" />
+    @if(isRainy()) {
+      <div class="mt-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-r-lg" role="alert">
+        <p class="font-bold">{{ 'rainyDay' | l10n }}</p>
+        <p>{{ 'rainyDaySuggestion' | l10n }} <button (click)="activateRainyFilter()" class="font-semibold underline hover:text-blue-800">{{ 'seeIndoorActivities' | l10n }}</button></p>
+      </div>
+    }
+    @if(isUvHigh()) {
+       <div class="mt-4 bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-r-lg" role="alert">
+        <p class="font-bold">{{ 'highUV' | l10n }}</p>
+        <p>{{ 'highUVSuggestion' | l10n }}</p>
+      </div>
+    }
+  </section>
+
+  <!-- Upcoming Events -->
+  <section>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ 'upcomingEvents' | l10n }}</h2>
+    <app-event-carousel [events]="upcomingEvents()" />
+  </section>
+
+  <!-- Main Discover Section -->
+  <section>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold text-gray-800">{{ 'discover' | l10n }}</h2>
+      <!-- View Toggle -->
+      <div class="flex space-x-1 bg-gray-200 p-1 rounded-lg">
+        <button (click)="viewMode.set('list')" class="px-3 py-1 rounded-md text-sm font-semibold" [class.bg-white]="viewMode() === 'list'" [class.text-gray-500]="viewMode() === 'map'">{{ 'listView' | l10n }}</button>
+        <button (click)="viewMode.set('map')" class="px-3 py-1 rounded-md text-sm font-semibold" [class.bg-white]="viewMode() === 'map'" [class.text-gray-500]="viewMode() === 'list'">{{ 'mapView' | l10n }}</button>
+      </div>
+    </div>
+    
+    <!-- Filters -->
+    <app-filters class="mb-6" />
+
+    <!-- Content -->
+    @if (viewMode() === 'list') {
+      <app-discover-feed [activities]="filteredActivities()" />
+    } @else {
+      <div class="h-96">
+        <app-map-view [locations]="filteredActivities().map(a => ({ name: a.name, lat: a.location.lat, lng: a.location.lng }))" />
+      </div>
+    }
+  </section>
+</div>

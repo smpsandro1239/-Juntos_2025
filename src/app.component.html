@@ -1,1 +1,85 @@
-full contents of src/app.component.html
+<div class="flex flex-col min-h-screen">
+  <!-- Offline Banner -->
+  @if (isOffline()) {
+    <div class="bg-yellow-400 text-center p-2 text-sm text-yellow-900 font-semibold">
+      {{ 'offlineMode' | l10n }}
+    </div>
+  }
+
+  <header class="bg-white shadow-md sticky top-0 z-40">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+      <a routerLink="/" class="text-2xl font-bold text-teal-600">+JUNTOS</a>
+      
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a routerLink="/" routerLinkActive="text-teal-600" [routerLinkActiveOptions]="{exact: true}" class="text-gray-600 hover:text-teal-600">{{ 'discover' | l10n }}</a>
+        <a routerLink="/community" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">{{ 'community' | l10n }}</a>
+        <a routerLink="/suppliers" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">{{ 'suppliers' | l10n }}</a>
+        @if (currentUser()) {
+          <a routerLink="/trip-planner" routerLinkActive="text-teal-600" class="text-gray-600 hover:text-teal-600">{{ 'tripPlanner' | l10n }}</a>
+        }
+      </div>
+
+      <div class="flex items-center space-x-4">
+        @if (currentUser(); as user) {
+          <div class="hidden md:flex items-center space-x-4">
+            <a routerLink="/profile" class="flex items-center text-gray-600 hover:text-teal-600">
+              <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center font-bold mr-2">
+                {{ user.name.charAt(0) }}
+              </div>
+              <span>{{ user.name }}</span>
+            </a>
+            <button (click)="logout()" class="text-gray-600 hover:text-teal-600">{{ 'logout' | l10n }}</button>
+          </div>
+        } @else {
+          <a routerLink="/login" class="hidden md:block text-gray-600 hover:text-teal-600">{{ 'login' | l10n }}</a>
+        }
+        
+        <!-- Language Dropdown -->
+        <div class="relative">
+          <button (click)="langDropdownOpen.set(!langDropdownOpen())" class="text-gray-600 hover:text-teal-600 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m4 1h5l-1.667 4.667M12 7V3m4 4V3m4 4h-4m-2 10v-2m0 0h-2m2 0h2M5 10v2m0 0h2m-2 0H3m2 0h2m7 7l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01M17 17l-2-2m0 0l-2 2m2-2v-2m0 2h.01"/></svg>
+          </button>
+          @if(langDropdownOpen()) {
+            <div class="absolute right-0 mt-2 py-2 w-24 bg-white rounded-md shadow-xl z-20">
+              <a (click)="setLang('pt')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-100 cursor-pointer">Português</a>
+              <a (click)="setLang('en')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-100 cursor-pointer">English</a>
+            </div>
+          }
+        </div>
+        <!-- Mobile menu button -->
+         <button (click)="mobileMenuOpen.set(!mobileMenuOpen())" class="md:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    @if(mobileMenuOpen()) {
+      <div class="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a routerLink="/" (click)="mobileMenuOpen.set(false)" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'discover' | l10n }}</a>
+        <a routerLink="/community" (click)="mobileMenuOpen.set(false)" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'community' | l10n }}</a>
+        <a routerLink="/suppliers" (click)="mobileMenuOpen.set(false)" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'suppliers' | l10n }}</a>
+        @if (currentUser()) {
+          <a routerLink="/trip-planner" (click)="mobileMenuOpen.set(false)" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'tripPlanner' | l10n }}</a>
+          <a routerLink="/profile" (click)="mobileMenuOpen.set(false)" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'profile' | l10n }}</a>
+          <button (click)="logout()" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'logout' | l10n }}</button>
+        } @else {
+          <a routerLink="/login" (click)="mobileMenuOpen.set(false)" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">{{ 'login' | l10n }}</a>
+        }
+      </div>
+    }
+  </header>
+
+  <main class="flex-grow container mx-auto p-6">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="bg-white mt-12">
+    <div class="container mx-auto px-6 py-4 text-center text-gray-600">
+      &copy; {{ currentYear }} +JUNTOS. {{ 'allRightsReserved' | l10n }}
+    </div>
+  </footer>
+
+  <app-toast />
+</div>

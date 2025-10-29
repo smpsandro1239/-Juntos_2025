@@ -1,179 +1,184 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { User } from '../models/user.model';
-import { ThematicSeries } from '../models/thematic-series.model';
-import { PointTransaction } from '../models/point-transaction.model';
 import { Order } from '../models/order.model';
-import { Album } from '../models/album.model';
+import { Album, AlbumPhoto } from '../models/album.model';
 import { TripPlan } from '../models/trip-plan.model';
+import { ActivityService } from './activity.service';
 import { L10nService } from './l10n.service';
-
-const MOCK_THEMATIC_SERIES: ThematicSeries[] = [
-    {
-        id: 1, name: 'Maravilhas de Lisboa', description: 'Descubra os ícones da cidade.',
-        stamps: [
-            { id: 2, name: 'Elétrico 28', imageUrl: 'https://picsum.photos/seed/stamp2/100/100', collected: false },
-            { id: 4, name: 'Pastéis de Belém', imageUrl: 'https://picsum.photos/seed/stamp4/100/100', collected: false },
-            { id: 6, name: 'Passeio no Tejo', imageUrl: 'https://picsum.photos/seed/stamp6/100/100', collected: false },
-        ]
-    },
-    {
-        id: 2, name: 'Amigos dos Animais', description: 'Conheça a vida selvagem.',
-        stamps: [
-            { id: 1, name: 'Oceanário', imageUrl: 'https://picsum.photos/seed/stamp1/100/100', collected: false },
-        ]
-    }
-];
-
 
 const MOCK_USER: User = {
   id: 1,
-  name: 'Ana Silva',
-  email: 'user@juntos.com',
+  name: 'Utilizador Teste',
+  email: 'teste@juntos.pt',
   isPremium: false,
   favorites: [1, 3],
-  points: {
-    balance: 850,
-    transactions: [
-      { id: 1, date: new Date(Date.now() - 86400000 * 5).toISOString(), description: 'Completou a missão "Primeira Avaliação"', points: 50 },
-      { id: 2, date: new Date(Date.now() - 86400000 * 2).toISOString(), description: 'Completou a missão "Explorador de Fim de Semana"', points: 100 },
-    ]
-  },
-  passport: {
-    thematicSeries: MOCK_THEMATIC_SERIES,
-    stampsCollected: [2]
-  },
-  albums: [
-    { id: 1, name: 'Fim de Semana em Belém', photos: [{ imageUrl: 'https://picsum.photos/seed/belem1/400/400', activityName: 'Fábrica de Pastéis de Belém' }, { imageUrl: 'https://picsum.photos/seed/belem2/400/400', activityName: 'Mosteiro dos Jerónimos' }] },
-    { id: 2, name: 'Verão 2024', photos: [] }
-  ],
+  points: { balance: 1250, transactions: [{id: 1, date: '2025-01-01', description: 'Bónus de Boas-Vindas', points: 100}] },
+  passport: { thematicSeries: [], stampsCollected: [1] },
+  albums: [{ id: 1, name: 'Fim de Semana em Lisboa', photos: [{imageUrl: 'https://picsum.photos/seed/album1/400/400', activityName: 'Oceanário de Lisboa'}] }],
   orders: [],
-  missions: [
-      { id: 1, title: 'Primeira Avaliação', description: 'Deixe uma avaliação numa atividade', points: 50, isCompleted: true },
-      { id: 2, title: 'Explorador de Fim de Semana', description: 'Adicione 3 atividades aos favoritos', points: 100, isCompleted: true },
-      { id: 3, title: 'Fotógrafo Amador', description: 'Crie o seu primeiro álbum de fotos', points: 75, isCompleted: false },
-      { id: 4, title: 'Membro da Comunidade', description: 'Faça o seu primeiro post na comunidade', points: 50, isCompleted: false },
-  ],
+  missions: [],
   savedPlans: [],
+};
+
+const MOCK_PREMIUM_USER: User = {
+    id: 2,
+    name: 'Família Premium',
+    email: 'premium@juntos.pt',
+    isPremium: true,
+    favorites: [2, 4],
+    points: { balance: 500, transactions: [] },
+    passport: { thematicSeries: [], stampsCollected: [1,3] },
+    albums: [],
+    orders: [],
+    missions: [],
+    savedPlans: [],
 };
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private l10nService = inject(L10nService);
+  private router = inject(Router);
+  private l10n = inject(L10nService);
   
-  private user = signal<User | null>(null);
-
-  isLoggedIn = computed(() => !!this.user());
-  currentUser = this.user.asReadonly();
-  isPremium = computed(() => this.user()?.isPremium ?? false);
-  userAlbums = computed(() => this.user()?.albums ?? []);
-  userOrders = computed(() => this.user()?.orders ?? []);
-  savedPlans = computed(() => this.user()?.savedPlans ?? []);
+  currentUser = signal<User | null>(null);
+  
+  isLoggedIn = computed(() => !!this.currentUser());
+  isPremium = computed(() => this.currentUser()?.isPremium ?? false);
+  userAlbums = computed(() => this.currentUser()?.albums ?? []);
+  userOrders = computed(() => this.currentUser()?.orders ?? []);
+  savedPlans = computed(() => this.currentUser()?.savedPlans ?? []);
+  
+  // UI state signals, managed here for convenience
+  langDropdownOpen = signal(false);
+  mobileMenuOpen = signal(false);
 
   constructor() {
-    // In a real app, you would check for a stored token/session
-  }
-  
-  translate(key: any, ...args: any[]): string {
-    return this.l10nService.translate(key, ...args);
+    // Check for logged-in user in storage on startup
+    const storedUser = localStorage.getItem('juntos_user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      // In a real app, you'd fetch fresh data. Here we just set it.
+      // We also need to populate dynamic data like missions and series
+      const activityService = inject(ActivityService);
+      user.missions = activityService.allMissions();
+      user.passport.thematicSeries = activityService.allThematicSeries();
+      this.currentUser.set(user);
+    }
   }
 
-  login(email: string, password: string): boolean {
-    if (email.toLowerCase() === 'user@juntos.com' && password === '123456') {
-      this.user.set(MOCK_USER);
+  login(email: string, pass: string): boolean {
+    let user: User | null = null;
+    if (email.toLowerCase() === MOCK_USER.email) {
+      user = MOCK_USER;
+    } else if (email.toLowerCase() === MOCK_PREMIUM_USER.email) {
+      user = MOCK_PREMIUM_USER;
+    }
+
+    if (user) {
+      localStorage.setItem('juntos_user', JSON.stringify(user));
+      const activityService = inject(ActivityService);
+      user.missions = activityService.allMissions();
+      user.passport.thematicSeries = activityService.allThematicSeries();
+      this.currentUser.set(user);
       return true;
     }
     return false;
   }
 
   logout(): void {
-    this.user.set(null);
-  }
-
-  toggleFavorite(activityId: number): void {
-    this.user.update(user => {
-      if (!user) return null;
-      const favorites = user.favorites;
-      const index = favorites.indexOf(activityId);
-      if (index > -1) {
-        favorites.splice(index, 1);
-      } else {
-        favorites.push(activityId);
-      }
-      return { ...user, favorites };
-    });
+    localStorage.removeItem('juntos_user');
+    this.currentUser.set(null);
+    this.router.navigate(['/']);
   }
   
   becomePremium(): void {
-      this.user.update(user => user ? ({ ...user, isPremium: true }) : null);
+    this.currentUser.update(user => {
+        if(!user) return null;
+        const updatedUser = { ...user, isPremium: true };
+        localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+        return updatedUser;
+    });
   }
 
+  toggleFavorite(activityId: number): void {
+      this.currentUser.update(user => {
+          if (!user) return null;
+          const favorites = user.favorites.includes(activityId)
+            ? user.favorites.filter(id => id !== activityId)
+            : [...user.favorites, activityId];
+          const updatedUser = { ...user, favorites };
+          localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+          return updatedUser;
+      });
+  }
+
+  addAlbum(name: string): void {
+      this.currentUser.update(user => {
+          if (!user) return null;
+          const newAlbum: Album = { id: Date.now(), name, photos: [] };
+          const updatedUser = { ...user, albums: [...user.albums, newAlbum] };
+          localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+          return updatedUser;
+      });
+  }
+
+  addPhotoToAlbum(albumId: number, photo: AlbumPhoto): void {
+      this.currentUser.update(user => {
+          if (!user) return null;
+          const albums = user.albums.map(album => 
+              album.id === albumId ? { ...album, photos: [...album.photos, photo] } : album
+          );
+          const updatedUser = { ...user, albums };
+          localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+          return updatedUser;
+      });
+  }
+  
+  getAlbumById = (id: number): Album | undefined => this.currentUser()?.albums.find(a => a.id === id);
+  
+  addOrder(order: Omit<Order, 'id'>): void {
+      this.currentUser.update(user => {
+          if (!user) return null;
+          const newOrder: Order = { ...order, id: Date.now() };
+          const updatedUser = { ...user, orders: [...user.orders, newOrder] };
+          localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+          return updatedUser;
+      });
+  }
+  
   spendPoints(amount: number, description: string): boolean {
-    if (!this.user() || this.user()!.points.balance < amount) {
-        return false;
+    if (!this.currentUser() || this.currentUser()!.points.balance < amount) {
+      return false;
     }
-    this.user.update(user => {
+    this.currentUser.update(user => {
         if (!user) return null;
-        const newTransaction: PointTransaction = {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            description: description,
-            points: -amount
-        };
-        return { 
+        const newTransaction = { id: Date.now(), date: new Date().toISOString(), description, points: -amount };
+        const updatedUser = { 
             ...user, 
             points: {
                 balance: user.points.balance - amount,
                 transactions: [...user.points.transactions, newTransaction]
             }
         };
+        localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+        return updatedUser;
     });
     return true;
   }
-
-  addAlbum(name: string): void {
-      this.user.update(user => {
-          if (!user) return null;
-          const newAlbum: Album = { id: Date.now(), name, photos: [] };
-          return { ...user, albums: [...user.albums, newAlbum] };
-      });
-  }
-
-  getAlbumById(id: number): Album | undefined {
-      return this.user()?.albums.find(a => a.id === id);
-  }
   
-  addPhotoToAlbum(albumId: number, photo: { imageUrl: string; activityName: string; }): void {
-      this.user.update(user => {
-          if (!user) return null;
-          const albums = user.albums.map(album => {
-              if (album.id === albumId) {
-                  return { ...album, photos: [...album.photos, photo] };
-              }
-              return album;
-          });
-          return { ...user, albums };
-      });
-  }
-  
-  addOrder(order: Omit<Order, 'id'>): void {
-      this.user.update(user => {
-          if (!user) return null;
-          const newOrder: Order = { ...order, id: Date.now() };
-          return { ...user, orders: [...user.orders, newOrder] };
-      });
-  }
-
-  getPlanById(id: number): TripPlan | undefined {
-    return this.user()?.savedPlans.find(p => p.id === id);
-  }
-
-  savePlan(plan: Omit<TripPlan, 'id'>): void {
-    this.user.update(user => {
-      if (!user) return null;
-      const newPlan: TripPlan = { ...plan, id: Date.now() };
-      return { ...user, savedPlans: [newPlan, ...user.savedPlans] };
+  saveTripPlan(plan: Omit<TripPlan, 'id'>): void {
+    this.currentUser.update(user => {
+        if (!user) return null;
+        const newPlan: TripPlan = { ...plan, id: Date.now() };
+        const updatedUser = { ...user, savedPlans: [...user.savedPlans, newPlan] };
+        localStorage.setItem('juntos_user', JSON.stringify(updatedUser));
+        return updatedUser;
     });
   }
+
+  getPlanById = (id: number): TripPlan | undefined => this.currentUser()?.savedPlans.find(p => p.id === id);
+
+  translate = (key: keyof import('../i18n/en').en, ...args: any[]): string => this.l10n.translate(key, ...args);
 }
